@@ -37,9 +37,6 @@ export function activate(context: vscode.ExtensionContext) {
 	const config: TDitoConfig = getDitoConfiguration();
 	context.subscriptions.push(...initStatusBarItems());
 
-	const outputChannel = vscode.window.createOutputChannel('TDS-Dito', { log: true });
-
-
 	// const afterInsert = vscode.commands.registerCommand('tds-dito.afterInsert', async (response: CompletionResponse) => {
 	// 	const { request_id, completions } = response;
 	// 	const params = {
