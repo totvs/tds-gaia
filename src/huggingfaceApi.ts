@@ -4,7 +4,9 @@ import { HfInference } from "@huggingface/inference";
 import { HfAgent, LLMFromHub, defaultTools } from '@huggingface/agents';
 import { Credentials, whoAmI } from "@huggingface/hub";
 
-export const USER_TOKEN_BRODAO = "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";
+// USER_TOKEN_BRODAO = "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";
+
+//huggingface-cli login --token %HUGGINGFACE_TOKEN% --add-to-git-credential
 
 export namespace HuggingFaceApi {
     let _token: string;
@@ -42,7 +44,6 @@ export namespace HuggingFaceApi {
             } else {
                 console.log("You are logged in as " + info.name + " (organization)");
             }
-Zjt7~'kBGV^3&L,
             result = true;
         }).catch((reason: any) => {
             console.error(reason);

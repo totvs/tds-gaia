@@ -16,3 +16,5 @@ sig
 
 **/assistant-cache
 **/assistant-binaries
+
+.env

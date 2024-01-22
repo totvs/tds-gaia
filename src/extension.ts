@@ -6,12 +6,13 @@ import {
 	ServerOptions,
 	TransportKind
 } from 'vscode-languageclient/node';
-import { TemplateKey, templates } from './configTemplates';
 import { readFile } from 'fs';
 import { homedir } from 'os';
 import * as path from 'path';
 import * as hf from './huggingfaceApi';
 import { CancellationToken } from 'vscode';
+import { initStatusBarItems, updateStatusBarItems } from './statusBar';
+import { TDitoConfig, getDitoConfiguration } from './configTemplates';
 
 interface Completion {
 	generated_text: string;
@@ -32,8 +33,9 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	ctx = context;
-	handleConfigTemplateChange(context);
-	const config = vscode.workspace.getConfiguration("llm");
+	handleConfigChange(context);
+	const config: TDitoConfig = getDitoConfiguration();
+	context.subscriptions.push(...initStatusBarItems());
 
 	const outputChannel = vscode.window.createOutputChannel('TDS-Dito', { log: true });
 
@@ -178,7 +180,8 @@ export function activate(context: vscode.ExtensionContext) {
 		},
 
 	};
-	const documentFilter = config.get("documentFilter") as DocumentFilter | DocumentFilter[];
+
+	const documentFilter = config.documentFilter;
 	vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
 }
 
@@ -189,16 +192,17 @@ export function deactivate() {
 	return hf.HuggingFaceApi.stop();
 }
 
-function handleConfigTemplateChange(context: vscode.ExtensionContext) {
+function handleConfigChange(context: vscode.ExtensionContext) {
 	const listener = vscode.workspace.onDidChangeConfiguration(async event => {
-		if (event.affectsConfiguration('tds-dito.configTemplate')) {
-			const config = vscode.workspace.getConfiguration("llm");
-			const configKey = config.get("configTemplate") as TemplateKey;
-			const template = templates[configKey];
-			if (template) {
-				const updatePromises = Object.entries(template).map(([key, val]) => config.update(key, val, vscode.ConfigurationTarget.Global));
-				await Promise.all(updatePromises);
-			}
+		if (event.affectsConfiguration('tds-dito')) {
+			updateStatusBarItems();
+			// const config = vscode.workspace.getConfiguration("llm");
+			// const configKey = config.get("configTemplate") as TemplateKey;
+			// const template = templates[configKey];
+			// if (template) {
+			// 	const updatePromises = Object.entries(template).map(([key, val]) => config.update(key, val, vscode.ConfigurationTarget.Global));
+			// 	await Promise.all(updatePromises);
+			// }
 		}
 	});
 	context.subscriptions.push(listener);
