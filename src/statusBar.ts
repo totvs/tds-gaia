@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
-import { TDitoConfig, getDitoConfiguration } from "./configTemplates";
+import { TDitoConfig, getDitoConfiguration, getDitoUser } from "./config";
+import { WhoAmI, WhoAmIOrg, WhoAmIUser } from "@huggingface/hub";
 
 let statusBarItem: vscode.StatusBarItem;
 
@@ -31,15 +32,35 @@ function initStatusBarItem(): vscode.StatusBarItem {
 }
 
 function updateStatusBarItem(): void {
-  const config: TDitoConfig = getDitoConfiguration();
+  const user: WhoAmI | undefined = getDitoUser();
+  statusBarItem.text = "Dito: ";
 
-  if (config.userLogin) {
-    statusBarItem.text = `User: $(config.userLogin) `;
+  if (user) {
+    statusBarItem.text += `User: $(config.userLogin) `;
     statusBarItem.command = "tds-dito.logout";
+    statusBarItem.tooltip = buildTooltip(user as WhoAmIUser);
   } else {
-    statusBarItem.text = `Need login `;
+    statusBarItem.text += `Need login`;
     statusBarItem.command = "tds-dito.login";
+    statusBarItem.tooltip = "Acione para efetuar a identificação";
   }
 
   statusBarItem.show();
+}
+
+function buildTooltip(user: WhoAmIUser) {
+  let result: string = "";
+
+  result += `Tipo: ${user.type}\n`;
+  result += `Nome: ${user.fullname} [${user.name}]\n`;
+  result += `Id: ${user.id}\n`;
+
+  if (user.orgs.length) {
+    result += `Organizações\n`;
+    user.orgs.forEach((org: WhoAmIOrg) => {
+      result += `${org.name}\n`;
+    })
+  }
+
+  return result;
 }

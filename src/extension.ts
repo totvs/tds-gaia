@@ -12,16 +12,9 @@ import * as path from 'path';
 import * as hf from './huggingfaceApi';
 import { CancellationToken } from 'vscode';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
-import { TDitoConfig, getDitoConfiguration } from './configTemplates';
-
-interface Completion {
-	generated_text: string;
-}
-
-interface CompletionResponse {
-	request_id: String,
-	completions: Completion[],
-}
+import { TDitoConfig, getDitoConfiguration, getDitoUser } from './config';
+import { inlineCompletionItemProvider } from './completionItemProvider';
+import { capitalize } from './util';
 
 let ctx: vscode.ExtensionContext;
 //let client: HuggingfaceApi;
@@ -52,26 +45,20 @@ export function activate(context: vscode.ExtensionContext) {
 	const login = vscode.commands.registerCommand('tds-dito.login', async (...args) => {
 		const apiToken = await context.secrets.get('apiToken');
 		if (apiToken !== undefined) {
-			vscode.window.showInformationMessage('TDS-Dito: Already logged in');
-			return;
+			hf.HuggingFaceApi.start(apiToken);
+			if (await hf.HuggingFaceApi.login()) {
+				//vscode.window.showInformationMessage(`TDS-Dito: Logged in successfully`);
+				vscode.window.showInformationMessage(`TDS-Dito: Hi ${capitalize(getDitoUser()?.name || "<not logged>")}. I am ready to help you in any way possible.`);
+				return;
+			}
 		}
-		const tokenPath = path.join(homedir(), ".totvsls", "token");
-		const token: string | undefined = await new Promise((res) => {
-			readFile(tokenPath, (err, data) => {
-				if (err) {
-					res(undefined);
-				}
-				const content = data.toString();
-				res(content.trim());
-			});
-		});
-		if (token !== undefined) {
-			hf.HuggingFaceApi.start(token);
-			await hf.HuggingFaceApi.login();
-			await context.secrets.store('apiToken', token);
-			vscode.window.showInformationMessage(`TDS-Dito: Logged in from cache: ~/.totvsls/token ${tokenPath}`);
-			return;
+
+		if (args) {
+			if (args[0]) {
+				return;
+			}
 		}
+
 		const input = await vscode.window.showInputBox({
 			prompt: 'Please enter your API token:',
 			placeHolder: 'Your token goes here ...'
@@ -101,7 +88,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const text: string = "Gerar código para varrer um array";
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.selection.active.lineText);
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.document.getText());
-		hf.HuggingFaceApi.generateCode(text);
+		hf.HuggingFaceApi._generateCode(text);
 	});
 
 	context.subscriptions.push(attribution);
@@ -111,75 +98,12 @@ export function activate(context: vscode.ExtensionContext) {
 	// });
 	// context.subscriptions.push(attribution);
 
-	const provider: vscode.InlineCompletionItemProvider = {
-		async provideInlineCompletionItems(document, position, context, token) {
-			const config = vscode.workspace.getConfiguration("llm");
-			const autoSuggest = config.get("enableAutoSuggest") as boolean;
-			const requestDelay = config.get("requestDelay") as number;
-			if (context.triggerKind === vscode.InlineCompletionTriggerKind.Automatic && !autoSuggest) {
-				return;
-			}
-			if (position.line < 0) {
-				return;
-			}
-			if (requestDelay > 0) {
-				const cancelled = await delay(requestDelay, token);
-				if (cancelled) {
-					return
-				}
-			}
-			let params = {
-				position,
-				//textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
-				model: config.get("modelIdOrEndpoint") as string,
-				tokens_to_clear: config.get("tokensToClear") as string[],
-				api_token: await ctx.secrets.get('apiToken'),
-				request_params: {
-					max_new_tokens: config.get("maxNewTokens") as number,
-					temperature: config.get("temperature") as number,
-					do_sample: true,
-					top_p: 0.95,
-				},
-				fim: config.get("fillInTheMiddle") as number,
-				context_window: config.get("contextWindow") as number,
-				tls_skip_verify_insecure: config.get("tlsSkipVerifyInsecure") as boolean,
-				ide: "vscode",
-				tokenizer_config: config.get("tokenizer") as object | null,
-			};
-			try {
-				const response: CompletionResponse = await hf.HuggingFaceApi.getCompletions(params, token);
-
-				const items = [];
-				for (const completion of response.completions) {
-					items.push({
-						insertText: completion.generated_text,
-						range: new vscode.Range(position, position),
-						command: {
-							title: 'afterInsert',
-							command: 'tds-dito.afterInsert',
-							arguments: [response],
-						}
-					});
-				}
-
-				return {
-					items,
-				};
-			} catch (e) {
-				const err_msg = (e as Error).message;
-				if (err_msg.includes("is currently loading")) {
-					vscode.window.showWarningMessage(err_msg);
-				} else if (err_msg !== "Canceled") {
-					vscode.window.showErrorMessage(err_msg);
-				}
-			}
-
-		},
-
-	};
-
+	const provider: vscode.InlineCompletionItemProvider = inlineCompletionItemProvider(context);
 	const documentFilter = config.documentFilter;
-	vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
+	const inlineRegister: vscode.Disposable = vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
+	context.subscriptions.push(inlineRegister);
+
+	vscode.commands.executeCommand("tds-dito.login", [true])
 }
 
 export function deactivate() {
@@ -202,6 +126,7 @@ function handleConfigChange(context: vscode.ExtensionContext) {
 			// }
 		}
 	});
+
 	context.subscriptions.push(listener);
 }
 
@@ -287,30 +212,4 @@ export default async function highlightStackAttributions(): Promise<void> {
 	setTimeout(() => {
 		vscode.window.activeTextEditor?.setDecorations(decorationType, []);
 	}, 5000);
-}
-
-async function delay(milliseconds: number, token: vscode.CancellationToken): Promise<boolean> {
-	/**
-	 * Wait for a number of milliseconds, unless the token is cancelled.
-	 * It is used to delay the request to the server, so that the user has time to type.
-	 *
-	 * @param milliseconds number of milliseconds to wait
-	 * @param token cancellation token
-	 * @returns a promise that resolves with false after N milliseconds, or true if the token is cancelled.
-	 *
-	 * @remarks This is a workaround for the lack of a debounce function in vscode.
-	*/
-	return new Promise<boolean>((resolve) => {
-		const interval = setInterval(() => {
-			if (token.isCancellationRequested) {
-				clearInterval(interval);
-				resolve(true)
-			}
-		}, 10); // Check every 10 milliseconds for cancellation
-
-		setTimeout(() => {
-			clearInterval(interval);
-			resolve(token.isCancellationRequested)
-		}, milliseconds);
-	});
 }

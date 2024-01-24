@@ -90,17 +90,42 @@
       {
         "title": "TDS-Dito",
         "properties": {
+          "tds-dito.verbose" : {
+          "scope": "application",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "%tds.package.trace.vscode.server%",
+          "enumDescriptions": [
+            "%tds.package.trace.vscode.off%",
+            "%tds.package.trace.vscode.messages%",
+            "%tds.package.trace.vscode.verbose%"
+          ]
+        },
           "tds-dito.version": {
+            "scope": "application",
             "type": "string",
             "value": "0.0.1",
             "description": "Schema Configuration Version"
           },
+          "tds-dito.endPoint": {
+            "scope": "application",
+            "type": "string",
+            "default": "https://bgit1s84n6bop23h.us-east-1.aws.endpoints.huggingface.cloud",
+            "description": "endPoint"
+          },
           "tds-dito.userLogin": {
+            "scope": "application",
             "type": "boolean",
             "default": false,
             "description": "User login status"
           },
           "tds-dito.documentFilter": {
+            "scope": "application",
             "type": [
               "object",
               "array"
@@ -114,6 +139,78 @@
               }
             ],
             "description": "Filter documents to enable suggestions for"
+          },
+          "tds-dito.enableAutoSuggest": {
+            "scope": "application",
+            "type": "boolean",
+            "default": true,
+            "description": "enableAutoSuggest"
+          },
+          "tds-dito.requestDelay": {
+            "scope": "application",
+            "type": "number",
+            "default": 30,
+            "description": "requestDelay"
+          },
+          "tds-dito.tokensToClear": {
+            "scope": "application",
+            "type": "array",
+            "default": [],
+            "description": "tokensToClear"
+          },
+          "tds-dito.maxNewTokens": {
+            "scope": "application",
+            "type": "number",
+            "default": 128,
+            "description": "maxNewTokens"
+          },
+          "tds-dito.temperature": {
+            "scope": "application",
+            "type": "number",
+            "default": 0.2,
+            "description": "temperature"
+          },
+          "tds-dito.top_p": {
+            "scope": "application",
+            "type": "number",
+            "default": 0.95,
+            "description": "top_p"
+          },
+          "tds-dito.top_k": {
+            "scope": "application",
+            "type": "number",
+            "default": 50,
+            "description": "top_p"
+          },
+          "tds-dito.stop_sequence": {
+            "scope": "application",
+            "type": "array",
+            "default": [],
+            "description": "stop_sequence"
+          },
+          "tds-dito.fillInTheMiddle": {
+            "scope": "application",
+            "type": "number",
+            "default": 1,
+            "description": "fillInTheMiddle"
+          },
+          "tds-dito.contextWindow": {
+            "scope": "application",
+            "type": "number",
+            "default": 0,
+            "description": "contextWindow"
+          },
+          "tds-dito.tlsSkipVerifyInsecure": {
+            "scope": "application",
+            "type": "boolean",
+            "default": false,
+            "description": "contextWindow"
+          },
+          "tds-dito.tokenizer": {
+            "scope": "application",
+            "type": "object",
+            "default": {},
+            "description": "tokenizer"
           }
         }
       }
@@ -145,8 +242,10 @@
     "@huggingface/inference": "^2.6.4",
     "@vscode/l10n": "^0.0.18",
     "@vscode/l10n-dev": "^0.0.31",
+    "@xenova/transformers": "^2.14.0",
     "undici": "^6.4.0",
-    "vscode-languageclient": "^9.0.1"
+    "vscode-languageclient": "^9.0.1",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",

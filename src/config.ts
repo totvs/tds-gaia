@@ -1,3 +1,4 @@
+import { AuthInfo, WhoAmI, WhoAmIOrg, WhoAmIUser } from '@huggingface/hub';
 import * as vscode from 'vscode';
 
 // export interface Config {
@@ -137,28 +138,85 @@ import * as vscode from 'vscode';
           }
 */
 
+let customConfig: TDitoCustomConfig = {};
+
+//deve ser espelho do definido no package.json
+//outras configurações, de preferência não persistentes, devem ser efetuadas em TDitoCustomConfig
 export type TDitoConfig = {
-    version: string;
-    modelIdOrEndpoint: string;
-    documentFilter: vscode.DocumentFilter;
-    //     "fillInTheMiddle.enabled": boolean;
-    //     "fillInTheMiddle.prefix": string;
-    //     "fillInTheMiddle.middle": string;
-    //     "fillInTheMiddle.suffix": string;
-    //     temperature: number;
-    //     contextWindow: number;
-    //     tokensToClear: string[];
-    //     tokenizer: TokenizerPathConfig | TokenizerRepoConfig | TokenizerUrlConfig | null;
-    userLogin: boolean,
+  version: string;
+  modelIdOrEndpoint: string;
+  endPoint: string;
+  documentFilter: vscode.DocumentFilter;
+  //     "fillInTheMiddle.enabled": boolean;
+  //     "fillInTheMiddle.prefix": string;
+  //     "fillInTheMiddle.middle": string;
+  //     "fillInTheMiddle.suffix": string;
+  //     temperature: number;
+  //     contextWindow: number;
+  //     tokensToClear: string[];
+  //     tokenizer: TokenizerPathConfig | TokenizerRepoConfig | TokenizerUrlConfig | null;
+  userLogin: boolean;
+  enableAutoSuggest: boolean
+  requestDelay: number;
+  tokensToClear: string[];
+  maxNewTokens: number;
+  temperature: number;
+  fillInTheMiddle: number;
+  contextWindow: number;
+  tlsSkipVerifyInsecure: boolean;
+  tokenizer: object | null;
+  top_p: number,
+  top_k: number,
+  stop_sequence: string[]
+}
+
+export type TDitoCustomConfig = {
+  currentUser?: WhoAmI
 }
 
 export function getDitoConfiguration(): TDitoConfig {
-    const config: any = vscode.workspace.getConfiguration("tds-dito");
+  const config: any = vscode.workspace.getConfiguration("tds-dito");
 
-    return config;
+  return config;
 
-    // "bigcode/starcoder": StarCoderConfig,
-    // "codellama/CodeLlama-13b-hf": CodeLlama13BConfig,
-    // "Phind/Phind-CodeLlama-34B-v2": PhindCodeLlama34Bv2Config,
-    // "WizardLM/WizardCoder-Python-34B-V1.0": WizardCoderPython34Bv1Config,
+  // "bigcode/starcoder": StarCoderConfig,
+  // "codellama/CodeLlama-13b-hf": CodeLlama13BConfig,
+  // "Phind/Phind-CodeLlama-34B-v2": PhindCodeLlama34Bv2Config,
+  // "WizardLM/WizardCoder-Python-34B-V1.0": WizardCoderPython34Bv1Config,
+}
+
+//Informar key sem prefixo 'tds-dito'
+function setDitoConfiguration(key: keyof TDitoConfig, newValues: string | boolean | number | []): void {
+  const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("tds-dito");
+
+  config.update(key, newValues, vscode.ConfigurationTarget.Global);
+
+  return;
+
+  // "bigcode/starcoder": StarCoderConfig,
+  // "codellama/CodeLlama-13b-hf": CodeLlama13BConfig,
+  // "Phind/Phind-CodeLlama-34B-v2": PhindCodeLlama34Bv2Config,
+  // "WizardLM/WizardCoder-Python-34B-V1.0": WizardCoderPython34Bv1Config,
+}
+
+function setDitoCustomConfiguration(key: keyof TDitoCustomConfig, newValue: any): void {
+  customConfig[key] = newValue;
+}
+
+export function setDitoUser(info: WhoAmI & {
+  auth: AuthInfo;
+} | undefined) {
+
+  setDitoCustomConfiguration("currentUser", info);
+  setDitoConfiguration("userLogin", info as WhoAmI !== undefined);
+}
+
+export function getDitoUser(): WhoAmI | undefined {
+
+  return customConfig["currentUser"];
+}
+
+export function isDitoLogged(): boolean {
+
+  return getDitoUser() !== undefined;
 }
