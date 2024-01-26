@@ -4,6 +4,8 @@ import { getDitoConfiguration } from "./config";
 import * as hf from "./huggingfaceApi";
 import { text } from "stream/consumers";
 
+
+//acionamento manual: F1 +  editor.action.inlineSuggest.trigger
 export function inlineCompletionItemProvider(context: vscode.ExtensionContext): vscode.InlineCompletionItemProvider {
 
     const provider: vscode.InlineCompletionItemProvider = {
@@ -18,22 +20,47 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
             if (position.line < 0) {
                 return;
             }
+
             if (requestDelay > 0) {
                 const cancelled = await delay(requestDelay, token);
                 if (cancelled) {
-                    //return
+                    return
                 }
             }
 
-            let line: number = position.line;
-            let textLine: vscode.TextLine = document.lineAt(line);
-            while ((line > 0) && textLine.isEmptyOrWhitespace) {
+            const textBeforeCursor: string[] = [];
+            const textAfterCursor: string[] = [];
+            const textSelected: string = "";
+
+            let line: number = 0;
+
+            const validLine = (textLine: vscode.TextLine) => {
+
+                return !textLine.isEmptyOrWhitespace &&
+                    !textLine.text.trim().startsWith("//");
+            };
+
+            //verifica se há texto selecionado (ocorre na invocação manual)
+            if (context.selectedCompletionInfo) {
+                //a inserção ocorre da última linha para a primeira
+                textBeforeCursor.push(context.selectedCompletionInfo.text);
+            }
+
+            //busca por uma linha vazia antes da linha corrente
+            line = position.line - 1;
+            while ((line > 0) && validLine(document.lineAt(line))) {
+                //a inserção ocorre da última linha para a primeira
+                textBeforeCursor.push(document.lineAt(line).text);
                 line--;
-                textLine = document.lineAt(line);
             }
-            if (textLine.isEmptyOrWhitespace) {
-                return;
+
+            //busca por uma linha vazia depois da linha corrente
+            line = position.line + 1;
+            while ((line < document.lineCount) && validLine(document.lineAt(line))) {
+                textAfterCursor.push(document.lineAt(line).text);
+                line++;
             }
+
             // let params = {
             //     position,
             //     //textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
@@ -53,13 +80,8 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
             //     tokenizer_config: config.get("tokenizer") as object | null,
             // };
             try {
-                //const text: string = textLine.text;
-                //const text = "<fim_prefix><fim_suffix>\n// Cria browse\noBrowse := MsBrGetDBase():New( 0, 0, 260, 170,,,, oDlg,,,,,,,,,,,, .F., \"\", .T.,, .F.,,, )<fim_middle>";
-                const textBeforeCursor: string = "// Cria array com dados\naDados := {}\naadd(aDados, {\"01\",\"Nome 01\",\"Descri\ufffd\ufffdo 01\",\"Conteu1\"})\naadd(aDados, {\"02\",\"Nome 02\",\"Descri\ufffd\ufffdo 02\",\"Conteu2\"})"; 
-                const textAfterCursor: string = "";
-
-                const response: any = //hf.CompletionResponse | undefined =
-                    await hf.HuggingFaceApi._getCompletions3(textBeforeCursor, textAfterCursor);
+                const response: hf.CompletionResponse =
+                    await hf.HuggingFaceApi.getCompletions(textBeforeCursor.reverse().join("\n"), textAfterCursor.join("\n"));
 
                 const items = [];
                 if (response !== undefined && response.completions.length) {
@@ -80,12 +102,15 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
                     items,
                 };
             } catch (e) {
-                const err_msg = (e as Error).message;
-                if (err_msg.includes("is currently loading")) {
-                    vscode.window.showWarningMessage(err_msg);
-                } else if (err_msg !== "Canceled") {
-                    vscode.window.showErrorMessage(err_msg);
+                const err_msg = (e as Error);
+
+                if (err_msg.message.includes("is currently loading")) {
+                    vscode.window.showWarningMessage(err_msg.message);
+                } else if (err_msg.message !== "Canceled") {
+                    vscode.window.showErrorMessage(err_msg.message);
                 }
+
+                console.error(e);
             }
         },
 
