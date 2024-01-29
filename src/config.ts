@@ -144,6 +144,7 @@ let customConfig: TDitoCustomConfig = {};
 //outras configurações, de preferência não persistentes, devem ser efetuadas em TDitoCustomConfig
 export type TDitoConfig = {
   version: string;
+  showBanner: boolean;
   modelIdOrEndpoint: string;
   endPoint: string;
   documentFilter: vscode.DocumentFilter;
@@ -168,6 +169,20 @@ export type TDitoConfig = {
   top_p: number,
   top_k: number,
   stop_sequence: string[]
+}
+
+const EMPTY_USER: WhoAmI = {
+  id: "",
+  type: "user",
+  email: "",
+  emailVerified: false,
+  isPro: false,
+  orgs: [],
+  name: "<not logged>",
+  fullname: "<not logged>",
+  canPay: false,
+  avatarUrl: "",
+  periodEnd: null
 }
 
 export type TDitoCustomConfig = {
@@ -213,10 +228,15 @@ export function setDitoUser(info: WhoAmI & {
 
 export function getDitoUser(): WhoAmI | undefined {
 
-  return customConfig["currentUser"];
+  return customConfig["currentUser"] || EMPTY_USER;
 }
 
 export function isDitoLogged(): boolean {
 
   return getDitoUser() !== undefined;
+}
+
+export function isDitoShowBanner(): boolean {
+
+  return getDitoConfiguration().showBanner
 }

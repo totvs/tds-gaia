@@ -1,23 +1,11 @@
 import * as vscode from 'vscode';
-import {
-	DocumentFilter,
-	LanguageClient,
-	LanguageClientOptions,
-	ServerOptions,
-	TransportKind
-} from 'vscode-languageclient/node';
-import { readFile } from 'fs';
-import { homedir } from 'os';
-import * as path from 'path';
 import * as hf from './huggingfaceApi';
-import { CancellationToken } from 'vscode';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
 import { TDitoConfig, getDitoConfiguration, getDitoUser } from './config';
 import { inlineCompletionItemProvider } from './completionItemProvider';
 import { capitalize } from './util';
 
 let ctx: vscode.ExtensionContext;
-//let client: HuggingfaceApi;
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -30,20 +18,10 @@ export function activate(context: vscode.ExtensionContext) {
 	const config: TDitoConfig = getDitoConfiguration();
 	context.subscriptions.push(...initStatusBarItems());
 
-	// const afterInsert = vscode.commands.registerCommand('tds-dito.afterInsert', async (response: CompletionResponse) => {
-	// 	const { request_id, completions } = response;
-	// 	const params = {
-	// 		request_id,
-	// 		accepted_completion: 0,
-	// 		shown_completions: [0],
-	// 		completions,
-	// 	};
-	// 	await client.sendRequest("llm-ls/acceptCompletion", params);
-	// });
-	// context.subscriptions.push(afterInsert);
-
+	//args[0], bool, quando true, ignora processamento se  login automático falhar
 	const login = vscode.commands.registerCommand('tds-dito.login', async (...args) => {
-		const apiToken = await context.secrets.get('apiToken');
+		let apiToken = await context.secrets.get('apiToken');
+
 		if (apiToken !== undefined) {
 			hf.HuggingFaceApi.start(apiToken);
 			if (await hf.HuggingFaceApi.login()) {
@@ -54,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		if (args) {
-			if (args[0]) {
+			if (args[0]) { //indica que login automático
 				return;
 			}
 		}

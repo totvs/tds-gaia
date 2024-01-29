@@ -28,38 +28,12 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
                 }
             }
 
-            const textBeforeCursor: string[] = [];
-            const textAfterCursor: string[] = [];
-            const textSelected: string = "";
+            let textBeforeCursor: string = "";
+            let textAfterCursor: string = "";
+            const offset = document.offsetAt(position);
 
-            let line: number = 0;
-
-            const validLine = (textLine: vscode.TextLine) => {
-
-                return !textLine.isEmptyOrWhitespace &&
-                    !textLine.text.trim().startsWith("//");
-            };
-
-            //verifica se há texto selecionado (ocorre na invocação manual)
-            if (context.selectedCompletionInfo) {
-                //a inserção ocorre da última linha para a primeira
-                textBeforeCursor.push(context.selectedCompletionInfo.text);
-            }
-
-            //busca por uma linha vazia antes da linha corrente
-            line = position.line - 1;
-            while ((line > 0) && validLine(document.lineAt(line))) {
-                //a inserção ocorre da última linha para a primeira
-                textBeforeCursor.push(document.lineAt(line).text);
-                line--;
-            }
-
-            //busca por uma linha vazia depois da linha corrente
-            line = position.line + 1;
-            while ((line < document.lineCount) && validLine(document.lineAt(line))) {
-                textAfterCursor.push(document.lineAt(line).text);
-                line++;
-            }
+            textBeforeCursor = document.getText().substring(0, offset);
+            textAfterCursor = document.getText().substring(offset + 1);
 
             // let params = {
             //     position,
@@ -81,7 +55,7 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
             // };
             try {
                 const response: hf.CompletionResponse =
-                    await hf.HuggingFaceApi.getCompletions(textBeforeCursor.reverse().join("\n"), textAfterCursor.join("\n"));
+                    await hf.HuggingFaceApi.getCompletions(textBeforeCursor, textAfterCursor);
 
                 const items = [];
                 if (response !== undefined && response.completions.length) {

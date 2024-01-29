@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { HfInference, HfInferenceEndpoint, Options, TextGenerationArgs, TextGenerationOutput } from "@huggingface/inference";
 import { HfAgent, LLMFromHub, defaultTools } from '@huggingface/agents';
 import { AuthInfo, Credentials, WhoAmI, WhoAmIOrg, WhoAmIUser, whoAmI } from "@huggingface/hub";
-import { TDitoConfig, getDitoConfiguration, getDitoUser, isDitoLogged, setDitoUser } from "./config";
+import { TDitoConfig, getDitoConfiguration, getDitoUser, isDitoLogged, isDitoShowBanner, setDitoUser } from "./config";
 import { fetch } from "undici";
 import { capitalize } from "./util";
 import * as fse from 'fs-extra';
@@ -23,7 +23,9 @@ export interface CompletionResponse {
 }
 
 export namespace HuggingFaceApi {
-    let outputChannel: vscode.OutputChannel = vscode.window.createOutputChannel('TDS-Dito', { log: true });
+    const outputChannel: vscode.OutputChannel = vscode.window.createOutputChannel('TDS-Dito', { log: true });
+    let fistStart = true;
+
     // prefixo _ indica envolvidas com a API HF
     let _token: string;
     let _inference: HfInference;
@@ -31,12 +33,58 @@ export namespace HuggingFaceApi {
     let _model: string = getDitoConfiguration().endPoint;
     let _endPoint: HfInferenceEndpoint;
 
+    function showBanner(force: boolean = false) {
+        const showBanner = isDitoShowBanner();
+
+        if ((fistStart && showBanner) || force) {
+
+            let ext = vscode.extensions.getExtension("TOTVS.tds-dito-vscode");
+            // prettier-ignore
+            {
+                const lines: string[] = [
+                    "",
+                    "--------------------------------v---------------------------------------------",
+                    "     ////    //  //////  ////// |  TDS-Dito, your partner in AdvPL programming",
+                    "    //  //        //    //  //  |  Version " + ext?.packageJSON["version"] + " (BETA)",
+                    "   //  //  //    //    //  //   |  TOTVS Technology",
+                    "  //  //  //    //    //  //    |",
+                    " ////    //    //    //////     |  https://github.com/totvs/tds-dito",
+                    "--------------------------------^----------------------------------------------",
+                    "",
+                ];
+
+                outputChannel.appendLine(lines.join("\n"));
+            }
+
+        }
+
+        fistStart = false;
+        // prettier-ignore
+        // {
+        //     appLine("-------------------------------------------------------------------------------");
+        //     appLine("SOBRE O USO DE CHAVES E TOKENS DE COMPILAÇÃO                                   ");
+        //     appLine("");
+        //     appLine("As chaves de compilação ou tokens de compilação empregados na construção do    ");
+        //     appLine("Protheus e suas funcionalidades, são de uso restrito dos desenvolvedores de    ");
+        //     appLine("cada módulo.                                                                   ");
+        //     appLine("");
+        //     appLine("Em caso de mau uso destas chaves ou tokens, por qualquer outra parte, que não  ");
+        //     appLine("a referida acima, a mesma irá se responsabilizar, direta ou regressivamente,   ");
+        //     appLine("única e exclusivamente, por todos os prejuízos, perdas, danos, indenizações,   ");
+        //     appLine("multas, condenações judiciais, arbitrais e administrativas e quaisquer outras  ");
+        //     appLine("despesas relacionadas ao mau uso, causados tanto à TOTVS quanto a terceiros,   ");
+        //     appLine("eximindo a TOTVS de toda e qualquer responsabilidade.                          ");
+        //     appLine("-------------------------------------------------------------------------------");
+        // }
+    }
+
     export function start(token: string) {
         // logging.set_verbosity_error()
         // logging.set_verbosity_warning()
         // logging.set_verbosity_info()
         // logging.set_verbosity_debug()
         const config = getDitoConfiguration();
+        showBanner()
 
         _inference = new HfInference(token);
         _endPoint = _inference.endpoint(config.endPoint);
@@ -69,14 +117,17 @@ export namespace HuggingFaceApi {
                 outputChannel.appendLine("You are using an app token, which is not supported by the extension. Please use an API token instead.");
                 return;
             }
-            outputChannel.appendLine(`"Logged in as ${capitalize(info.name)}`);
 
-            if (info.type === "user") {
-            } else {
-                outputChannel.appendLine(`"Organizations: (${(info as any as WhoAmIUser).orgs.map((org: WhoAmIOrg) => {
-                    return org.name;
-                }).join(", ")})`);
+            message = `Logged in as ${capitalize(info.name)}\n`;
+
+            const orgs: WhoAmIOrg[] = (info as any as WhoAmIUser).orgs;
+            if (orgs.length > 0) {
+                message += `\tYou are part of the following organizations: ${orgs.map((org: WhoAmIOrg) => {
+                    return `${org.fullname} (${org.name})`;
+                }).join(", ")}`;
             }
+
+            outputChannel.appendLine(message);
 
             setDitoUser(info);
 
@@ -299,7 +350,9 @@ export namespace HuggingFaceApi {
     // }
 
     export async function getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse> {
-        outputChannel.appendLine("Code completions... (3)");
+        const startTime = new Date().getMilliseconds();
+
+        outputChannel.appendLine("Code completions...");
         const config: TDitoConfig = getDitoConfiguration();
 
         const headers: {} = {
@@ -307,12 +360,8 @@ export namespace HuggingFaceApi {
             "content-type": "application/json",
             "x-use-cache": "false",
             "origin": "https://ui.endpoints.huggingface.co"
-
         };
-        //jenn: <fim_prefix>before<fim_suffix>after<fim_middle>
-        //alan: <fix_prefix>before<fim_prefix>after<fim_middle> (alteração Jean)
-        //leo: <fim_prefix>beforeCursor<fim_suffix>afterCursor<fim_middle>textoselecionado
-        // 
+
         const body: {} = {
             "inputs": `<fim_prefix>${textBeforeCursor}<fim_suffix>${textAfterCursor}<fim_middle>`,
             "parameters": {
@@ -344,10 +393,12 @@ export namespace HuggingFaceApi {
         }
 
         if (!resp.ok) {
+            const usarName: string = getDitoUser()!["name"];
+
             if (resp.status == 502) {
-                outputChannel.appendLine(`${capitalize(getDitoUser()!.name)}, I'm sorry but I can't answer you at the moment.`);
+                outputChannel.appendLine(`${usarName}, I'm sorry but I can't answer you at the moment.`);
             } else if (resp.status == 401) {
-                outputChannel.appendLine(`${capitalize(getDitoUser()!.name)}, I'm sorry but you do not have access privileges.`);
+                outputChannel.appendLine(`${usarName}, I'm sorry but you do not have access privileges. Try login.`);
             } else {
                 outputChannel.appendLine(`Fetch response error: Status: ${resp.status}-${resp.statusText}`);
             }
@@ -369,6 +420,14 @@ export namespace HuggingFaceApi {
             response.completions.push(json[key]);
         });
 
+        // const samples: string[] = json.map((item: any) => item.generated_text.replace("\r", "").split("\n\n"));
+        // samples.forEach((sample: string) => {
+        //     response.completions.push({ generated_text: sample });
+        // });
+
+        const endTime = new Date().getMilliseconds();
+        outputChannel.appendLine("Code completions finish " + (endTime - startTime) + " ms");
+
         return response;
     }
 
@@ -389,7 +448,7 @@ export namespace HuggingFaceApi {
         throw new Error('Function not implemented.');
     }
 
-    const fileLog = "P:\\git\\tds-vscode\\test\\resources\\projects\\dss\\communication.log"
+    const fileLog = "W:\\ws_tds_vscode\\tds-vscode\\test\\resources\\projects\\dss\\src\\communication.log"
     fse.writeFileSync(fileLog, `Start at ${new Date().toLocaleTimeString()}\n\n`);
     const file = fse.openSync(fileLog, "a");
     let execBeginTime: Date;
