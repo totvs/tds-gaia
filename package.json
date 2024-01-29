@@ -90,6 +90,11 @@
       {
         "title": "TDS-Dito",
         "properties": {
+          "tds-dito.showBanner": {
+            "type": "boolean",
+            "default": true,
+            "description": "Displays banner when starting"
+          },
           "tds-dito.verbose": {
             "scope": "application",
             "type": "string",
