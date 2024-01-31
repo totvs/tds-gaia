@@ -4,7 +4,7 @@
   <chain id="chain0" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -75,7 +75,7 @@
   <chain id="chain1" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -128,11 +128,21 @@
     <property name="xml">was here</property>
     <property name="shotcut:caption">2024-01-29 13-57-26.mkv</property>
     <property name="shotcut:defaultAudioIndex">1</property>
+    <property name="meta.shotcut.vui">1</property>
+    <filter id="filter0" in="00:00:22.817" out="00:01:50.100">
+      <property name="rect">0 0 1920 1026 1</property>
+      <property name="circle">0</property>
+      <property name="color">#ff000000</property>
+      <property name="radius">0</property>
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+      <property name="disable">0</property>
+    </filter>
   </chain>
   <chain id="chain2" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -189,7 +199,7 @@
   <chain id="chain3" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -246,7 +256,7 @@
   <chain id="chain4" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -303,7 +313,7 @@
   <chain id="chain5" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -360,7 +370,7 @@
   <chain id="chain6" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -417,7 +427,7 @@
   <chain id="chain7" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -474,7 +484,7 @@
   <chain id="chain8" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -531,7 +541,7 @@
   <chain id="chain9" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -588,7 +598,7 @@
   <chain id="chain10" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -645,7 +655,7 @@
   <chain id="chain11" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -702,7 +712,7 @@
   <chain id="chain12" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -759,7 +769,7 @@
   <chain id="chain13" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -816,7 +826,7 @@
   <chain id="chain14" out="00:10:17.567">
     <property name="length">00:10:17.583</property>
     <property name="eof">pause</property>
-    <property name="resource">C:/Users/acandido/Videos/2024-01-29 13-57-26.mkv</property>
+    <property name="resource">2024-01-29 13-57-26.mkv</property>
     <property name="mlt_service">avformat-novalidate</property>
     <property name="meta.media.nb_streams">2</property>
     <property name="meta.media.0.stream.type">video</property>
@@ -888,19 +898,15 @@
     <entry producer="chain13" in="00:06:44.783" out="00:09:28.617"/>
     <entry producer="chain14" in="00:09:33.417" out="00:09:49.233"/>
   </playlist>
-  <playlist id="playlist1">
-    <property name="shotcut:audio">1</property>
-    <property name="shotcut:name">A1</property>
-    <blank length="00:00:00.017"/>
-  </playlist>
   <tractor id="tractor0" title="Shotcut version 23.12.15" in="00:00:00.000" out="00:08:15.850">
     <property name="shotcut">1</property>
     <property name="shotcut:projectAudioChannels">2</property>
     <property name="shotcut:projectFolder">0</property>
     <property name="shotcut:scaleFactor">0.187979</property>
+    <property name="shotcut:skipConvert">0</property>
+    <property name="shotcut:trackHeight">30</property>
     <track producer="background"/>
     <track producer="playlist0"/>
-    <track producer="playlist1" hide="video"/>
     <transition id="transition0">
       <property name="a_track">0</property>
       <property name="b_track">1</property>
@@ -915,13 +921,6 @@
       <property name="mlt_service">frei0r.cairoblend</property>
       <property name="threads">0</property>
       <property name="disable">1</property>
-    </transition>
-    <transition id="transition2">
-      <property name="a_track">0</property>
-      <property name="b_track">2</property>
-      <property name="mlt_service">mix</property>
-      <property name="always_active">1</property>
-      <property name="sum">1</property>
     </transition>
   </tractor>
 </mlt>
