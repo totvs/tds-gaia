@@ -1,11 +1,16 @@
 # Relato do uso de IA (29/01/24)
 
+> O termo "estilo do usuário", utilizado neste relatório, refere-se a forma de escrever o código:
+> Usando comando:
+> ``@ 10,01 say....``
+> Ou usando classes/métodos:
+> ``oSay := TSay():New(......``
+
 ## Resumo
 
 - Códigos sugeridos coerentes, divergente do estilo adotado pelo usuário.
 - Sem erros de sintaxe (a maior parte da vezes)
   Apresenta sugestões que fazem a mesma coisa (ou similar) de formas diferentes (grande frequência). Apresentar como mais de uma sugestão.
-- Sugestões que não são coerentes com o estilo do fonte/usuário.
 - Sugestões apresentadas, na maior parte das vezes somente a 1ª linha é válida e o restante é descartável ou mesmo de baixa usabilidade.
 
 ## Geral
@@ -18,6 +23,9 @@
 - A expressão "outra amostra", que uso, presume que o IA é capaz de gerar mais de uma resposta para o mesmo contexto. É possível o retorno do tipo vetor, onde cada elemento é uma sugestão?
 
 ## Identificadores em geral
+
+> NOTA: Em conversar com a equipe foi estabelecido como alvo o TLPP.
+> Desconsiderar esse tópico.
 
 ![Identificadores](identificadores.png)
 
@@ -59,7 +67,7 @@ Mesmo teste e dados como contexto, com resultados diferentes.
 ### Várias sugestões
 
 Durante os testes, percebi que as "linhas" vem separadas por um duplo "\n".
-Isso é proposital, é um bug ou um separador de sugestões?
+Isso é proposital, um separador de sugestões, decorrência dos dados usados no treinamento?
 
 ### Comando incompleto
 
@@ -80,7 +88,7 @@ Foi sugerido e aceito, o bloco:
 A última linha esta incompleta devido ao limite de tokens imposto, o que esta correto. Se continuar usando o IA, ele complementa corretamente.
 
 As sugestões estão finalizadas com ``;``, que indica continuação de linha de código. Nesse caso, não apresentou erro de sintaxe pois veio com ``\n\n``. Se viesse com um, o erro de sintaxe seria gerado.
-E esse estilo de codificação (finalizar com ``;`` e deixar uma linha em branco) não é o comum.
+E esse estilo de codificação (finalizar com ``;`` e deixar uma linha em branco) não é algo comum.
 
 **Observação:** Há situações, por exemplo pseudo funções e macros, onde o uso de ``;`` é permitido.
 
@@ -88,13 +96,13 @@ E esse estilo de codificação (finalizar com ``;`` e deixar uma linha em branco
 
 ![Amostra com comando](./uso-comando-4.png)
 
-Ao usar o comando ``@..get``, um dos retornos do IA foi o acima que não está correto. Ou usa-se comando ou classe.
+Ao usar o comando ``@..get``, um dos retornos do IA foi o acima que não respeita o estilo de programação. Ou usa-se comando ou classe.
 
 Na mesma linha, foi adicionado espaço e o retorno foi outro.
 
 ![Amostra com comando](./uso-comando-4.png)
 
-Se tira o espaço, vem somente uma linha (errada). A cada alteração de colocar e tirar espaço, vem sugestões distintas.
+Se tirar o espaço, vem somente uma linha (errada). A cada alteração de colocar e tirar espaço, vem sugestões distintas.
 
 ### Destaques na sessão
 
