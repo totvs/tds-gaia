@@ -22,10 +22,12 @@
   |                                                 | ``@ ${0:10},${1:1} say ${2:"Teste 1"} size ${3:100}, ${4:100} of meuDlg`` |
   |                                                 | ``@ ${0:10},${1:100} say ${2:"Teste 2"} size ${3:100}, ${4:100} of meuDlg`` |
   |                                                 | ``},`` |
-  |                                                 | ``[`` |
+  |                                                 | ``,`` |
   |                                                 | ``{`` |
   |                                                 | ``oSay1:= TSay():New(${0:10}, ${1:1}, {\|\|${2:'Teste 1'}},oDlg,,oFont,,,,.T.,CLR_RED,CLR_WHITE,200,20)`` |
   |                                                 | ``oSay2:= TSay():New(${0:10}, ${1:100}, {\|\|${2:'Teste 2'}},oDlg,,oFont,,,,.T.,CLR_RED,CLR_WHITE,200,20)`` |
+  |                                                 | ``}`` |
+  |                                                 | ``]`` |
 
 ## Geral
 
@@ -162,7 +164,7 @@ Se tirar o espaço, vem somente uma linha (errada). A cada alteração de coloca
 
 Abaixo, a gravação (editada) da sessão de codificação relatada:
 
-> Se preferir, baixe a versão [mp4](./video://).
+> Se preferir, baixe a versão [mp4](./video/sessao-01-29.mp4).
 
 ![Sessão de codificação](./video/sessao-01-29.gif)
 
