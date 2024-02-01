@@ -12,7 +12,7 @@
 - Sem erros de sintaxe (exceto uma ocorrência, ``;`` não é válido).
 - Apresenta sugestões que fazem a mesma coisa (ou similar) de formas diferentes (grande frequência).
   Apresentar como mais uma sugestão.
-- Sugestões apresentadas, na maior parte das vezes somente a 1ª linha é válida e o restante é descartável ou mesmo de baixa usabilidade.
+- Sugestões apresentadas, na maior parte das vezes somente a 1ª linha é válida e o restante é descartável ou de baixa usabilidade.
 - Retorno como amostra ([_snippets_](https://code.visualstudio.com/docs/editor/userdefinedsnippets)). Por exemplo:
 
   | Atual | Desejado |
