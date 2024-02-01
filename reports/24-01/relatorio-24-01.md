@@ -8,10 +8,24 @@
 
 ## Resumo
 
-- Códigos sugeridos coerentes, divergente do estilo adotado pelo usuário.
-- Sem erros de sintaxe (a maior parte da vezes)
-  Apresenta sugestões que fazem a mesma coisa (ou similar) de formas diferentes (grande frequência). Apresentar como mais de uma sugestão.
+- Códigos sugeridos coerentes, porém divergente do estilo adotado pelo usuário.
+- Sem erros de sintaxe (exceto uma ocorrência, ``;`` não é válido).
+- Apresenta sugestões que fazem a mesma coisa (ou similar) de formas diferentes (grande frequência).
+  Apresentar como mais uma sugestão.
 - Sugestões apresentadas, na maior parte das vezes somente a 1ª linha é válida e o restante é descartável ou mesmo de baixa usabilidade.
+- Retorno como amostra ([_snippets_](https://code.visualstudio.com/docs/editor/userdefinedsnippets)). Por exemplo:
+
+  | Atual | Desejado |
+  | --- | --- |
+  | ``@ 10,1 say "Teste" size 100,100 of meuDlg``   | ``[`` |
+  | ``oSay2:= TSay():New(10, 100, {\|\|'Teste 2}},oDlg,,oFont,,,,.T.,CLR_RED,CLR_WHITE,200,20)`` | ``{`` |
+  |                                                 | ``@ ${0:10},${1:1} say ${2:"Teste 1"} size ${3:100}, ${4:100} of meuDlg`` |
+  |                                                 | ``@ ${0:10},${1:100} say ${2:"Teste 2"} size ${3:100}, ${4:100} of meuDlg`` |
+  |                                                 | ``},`` |
+  |                                                 | ``[`` |
+  |                                                 | ``{`` |
+  |                                                 | ``oSay1:= TSay():New(${0:10}, ${1:1}, {\|\|${2:'Teste 1'}},oDlg,,oFont,,,,.T.,CLR_RED,CLR_WHITE,200,20)`` |
+  |                                                 | ``oSay2:= TSay():New(${0:10}, ${1:100}, {\|\|${2:'Teste 2'}},oDlg,,oFont,,,,.T.,CLR_RED,CLR_WHITE,200,20)`` |
 
 ## Geral
 
