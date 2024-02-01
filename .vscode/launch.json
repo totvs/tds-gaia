@@ -9,7 +9,7 @@
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
 				"--inspect",
-				"P:\\git\\tds-vscode\\test\\resources\\projects\\dss"
+				"${workspaceFolder}/advpl_sources"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
