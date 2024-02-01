@@ -1,0 +1,10 @@
+{
+	"@say": {
+		"scope": "advpl",
+		"prefix": "@say",
+		"body": [
+			"@ ${1:10}, ${2:1} say ${3:\"Teste 1\"} size ${4:100}, ${5:100} of meuDlg"
+			"@ ${6:10}, ${7:100} say ${8:\"Teste 2\"} size ${9:100}, ${8:100} of meuDlg"
+		]
+	}
+}
