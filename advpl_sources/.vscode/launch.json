@@ -10,17 +10,20 @@
 			"smartclientBin": "M:\\protheus\\smartClient\\20-3-1-5\\smartclient.exe",
 			"isMultiSession": true,
 			"enableTableSync": true,
-			"waitForAttach": 30000,
+			"waitForAttach": 300,
 			"extendFeatures": {
-				"charDetails": false
+				"charDetails": true
 			}
 		}
 	],
 	"lastPrograms": [
 		{
 			"label": "u_dbgString"
+		},
+		{
+			"label": "u_TSTGRID"
 		}
 	],
-	"lastProgramExecuted": "u_dbgString",
+	"lastProgramExecuted": "u_TSTGRID",
 	"lastProgramArguments": []
 }

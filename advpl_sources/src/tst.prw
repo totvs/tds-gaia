@@ -14,8 +14,10 @@ user function test(arg1, arg2)
 	next
 
 @ 10,122 say "Teste 1" size 100, 100 of meuDlg
+
 @ 10,100 say "Teste 2" size 100, 100 of meuDlg
 
 @ 10, 1 say "Teste 1" size 100, 100 of meuDlg
 @ 10, 100 say "Teste 2" size 100, "Teste 2" of meuDlg
+
 return
