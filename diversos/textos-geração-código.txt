@@ -1,0 +1,125 @@
+
+// gerar diálogo solicitando usuário e senha
+// =========================================
+user function dlglogin()
+	local oDlg
+	local oButton1
+	local oGet1
+	local oGet2
+	local oSay1
+	local oSay2
+	local cName := space(10) //tem que reservar "espaço"
+	local cPassword := space(10)
+
+	define msdialog oDlg title "Login" from 000, 000 to 300, 500 pixel //oDlg := MSDialog()....
+
+	@ 038, 065 say oSay1 prompt "Nome" size 049, 007 of oDlg  pixel //oSay1 := TSay()....
+	@ 048, 065 get oGet1 var cName size 060, 010 of oDlg pixel //oGet1 := TGet()....
+
+	@ 075, 065 say oSay2 prompt "Senha" size 049, 007 of oDlg  pixel
+	@ 085, 065 get oGet2 var cPassword size 060, 010 of oDlg pixel
+
+	@ 105, 065 button oButton1 prompt "OK" of oDlg action {|| oDlg:end() } size 36,11 pixel // oButton1 := TButton()....
+
+	activate msdialog oDlg centered
+
+	//adicione o seu código
+	if trim(cPassword) == "1234"
+		msgalert(cName + ", senha correta", "ok")
+	else
+		msgalert(cName + ", senha incorreta. Tente 1234", "Erro")
+	endif
+
+return
+
+//apresenta a consulta padrão da tabela de produtos SB1
+// =========================================
+DbSelectArea("SB1")
+If ConPad1(, , , "SB1")
+     
+    //Se a consulta foi confirmada, mostra o produto selecionado
+    MsgInfo("Produto selecionado foi " + SB1->B1_COD, "Atenção")
+     
+EndIf
+
+//cadastro simples de cliente SA1
+// =========================================
+dbSelectArea("SA1")
+AxCadastro("SA1")
+
+//montar MBrowse para a tabela SA1 
+// =========================================
+dbSelectArea("SA1")
+mBrowse(, , , , "SA1")
+
+//montar FWBrowse para a tabela SX2, com os campos 
+// X2_CHAVE
+// X2_ARQUIVO 
+// X2_NOME 
+// X2_MODO 
+// =========================================
+	Local oBrowse
+	Local oColumn
+	Local oDlg
+
+//-------------------------------------------------------------------// Abertura da tabela//-------------------------------------------------------------------
+	DbSelectArea("SX2")
+	DbSetOrder(1)
+
+//-------------------------------------------------------------------// Define a janela do Browse//-------------------------------------------------------
+	DEFINE DIALOG oDlg FROM 0,0 TO 600,800 PIXEL  //oDlg := TDialog():New(0...
+
+//------------------------------------------------------------------- // Define o Browse //----------------------------------------------------------------
+	DEFINE FWBROWSE oBrowse DATA TABLE ALIAS "SX2" OF oDlg //oBrowse := FWBrowse():New(...
+    //oBrowse:SetDataTable(.T.)
+    //oBrowse:SetAlias("SX2")
+ 
+//------------------------------------------------------------------- // Adiciona as colunas do Browse //------------------------------------------
+	ADD COLUMN oColumn DATA { || X2_CHAVE } TITLE "Chave" SIZE 3 OF oBrowse //oColumn := oBrowse:AddMarkColumn...
+	ADD COLUMN oColumn DATA { || X2_ARQUIVO } TITLE "Arquivo" SIZE 10 OF oBrowse
+	ADD COLUMN oColumn DATA { || X2_NOME } TITLE DecodeUTF8("Descrição") SIZE 40 OF oBrowse
+	ADD COLUMN oColumn DATA { || X2_MODO } TITLE "Modo" SIZE 1 OF oBrowse
+
+//------------------------------------------------------------------- // Ativação do Browse//----------------------------------------------------------------
+	ACTIVATE FWBROWSE oBrowse
+
+//-------------------------------------------------------------------// Ativação do janela//-------------------------------------------------------------------
+	ACTIVATE DIALOG oDlg CENTERED
+
+Return
+
+
+//montar FWBrowse com caixa de seleção para a tabela SA2, com os campos 
+// A2_COD
+// A2_NOME 
+// =========================================
+	Local oBrowse
+	Local oColumn
+	Local oDlg
+
+//-------------------------------------------------------------------// Abertura da tabela//-------------------------------------------------------------------
+	DbSelectArea("SA2")
+	DbSetOrder(1)
+
+//-------------------------------------------------------------------// Define a janela do Browse//-------------------------------------------------------
+	DEFINE DIALOG oDlg FROM 0,0 TO 600,800 PIXEL
+
+//------------------------------------------------------------------- // Define o Browse //----------------------------------------------------------------
+	DEFINE FWBROWSE oBrowse DATA TABLE ALIAS "SA2" OF oDlg
+
+//-------------------------------------------------------- // Cria uma coluna de marca/desmarca//----------------------------------------------
+	ADD MARKCOLUMN oColumn DATA { || If(.T./* Função com a regra*/,'LBOK','LBNO') };
+		DOUBLECLICK { |oBrowse| /* Função que atualiza a regra*/ };
+		HEADERCLICK { |oBrowse| /* Função executada no clique do header */ } OF oBrowse
+
+//------------------------------------------------------------------- // Adiciona as colunas do Browse //------------------------------------------
+	ADD COLUMN oColumn DATA { || A2_COD } TITLE "Código" SIZE 6 OF oBrowse
+	ADD COLUMN oColumn DATA { || A2_NOME } TITLE "Nome" SIZE 40 OF oBrowse
+
+//------------------------------------------------------------------- // Ativação do Browse//----------------------------------------------------------------
+	ACTIVATE FWBROWSE oBrowse
+
+//-------------------------------------------------------------------// Ativação do janela//-------------------------------------------------------------------
+	ACTIVATE DIALOG oDlg CENTERED
+
+Return

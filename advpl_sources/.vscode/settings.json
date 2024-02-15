@@ -7,5 +7,6 @@
     "totvsLanguageServer.launch.args": [
         "--log-file=totvsls.log",
         "--record=totvsls"
-    ]
+    ],
+    "tds-dito.endPoint": ""
 }

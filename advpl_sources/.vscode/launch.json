@@ -10,7 +10,7 @@
 			"smartclientBin": "M:\\protheus\\smartClient\\20-3-1-5\\smartclient.exe",
 			"isMultiSession": true,
 			"enableTableSync": true,
-			"waitForAttach": 300,
+			"waitForAttach": 30,
 			"extendFeatures": {
 				"charDetails": true
 			}
@@ -22,8 +22,32 @@
 		},
 		{
 			"label": "u_TSTGRID"
+		},
+		{
+			"label": "u_dlgLogin"
+		},
+		{
+			"label": "u_consulta"
+		},
+		{
+			"label": "u_cadastro"
+		},
+		{
+			"label": "u_dwcadastro"
+		},
+		{
+			"label": "u_fwcadastro"
+		},
+		{
+			"label": "u_fwca01"
+		},
+		{
+			"label": "u_fwcad01"
+		},
+		{
+			"label": "u_fwcad02"
 		}
 	],
-	"lastProgramExecuted": "u_TSTGRID",
+	"lastProgramExecuted": "u_cadastro",
 	"lastProgramArguments": []
 }
