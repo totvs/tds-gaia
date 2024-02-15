@@ -2,7 +2,7 @@
   "name": "tds-dito-vscode",
   "displayName": "TDS-Dito, your partner in AdvPL programming",
   "description": "Using artificial intelligence resources, TDS-Dito will assist you in AdvPL programming",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "TOTVS",
   "preview": true,
   "author": {
@@ -12,9 +12,9 @@
   "license": "Apache-2.0",
   "keywords": [
     "advpl",
-    "tlpp",
+    "TLPP",
     "tds",
-    "totvs",
+    "TOTVS",
     "protheus",
     "artificial intelligence",
     "code",
@@ -23,7 +23,7 @@
     "development"
   ],
   "engines": {
-    "vscode": "^1.63.1"
+    "vscode": "^1.85.1"
   },
   "icon": "icons/tds-dito.png",
   "categories": [
@@ -111,17 +111,17 @@
               "%tds.package.trace.vscode.verbose%"
             ]
           },
-          "tds-dito.version": {
-            "scope": "application",
-            "type": "string",
-            "value": "0.0.1",
-            "description": "Schema Configuration Version"
-          },
           "tds-dito.endPoint": {
             "scope": "application",
             "type": "string",
-            "default": "https://bgit1s84n6bop23h.us-east-1.aws.endpoints.huggingface.cloud",
+            "default": "https://advpl.ds.dta.totvs.ai/",
             "description": "endPoint"
+          },
+          "tds-dito.apiVersion": {
+            "scope": "application",
+            "type": "string",
+            "default": "v1",
+            "description": "API Version"
           },
           "tds-dito.userLogin": {
             "scope": "application",
@@ -157,65 +157,87 @@
             "default": 30,
             "description": "requestDelay"
           },
+          "tds-dito.maxLine": {
+            "scope": "application",
+            "type": "number",
+            "default": 5,
+            "description": "Maximum lines per suggestion"
+          },
+          "tds-dito.maxSuggestion": {
+            "scope": "application",
+            "type": "number",
+            "default": 3,
+            "description": "Maximum suggestions per requisition"
+          },
           "tds-dito.tokensToClear": {
             "scope": "application",
             "type": "array",
             "default": [],
-            "description": "tokensToClear"
+            "description": "tokensToClear",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.maxNewTokens": {
             "scope": "application",
             "type": "number",
             "default": 128,
-            "description": "maxNewTokens"
+            "description": "maxNewTokens",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.temperature": {
             "scope": "application",
             "type": "number",
             "default": 0.2,
-            "description": "temperature"
+            "description": "temperature",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.top_p": {
             "scope": "application",
             "type": "number",
             "default": 0.95,
-            "description": "top_p"
+            "description": "top_p",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.top_k": {
             "scope": "application",
             "type": "number",
             "default": 50,
-            "description": "top_p"
+            "description": "top_p",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.stop_sequence": {
             "scope": "application",
             "type": "array",
             "default": [],
-            "description": "stop_sequence"
+            "description": "stop_sequence",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.fillInTheMiddle": {
             "scope": "application",
             "type": "number",
             "default": 1,
-            "description": "fillInTheMiddle"
+            "description": "fillInTheMiddle",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.contextWindow": {
             "scope": "application",
             "type": "number",
             "default": 0,
-            "description": "contextWindow"
+            "description": "contextWindow",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.tlsSkipVerifyInsecure": {
             "scope": "application",
             "type": "boolean",
             "default": false,
-            "description": "contextWindow"
+            "description": "tlsSkipVerifyInsecure",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.tokenizer": {
             "scope": "application",
             "type": "object",
             "default": {},
-            "description": "tokenizer"
+            "description": "tokenizer",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           }
         }
       }
@@ -233,7 +255,7 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
-    "xwatch": "tsc -watch -p ./",
+    "watch": "tsc -watch -p ./",
     "lint": "eslint src --ext ts",
     "--PUBLISH--": "",
     "vscode:prepublish": "npm run compile",
