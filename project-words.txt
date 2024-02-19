@@ -3,6 +3,7 @@ fullname
 huggingface
 protheus
 TLPP
+totvs
 TOTVS
 totvsls
 undici

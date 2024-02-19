@@ -8,5 +8,6 @@
         "--log-file=totvsls.log",
         "--record=totvsls"
     ],
-    "tds-dito.endPoint": ""
+    "tds-dito.userLogin": true,
+    "tds-dito.lastLogin": "Mon, 19 Feb 2024 18:17:42 GMT"
 }

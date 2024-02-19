@@ -59,10 +59,43 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "views": {
+      "totvs-platform": [
+        {
+          "id": "tds-dito-view",
+          "name": "Dito: Chat"
+        }
+      ],
+      "explorer-package": [
+        {
+          "id": "tds-dito-view",
+          "name": "Dito: Chat",
+          "visibility": "collapsed",
+          "icon": "icons/tds-dito-24x24.png"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "tds-dito-view",
+        "contents": "Olá, sou o Benedito, mas pode me chamar de Dito.\nPara que possamos ser parceiros, preciso saber quem é você.\n[Identificar-me](command:tds-dito.login)",
+        "when": "tds-dito.logged !== true && tds-dito.readyForUse == true"
+      },
+      {
+        "view": "tds-dito-view",
+        "contents": "Olá, sou o Benedito, mas no momento estou com dificuldades técnicas para atendê-lo.\n[Detalhar](command:tds-dito.detail-health)",
+        "when": "tds-dito.readyForUse !== true"
+      }
+    ],
     "commands": [
       {
         "command": "tds-dito.afterInsert",
         "title": "After Insert",
+        "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.detail-health",
+        "title": "Detail Health",
         "category": "TDS-Dito"
       },
       {
@@ -90,47 +123,23 @@
       {
         "title": "TDS-Dito",
         "properties": {
-          "tds-dito.showBanner": {
-            "type": "boolean",
-            "default": true,
-            "description": "Displays banner when starting"
-          },
-          "tds-dito.verbose": {
-            "scope": "application",
-            "type": "string",
-            "enum": [
-              "off",
-              "messages",
-              "verbose"
-            ],
-            "default": "off",
-            "description": "%tds.package.trace.vscode.server%",
-            "enumDescriptions": [
-              "%tds.package.trace.vscode.off%",
-              "%tds.package.trace.vscode.messages%",
-              "%tds.package.trace.vscode.verbose%"
-            ]
-          },
           "tds-dito.endPoint": {
             "scope": "application",
+            "order": 1,
             "type": "string",
-            "default": "https://advpl.ds.dta.totvs.ai/",
+            "default": "https://advpl.ds.dta.totvs.ai",
             "description": "endPoint"
           },
           "tds-dito.apiVersion": {
             "scope": "application",
+            "order": 2,
             "type": "string",
             "default": "v1",
             "description": "API Version"
           },
-          "tds-dito.userLogin": {
-            "scope": "application",
-            "type": "boolean",
-            "default": false,
-            "description": "User login status"
-          },
           "tds-dito.documentFilter": {
             "scope": "application",
+            "order": 3,
             "type": [
               "object",
               "array"
@@ -147,27 +156,64 @@
           },
           "tds-dito.enableAutoSuggest": {
             "scope": "application",
+            "order": 4,
             "type": "boolean",
             "default": true,
             "description": "enableAutoSuggest"
           },
           "tds-dito.requestDelay": {
             "scope": "application",
+            "order": 5,
             "type": "number",
             "default": 30,
             "description": "requestDelay"
           },
           "tds-dito.maxLine": {
             "scope": "application",
+            "order": 6,
             "type": "number",
             "default": 5,
             "description": "Maximum lines per suggestion"
           },
           "tds-dito.maxSuggestion": {
             "scope": "application",
+            "order": 7,
             "type": "number",
             "default": 3,
             "description": "Maximum suggestions per requisition"
+          },
+          "tds-dito.showBanner": {
+            "scope": "application",
+            "type": "boolean",
+            "default": true,
+            "description": "Displays banner when starting"
+          },
+          "tds-dito.verbose": {
+            "scope": "application",
+            "type": "string",
+            "enum": [
+              "off",
+              "request",
+              "verbose"
+            ],
+            "default": "off",
+            "description": "Rastreia a comunicação entre o VS Code e o serviço externo.",
+            "enumDescriptions": [
+              "Rastreamento desligado",
+              "Rastreamento de requisição (resumido)",
+              "Rastreamento de requisição (detalhado)"
+            ]
+          },
+          "tds-dito.userLogin": {
+            "type": "boolean",
+            "default": false,
+            "description": "User login status"
+          },
+          "tds-dito.lastLogin": {
+            "type": "string",
+            "default": "",
+            "description": "When last user logged",
+            "deprecationMessage": "For internal use"
           },
           "tds-dito.tokensToClear": {
             "scope": "application",

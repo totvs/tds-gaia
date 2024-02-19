@@ -1,20 +1,24 @@
 import * as vscode from "vscode";
 import { delay } from "./util";
 import { getDitoConfiguration } from "./config";
-import * as hf from "./huggingfaceApi";
-import { text } from "stream/consumers";
+import { CompletionResponse } from "./api/interfaceApi";
+import { iaApi } from "./extension"
 
-
-//acionamento manual: F1 +  editor.action.inlineSuggest.trigger
+//acionamento manual: F1 + editor.action.inlineSuggest.trigger
 export function inlineCompletionItemProvider(context: vscode.ExtensionContext): vscode.InlineCompletionItemProvider {
 
     const provider: vscode.InlineCompletionItemProvider = {
-        async provideInlineCompletionItems(document, position, context, token) {
+        async provideInlineCompletionItems(document, position, innerContext, token) {
+
+            if (context.workspaceState.get("tds-dito.readyFoUse") === false) {
+                return;
+            }
+
             const config = getDitoConfiguration();
             const autoSuggest = config.enableAutoSuggest;
             const requestDelay = config.requestDelay;
 
-            if (context.triggerKind === vscode.InlineCompletionTriggerKind.Automatic && !autoSuggest) {
+            if (innerContext.triggerKind === vscode.InlineCompletionTriggerKind.Automatic && !autoSuggest) {
                 return;
             }
             if (position.line < 0) {
@@ -54,8 +58,8 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
             //     tokenizer_config: config.get("tokenizer") as object | null,
             // };
             try {
-                const response: hf.CompletionResponse =
-                    await hf.HuggingFaceApi.getCompletions(textBeforeCursor, textAfterCursor);
+                const response: CompletionResponse =
+                    await iaApi.getCompletions(textBeforeCursor, textAfterCursor);
 
                 const items = [];
                 if (response !== undefined && response.completions.length) {

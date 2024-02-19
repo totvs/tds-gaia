@@ -1,8 +1,21 @@
-import { AuthInfo, WhoAmI, WhoAmIOrg, WhoAmIUser } from '@huggingface/hub';
+import { log } from 'console';
 import * as vscode from 'vscode';
 
-
 let customConfig: TDitoCustomConfig = {};
+
+export type LoggedUser = {
+  id: string;
+  email: string;
+  name: string;
+  fullname: string;
+  displayName: string;
+  avatarUrl: string;
+  expiration?: Date;
+  expiresAt?: Date;
+  orgs?: UserOrganization[]
+}
+
+export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
 
 //deve ser espelho do definido no package.json
 //outras configurações, de preferência não persistentes, devem ser efetuadas em TDitoCustomConfig
@@ -12,6 +25,7 @@ export type TDitoConfig = {
   endPoint: string;
   apiVersion: string;
   userLogin: string;
+  lastLogin: string;
   documentFilter: {
     [key: string]: string;
   }
@@ -27,22 +41,19 @@ export type TDitoConfig = {
   top_k: number;
 }
 
-const EMPTY_USER: WhoAmI = {
+const EMPTY_USER: LoggedUser = {
   id: "",
-  type: "user",
-  email: "",
-  emailVerified: false,
-  isPro: false,
-  orgs: [],
+  email: "<not logged>",
   name: "<not logged>",
   fullname: "<not logged>",
-  canPay: false,
+  displayName: "<not logged>",
   avatarUrl: "",
-  periodEnd: null
+  expiration: undefined,
+  expiresAt: undefined
 }
 
 export type TDitoCustomConfig = {
-  currentUser?: WhoAmI
+  currentUser?: LoggedUser
 }
 
 export function getDitoConfiguration(): TDitoConfig {
@@ -55,7 +66,7 @@ export function getDitoConfiguration(): TDitoConfig {
 function setDitoConfiguration(key: keyof TDitoConfig, newValue: string | boolean | number | []): void {
   const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("tds-dito");
 
-  config.update(key, newValue, vscode.ConfigurationTarget.Global);
+  config.update(key, newValue);//, vscode.ConfigurationTarget.Global);
 
   return;
 }
@@ -64,17 +75,16 @@ function setDitoCustomConfiguration(key: keyof TDitoCustomConfig, newValue: any)
   customConfig[key] = newValue;
 }
 
-export function setDitoUser(info: WhoAmI & {
-  auth: AuthInfo;
-} | undefined) {
+export function setDitoUser(user: LoggedUser | undefined) {
 
-  setDitoCustomConfiguration("currentUser", info);
-  setDitoConfiguration("userLogin", info as WhoAmI !== undefined);
+  setDitoCustomConfiguration("currentUser", user);
+  setDitoConfiguration("userLogin", user !== undefined);
+  setDitoConfiguration("lastLogin", new Date().toUTCString()); //forçar modificação em settings.json
 }
 
-export function getDitoUser(): WhoAmI | undefined {
+export function getDitoUser(): LoggedUser | undefined {
 
-  return customConfig["currentUser"] || EMPTY_USER;
+  return customConfig["currentUser"]; //|| EMPTY_USER;
 }
 
 export function isDitoLogged(): boolean {

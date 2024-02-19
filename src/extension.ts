@@ -1,15 +1,17 @@
 import * as vscode from 'vscode';
-import * as hf from './huggingfaceApi';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
-import { TDitoConfig, getDitoConfiguration, getDitoUser } from './config';
+import { TDitoConfig, getDitoConfiguration, isDitoLogged, isDitoShowBanner } from './config';
 import { inlineCompletionItemProvider } from './completionItemProvider';
-import { capitalize } from './util';
+import { IaApiInterface } from './api/interfaceApi';
+import { CarolApi } from './api/carolApi';
+import { logger } from './logger';
 
 let ctx: vscode.ExtensionContext;
 
-export function activate(context: vscode.ExtensionContext) {
+export const iaApi: IaApiInterface = new CarolApi();
 
-	console.log(
+export function activate(context: vscode.ExtensionContext) {
+	logger.info(
 		vscode.l10n.t('Congratulations, your extension "tds-dito" is now active!')
 	);
 
@@ -18,21 +20,23 @@ export function activate(context: vscode.ExtensionContext) {
 	const config: TDitoConfig = getDitoConfiguration();
 	context.subscriptions.push(...initStatusBarItems());
 
-	//args[0], bool, quando true, ignora processamento se  login automático falhar
+	showBanner()
+	//args[0], bool, quando true, ignora processamento se login automático falhar
 	const login = vscode.commands.registerCommand('tds-dito.login', async (...args) => {
 		let apiToken = await context.secrets.get('apiToken');
 
 		if (apiToken !== undefined) {
-			hf.HuggingFaceApi.start(apiToken);
-			if (await hf.HuggingFaceApi.login()) {
-				//vscode.window.showInformationMessage(`TDS-Dito: Logged in successfully`);
-				vscode.window.showInformationMessage(`TDS-Dito: Hi ${capitalize(getDitoUser()?.name || "<not logged>")}. I am ready to help you in any way possible.`);
-				return;
-			}
+			iaApi.start(apiToken).then(async (value: boolean) => {
+				if (await iaApi.login()) {
+					logger.info('Logged in successfully');
+					//vscode.window.showInformationMessage(`Hi ${getDitoUser()?.name || "<not logged>"}. I am ready to help you in any way possible.`);
+					return;
+				}
+			});
 		}
 
 		if (args) {
-			if (args[0]) { //indica que login automático
+			if (args[0]) { //indica que login foi acionado automaticamente
 				return;
 			}
 		}
@@ -42,31 +46,51 @@ export function activate(context: vscode.ExtensionContext) {
 			placeHolder: 'Your token goes here ...'
 		});
 		if (input !== undefined) {
-			hf.HuggingFaceApi.start(input);
-			if (await hf.HuggingFaceApi.login()) {
-				await context.secrets.store('apiToken', input);
-				vscode.window.showInformationMessage('TDS-Dito: Logged in successfully');
-			} else {
-				await context.secrets.delete('apiToken');
-				vscode.window.showErrorMessage('TDS-Dito: Login failure');
+			if (await iaApi.start(input)) {
+				if (await iaApi.login()) {
+					await context.secrets.store('apiToken', input);
+					vscode.window.showInformationMessage('TDS-Dito: Logged in successfully');
+				} else {
+					await context.secrets.delete('apiToken');
+					vscode.window.showErrorMessage('TDS-Dito: Login failure');
+				}
 			}
 		}
 	});
 	context.subscriptions.push(login);
 
 	const logout = vscode.commands.registerCommand('tds-dito.logout', async (...args) => {
-		hf.HuggingFaceApi.logout();
+		iaApi.logout();
 		await context.secrets.delete('apiToken');
 		vscode.window.showInformationMessage('TDS-Dito: Logged out');
 	});
 	context.subscriptions.push(logout);
 
+	const detailHealth = vscode.commands.registerCommand('tds-dito.detail-health', async () => {
+		iaApi.checkHealth().then((error: any) => {
+			updateContextKey("readyForUse", error === undefined);
+
+			if (error !== undefined) {
+				vscode.window.showErrorMessage('TDS-Dito: Desculpe. Problemas técnicos. Verifique o log.');
+				console.error(error);
+				logger.error(error);
+				// outputChannel.appendLine(`Message: ${error.message}`);
+				// outputChannel.appendLine(`Cause: ${error.cause}`);
+				// outputChannel.appendLine(`Stack: ${error.stack}`);
+
+				//outputChannel.show()
+			} else {
+				vscode.commands.executeCommand("tds-dito.login", [true])
+			}
+		});
+	});
+	context.subscriptions.push(detailHealth);
 
 	const attribution = vscode.commands.registerTextEditorCommand('tds-dito.generateCode', () => {
 		const text: string = "Gerar código para varrer um array";
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.selection.active.lineText);
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.document.getText());
-		hf.HuggingFaceApi._generateCode(text);
+		iaApi.generateCode(text);
 	});
 
 	context.subscriptions.push(attribution);
@@ -81,29 +105,28 @@ export function activate(context: vscode.ExtensionContext) {
 	const inlineRegister: vscode.Disposable = vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
 	context.subscriptions.push(inlineRegister);
 
-	vscode.commands.executeCommand("tds-dito.login", [true])
+	vscode.commands.executeCommand("tds-dito.detail-health");
 }
 
 export function deactivate() {
-	if (!hf) {
-		return undefined;
-	}
-	return hf.HuggingFaceApi.stop();
+
+	return iaApi.stop(); //para forçar mudança de userLogin
+}
+
+function updateContextKey(key: string, value: boolean | string | number) {
+	vscode.commands.executeCommand('setContext', `tds-dito.${key}`, value);
 }
 
 function handleConfigChange(context: vscode.ExtensionContext) {
-	const listener = vscode.workspace.onDidChangeConfiguration(async event => {
+	const listener: vscode.Disposable = vscode.workspace.onDidChangeConfiguration(async event => {
 		if (event.affectsConfiguration('tds-dito')) {
 			updateStatusBarItems();
-			// const config = vscode.workspace.getConfiguration("llm");
-			// const configKey = config.get("configTemplate") as TemplateKey;
-			// const template = templates[configKey];
-			// if (template) {
-			// 	const updatePromises = Object.entries(template).map(([key, val]) => config.update(key, val, vscode.ConfigurationTarget.Global));
-			// 	await Promise.all(updatePromises);
-			// }
+
+			updateContextKey("logged", isDitoLogged());
 		}
 	});
+
+	updateContextKey("logged", isDitoLogged());
 
 	context.subscriptions.push(listener);
 }
@@ -117,7 +140,7 @@ export default async function highlightStackAttributions(): Promise<void> {
 	const attributionWindowSize = config.get("attributionWindowSize") as number;
 	const attributionEndpoint = config.get("attributionEndpoint") as string;
 
-	// get cursor postion and offset
+	// get cursor position and offset
 	const cursorPosition = vscode.window.activeTextEditor?.selection.active;
 	if (!cursorPosition) return;
 	const cursorOffset = document.offsetAt(cursorPosition);
@@ -129,7 +152,6 @@ export default async function highlightStackAttributions(): Promise<void> {
 	if (!vscode.window.activeTextEditor) return;
 	vscode.window.activeTextEditor.selection = new vscode.Selection(document.positionAt(start), document.positionAt(end));
 	// new Range(document.positionAt(start), document.positionAt(end));
-
 
 	const text = document.getText();
 	const textAroundCursor = text.slice(start, end);
@@ -190,4 +212,34 @@ export default async function highlightStackAttributions(): Promise<void> {
 	setTimeout(() => {
 		vscode.window.activeTextEditor?.setDecorations(decorationType, []);
 	}, 5000);
+}
+
+/**
+   * Shows a welcome banner on the first start of the extension.
+   * The banner contains the extension name, version, info, and link to the repo.
+  */
+function showBanner(force: boolean = false): void {
+	const showBanner: boolean = isDitoShowBanner();
+
+	if (showBanner || force) {
+		let ext = vscode.extensions.getExtension("TOTVS.tds-dito-vscode");
+		// prettier-ignore
+		{
+			const lines: string[] = [
+				"",
+				"--------------------------------v---------------------------------------------",
+				"     ////    //  //////  ////// |  TDS-Dito, your partner in AdvPL programming",
+				`    //  //        //    //  //  |  Version ${ext?.packageJSON["version"]} (EXPERIMENTAL)`,
+				`   //  //  //    //    //  //   |  TOTVS Technology`,
+				"  //  //  //    //    //  //    |",
+				" ////    //    //    //////     |  https://github.com/totvs/tds-dito",
+				"--------------------------------^----------------------------------------------",
+				"",
+			];
+
+			logger.info(lines.join("\n"));
+		}
+
+		//logger.transports.outputChannel.show();
+	}
 }
