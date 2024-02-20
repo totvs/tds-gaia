@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as fse from "fs-extra";
 import { isDitoShowBanner } from "../config";
+import { logger } from "../logger";
 
 const fileLog = "W:\\ws_tds_vscode\\tds-vscode\\test\\resources\\projects\\dss\\src\\communication.log"
 fse.writeFileSync(fileLog, `Start at ${new Date().toLocaleTimeString()}\n\n`);
@@ -19,7 +20,7 @@ export interface CompletionResponse {
 export interface IaApiInterface {
     start(token: string): Promise<boolean>;
     stop(): Promise<boolean>;
-    checkHealth(): Promise<Error | undefined>;
+    checkHealth(detail: boolean): Promise<Error | undefined>;
 
     login(): Promise<boolean>;
     logout(): Promise<boolean>;
@@ -41,14 +42,23 @@ export class IaAbstractApi {
      * Writes the request body as a JSON string and object to the log file, 
      * along with the request start time.
      */
-    protected logRequest(body: {}) {
+    protected logRequest(uri: string, body: {}) {
         execBeginTime = new Date();
-        const data: string = JSON.stringify(body).replace('\\"', '\\"');
+        const data: string = JSON.stringify(body || {}).replace('\\"', '\\"');
+
+        fse.writeSync(file, `uri: ${execBeginTime.toLocaleTimeString()} \n`);
         fse.writeSync(file, `request: ${execBeginTime.toLocaleTimeString()} \n`);
         fse.writeSync(file, `data: ${data} \n\n`);
 
-        const json: string = JSON.stringify(body, undefined, 2);
-        fse.writeSync(file, json);
+        if (body) {
+            const json: string = JSON.stringify(body, undefined, 2);
+            fse.writeSync(file, json);
+        }
+
+        logger.http(`Request: ${uri}`);
+        if (body) {
+            logger.verbose(`Data: ${data}`);
+        }
     }
 
     /**
@@ -57,9 +67,9 @@ export class IaAbstractApi {
      * Writes the response body as a JSON string and object to the log file,
      * along with the request end time and duration.
      */
-    protected logResponse(response: {}) {
+    protected logResponse(uri: string, response: {}) {
         const execEndTime = new Date();
-        const data: string = JSON.stringify(response).replace('\\"', '\\"');
+        const data: string = JSON.stringify(response || {}).replace('\\"', '\\"');
 
         fse.writeSync(file, `request: ${execEndTime.toLocaleTimeString()} (${execEndTime.getMilliseconds() - execBeginTime.getMilliseconds()} ms}\n`);
         fse.writeSync(file, `data: ${data} \n`);
@@ -67,6 +77,11 @@ export class IaAbstractApi {
 
         const json: string = JSON.stringify(response, undefined, 2);
         fse.writeSync(file, json);
+
+        logger.http(`Response: ${uri} ${execEndTime.toLocaleTimeString()} (${execEndTime.getMilliseconds() - execBeginTime.getMilliseconds()} ms}\n`);
+        if (json) {
+            logger.verbose(json);
+        }
     }
 
     /**

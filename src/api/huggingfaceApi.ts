@@ -115,17 +115,17 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
     }
 
     generateCode(text: string): Promise<string[]> {
-        this.logRequest({ calledBy: "_generateCode", params: text });
+        this.logRequest(getDitoConfiguration().endPoint, { calledBy: "_generateCode", params: text });
         logger.info("Generating code...");
 
         this._agent.generateCode(text).then((code: string) => {
-            this.logResponse({
+            this.logResponse(getDitoConfiguration().endPoint, {
                 calledBy: "_generateCode", code: code
             });
 
             return this._agent.evaluateCode(code);
         }).then((value: any[]) => {
-            this.logResponse({
+            this.logResponse(getDitoConfiguration().endPoint, {
                 calledBy: ".evaluateCode", value: value
             });
         }).catch((reason: any) => {
@@ -159,7 +159,7 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
             }
         };
 
-        this.logRequest(body);
+        this.logRequest(getDitoConfiguration().endPoint, body);
 
         let resp: any = {};
         try {
@@ -192,7 +192,7 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
 
         const bodyResp: string = await resp.text();
         const json = JSON.parse(bodyResp);
-        this.logResponse(json);
+        this.logResponse(getDitoConfiguration().endPoint, json);
 
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage("No code found in the stack");

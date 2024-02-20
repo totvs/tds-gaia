@@ -67,18 +67,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(logout);
 
 	const detailHealth = vscode.commands.registerCommand('tds-dito.detail-health', async () => {
-		iaApi.checkHealth().then((error: any) => {
+		iaApi.checkHealth(true).then((error: any) => {
 			updateContextKey("readyForUse", error === undefined);
 
 			if (error !== undefined) {
 				vscode.window.showErrorMessage('TDS-Dito: Desculpe. Problemas técnicos. Verifique o log.');
-				console.error(error);
-				logger.error(error);
-				// outputChannel.appendLine(`Message: ${error.message}`);
-				// outputChannel.appendLine(`Cause: ${error.cause}`);
-				// outputChannel.appendLine(`Stack: ${error.stack}`);
-
-				//outputChannel.show()
 			} else {
 				vscode.commands.executeCommand("tds-dito.login", [true])
 			}
@@ -110,7 +103,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
 
-	return iaApi.stop(); //para forçar mudança de userLogin
+	return iaApi.stop();
 }
 
 function updateContextKey(key: string, value: boolean | string | number) {
@@ -123,6 +116,8 @@ function handleConfigChange(context: vscode.ExtensionContext) {
 			updateStatusBarItems();
 
 			updateContextKey("logged", isDitoLogged());
+
+			logger.level = getDitoConfiguration().verbose;
 		}
 	});
 
@@ -239,7 +234,5 @@ function showBanner(force: boolean = false): void {
 
 			logger.info(lines.join("\n"));
 		}
-
-		//logger.transports.outputChannel.show();
 	}
 }

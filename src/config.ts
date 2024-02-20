@@ -21,10 +21,9 @@ export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
 //outras configurações, de preferência não persistentes, devem ser efetuadas em TDitoCustomConfig
 export type TDitoConfig = {
   showBanner: boolean;
-  verbose: "off" | "messages" | "verbose"
+  verbose: string
   endPoint: string;
   apiVersion: string;
-  userLogin: string;
   lastLogin: string;
   documentFilter: {
     [key: string]: string;
@@ -32,7 +31,7 @@ export type TDitoConfig = {
   enableAutoSuggest: boolean;
   requestDelay: number;
   maxLine: number;
-  maxSuggestion: number;
+  maxSuggestions: number;
 
   //deprecated: used in HF Api
   maxNewTokens: number;
@@ -78,7 +77,6 @@ function setDitoCustomConfiguration(key: keyof TDitoCustomConfig, newValue: any)
 export function setDitoUser(user: LoggedUser | undefined) {
 
   setDitoCustomConfiguration("currentUser", user);
-  setDitoConfiguration("userLogin", user !== undefined);
   setDitoConfiguration("lastLogin", new Date().toUTCString()); //forçar modificação em settings.json
 }
 

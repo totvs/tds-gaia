@@ -10,9 +10,9 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
     const provider: vscode.InlineCompletionItemProvider = {
         async provideInlineCompletionItems(document, position, innerContext, token) {
 
-            if (context.workspaceState.get("tds-dito.readyFoUse") === false) {
-                return;
-            }
+            // if (context.workspaceState.get("tds-dito.readyFoUse") === false) {
+            //     return;
+            // }
 
             const config = getDitoConfiguration();
             const autoSuggest = config.enableAutoSuggest;

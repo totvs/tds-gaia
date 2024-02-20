@@ -6,6 +6,7 @@ user function cadastro()
 
 	process()
 
+
 return
 
 static function process()

@@ -175,7 +175,7 @@
             "default": 5,
             "description": "Maximum lines per suggestion"
           },
-          "tds-dito.maxSuggestion": {
+          "tds-dito.maxSuggestions": {
             "scope": "application",
             "order": 7,
             "type": "number",
@@ -193,21 +193,24 @@
             "type": "string",
             "enum": [
               "off",
-              "request",
-              "verbose"
+              "error",
+              "warn",
+              "info",
+              "http",
+              "verbose",
+              "debug"
             ],
-            "default": "off",
-            "description": "Rastreia a comunicação entre o VS Code e o serviço externo.",
+            "default": "info",
+            "description": "Nível de severidade mínima a ser apresentada no console da extensão.",
             "enumDescriptions": [
-              "Rastreamento desligado",
-              "Rastreamento de requisição (resumido)",
-              "Rastreamento de requisição (detalhado)"
+              "Desligado (não recomendado)",
+              "Erros",
+              "Avisos",
+              "Informações",
+              "Requisições externas",
+              "Detalhada",
+              "Depuração"
             ]
-          },
-          "tds-dito.userLogin": {
-            "type": "boolean",
-            "default": false,
-            "description": "User login status"
           },
           "tds-dito.lastLogin": {
             "type": "string",

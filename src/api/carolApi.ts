@@ -1,10 +1,11 @@
 import * as vscode from "vscode";
 
-import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoUser } from "../config";
+import { TDitoConfig, TDitoCustomConfig, getDitoConfiguration, getDitoUser, setDitoUser } from "../config";
 import { fetch } from "undici";
 import { capitalize } from "../util";
 import { CompletionResponse, IaAbstractApi, IaApiInterface } from "./interfaceApi";
 import { logger } from "../logger";
+import { log } from "console";
 
 export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
@@ -15,47 +16,82 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     private _urlRequest: string = `${this._endPoint}`;
     private _apiRequest: string = `${this._urlRequest}/api/${this._apiVersion}`;
 
+    private config: TDitoConfig = getDitoConfiguration();
+
     async start(token: string): Promise<boolean> {
         this._token = token;
 
         logger.info(`Extension is using [${this._urlRequest}]`);
 
-        return Promise.resolve(await this.checkHealth() === undefined)
+        return Promise.resolve(await this.checkHealth(false) === undefined)
     }
 
-    async checkHealth(): Promise<Error | undefined> {
-        let result: any = undefined
-        logger.info("Getting health check...");
-
+    private async textRequest(method: "GET" | "POST", url: string, data?: any): Promise<string | Error> {
         let resp: any = {};
+        let result: Error & { cause?: string } | undefined;
+        this.logRequest(url, data);
+
         try {
-            resp = await fetch(`${this._apiRequest}/health_check`, {
-                method: "GET"
+            resp = await fetch(url, {
+                method: method,
+                body: data,
             });
 
             if (!resp.ok) {
-                result = new Error("Error getting health check");
-                result.name = "Error getting health check";
-                result.message = resp.statusText;
-                result.cause = resp.statusText;
+                result = new Error();
+                result.cause = "Error requesting [type: " + method + ", url: " + url + "]";
+                result.message = `${resp.status}: ${resp.statusText}`;
                 Error.captureStackTrace(result);
-            } else {
-                const bodyResp: string = await resp.text();
-                this.logResponse(bodyResp);
+                this.logError(result);
+                return Promise.resolve(result);
 
-                if (bodyResp !== "Server is on") {
-                    result = new Error("Error getting health check");
-                    result.name = "Error getting health check";
-                    result.message = bodyResp;
-                    result.cause = resp.statusText;
-                    Error.captureStackTrace(result);
-                }
             }
+            const bodyResp: string = await resp.text();
+            this.logResponse(url, bodyResp);
+            resp = bodyResp.trim();
         } catch (error: any) {
-            result = error;
+            result = new Error();
+            result.name = "Error requesting [type: " + method + ", url: " + url + "]";
+            result.message = `${resp.statusCode}: ${resp.statusText}`;
+            result.cause = error;
+
+            return Promise.resolve(result);
         }
 
-        result = undefined
+        return Promise.resolve(resp);
+    }
+
+    private async jsonRequest(method: "GET" | "POST", url: string, data: any): Promise<{} | Error> {
+        let resp: any = this.textRequest(method, url, data);
+
+        if (typeof (resp) === "string") {
+            const json = JSON.parse(resp);
+            return Promise.resolve(json);
+        }
+
+        return Promise.resolve(resp);
+    }
+
+    async checkHealth(detail: boolean): Promise<Error | undefined> {
+        let result: any = undefined
+        logger.info("Getting health check...");
+
+        let resp: string | Error = await this.textRequest("GET", `${this._apiRequest}/health_check`);
+
+        if (typeof (resp) === "object") {
+            result = resp
+            if (detail) {
+                logger.error(`${result.cause}\n ${result.stack}`);
+            }
+        } if (resp !== "\"Server is on.\"") {
+            result = new Error("Error getting health check");
+            result.name = "Error getting health check";
+            result.message = resp;
+            Error.captureStackTrace(result);
+        } else {
+            logger.info("IA Service on-line");
+        }
+
         return Promise.resolve(result);
     }
 
@@ -92,72 +128,25 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     }
 
     async generateCode(text: string): Promise<string[]> {
-        this.logRequest({ calledBy: "_generateCode", params: text });
-        logger.info("Generating code...");
+        //this.logRequest({ calledBy: "_generateCode", params: text });
+        logger.error("Generating code... (not implemented");
 
         return [""]
     }
 
     async getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse> {
-        const config: TDitoConfig = getDitoConfiguration();
-        const startTime = new Date().getMilliseconds();
         logger.info("Code completions...");
 
-        const headers: {} = {
-            "authorization": `Bearer ${this._token}`,
-            "content-type": "application/json",
-            "x-use-cache": "false",
-            "origin": "https://ui.endpoints.huggingface.co"
-        };
-
         const body: {} = {
-            "inputs": `<fim_prefix>${textBeforeCursor}<fim_suffix>${textAfterCursor}<fim_middle>`,
+            "prefix": textBeforeCursor,
+            "suffix": textAfterCursor,
             "parameters": {
-                "top_k": config.top_k,
-                "top_p": config.top_p,
-                "temperature": config.temperature,
-                "max_new_tokens": config.maxNewTokens,
-                "do_sample": true
+                "nb_alternatives": this.config.maxSuggestions,
+                "nb_lines": this.config.maxLine
             }
         };
 
-        this.logRequest(body);
-
-        let resp: any = {};
-        try {
-            resp = await fetch(config.endPoint, {
-                method: "POST",
-                body: JSON.stringify(body),
-                headers: headers
-            });
-
-        } catch (error: any) {
-            this.logError(error);
-            logger.error("Catch (Fetch) error: ", error);
-            // logger.info(error.message);
-            // logger.info(error.cause);
-            // logger.info(error.stack);
-
-            resp.ok = false;
-        }
-
-        if (!resp.ok) {
-            const usarName: string = getDitoUser()!["name"];
-
-            if (resp.status == 502) {
-                logger.info(`${usarName}, I'm sorry but I can't answer you at the moment.`);
-            } else if (resp.status == 401) {
-                logger.info(`${usarName}, I'm sorry but you do not have access privileges. Try login.`);
-            } else {
-                logger.info(`Fetch response error: Status: ${resp.status}-${resp.statusText}`);
-            }
-
-            return { completions: [] };
-        }
-
-        const bodyResp: string = await resp.text();
-        const json = JSON.parse(bodyResp);
-        this.logResponse(json);
+        let json: any = await this.jsonRequest("POST", `${this._apiRequest}/complete`, body);
 
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage("No code found in the stack");
@@ -168,9 +157,6 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         Object.keys(json).forEach((key: string) => {
             response.completions.push(json[key]);
         });
-
-        const endTime = new Date().getMilliseconds();
-        logger.info("Code completions finish " + (endTime - startTime) + " ms");
 
         return response;
     }
