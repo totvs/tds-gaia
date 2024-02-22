@@ -1,6 +1,8 @@
 advpl
 fullname
+HOMEPATH
 huggingface
+Logform
 protheus
 TLPP
 totvs

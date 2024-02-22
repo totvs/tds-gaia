@@ -66,7 +66,7 @@
           "name": "Dito: Chat"
         }
       ],
-      "explorer-package": [
+      "explorer": [
         {
           "id": "tds-dito-view",
           "name": "Dito: Chat",
@@ -83,7 +83,7 @@
       },
       {
         "view": "tds-dito-view",
-        "contents": "Olá, sou o Benedito, mas no momento estou com dificuldades técnicas para atendê-lo.\n[Detalhar](command:tds-dito.detail-health)",
+        "contents": "Olá, sou o Benedito, mas no momento estou com dificuldades técnicas para atendê-lo.\n[Tentar novamente](command:tds-dito.detail-health)",
         "when": "tds-dito.readyForUse !== true"
       }
     ],
@@ -124,21 +124,18 @@
         "title": "TDS-Dito",
         "properties": {
           "tds-dito.endPoint": {
-            "scope": "application",
             "order": 1,
             "type": "string",
             "default": "https://advpl.ds.dta.totvs.ai",
             "description": "endPoint"
           },
           "tds-dito.apiVersion": {
-            "scope": "application",
             "order": 2,
             "type": "string",
             "default": "v1",
             "description": "API Version"
           },
           "tds-dito.documentFilter": {
-            "scope": "application",
             "order": 3,
             "type": [
               "object",
@@ -155,68 +152,83 @@
             "description": "Filter documents to enable suggestions for"
           },
           "tds-dito.enableAutoSuggest": {
-            "scope": "application",
             "order": 4,
             "type": "boolean",
             "default": true,
             "description": "enableAutoSuggest"
           },
           "tds-dito.requestDelay": {
-            "scope": "application",
             "order": 5,
             "type": "number",
-            "default": 30,
-            "description": "requestDelay"
+            "default": 600,
+            "description": "Delay in typing to activate the IA"
           },
           "tds-dito.maxLine": {
-            "scope": "application",
             "order": 6,
             "type": "number",
             "default": 5,
             "description": "Maximum lines per suggestion"
           },
           "tds-dito.maxSuggestions": {
-            "scope": "application",
             "order": 7,
             "type": "number",
             "default": 3,
             "description": "Maximum suggestions per requisition"
           },
           "tds-dito.showBanner": {
-            "scope": "application",
             "type": "boolean",
             "default": true,
             "description": "Displays banner when starting"
           },
-          "tds-dito.verbose": {
-            "scope": "application",
+          "tds-dito.logLevel": {
             "type": "string",
             "enum": [
               "off",
-              "error",
-              "warn",
-              "info",
-              "http",
+              "debug",
               "verbose",
-              "debug"
+              "http",
+              "info",
+              "warn",
+              "error"
+            ],
+            "default": "debug",
+            "description": "Nível de severidade mínima a ser gravada no arquivo de ocorrências.",
+            "enumDescriptions": [
+              "Desligado (não recomendado)",
+              "Depuração",
+              "Detalhado",
+              "Requisições HTTP",
+              "Informações",
+              "Avisos",
+              "Erros"
+            ]
+          },
+          "tds-dito.trace": {
+            "type": "string",
+            "enum": [
+              "off",
+              "trace",
+              "debug",
+              "info",
+              "warning",
+              "error"
             ],
             "default": "info",
             "description": "Nível de severidade mínima a ser apresentada no console da extensão.",
             "enumDescriptions": [
               "Desligado (não recomendado)",
-              "Erros",
-              "Avisos",
+              "Rastreamento",
+              "Depuração",
               "Informações",
-              "Requisições externas",
-              "Detalhada",
-              "Depuração"
+              "Avisos",
+              "Erros"
             ]
           },
           "tds-dito.lastLogin": {
             "type": "string",
             "default": "",
             "description": "When last user logged",
-            "deprecationMessage": "For internal use"
+            "deprecationMessage": "For internal use. Don´t edit please."
           },
           "tds-dito.tokensToClear": {
             "scope": "application",
@@ -318,7 +330,6 @@
     "@huggingface/inference": "^2.6.4",
     "@vscode/l10n": "^0.0.18",
     "@vscode/l10n-dev": "^0.0.31",
-    "@xenova/transformers": "^2.14.0",
     "fs-extra": "^11.2.0",
     "undici": "^6.4.0",
     "vscode-languageclient": "^9.0.1",
