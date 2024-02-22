@@ -1,11 +1,14 @@
 import * as vscode from "vscode";
 
-import { TDitoConfig, TDitoCustomConfig, getDitoConfiguration, getDitoUser, setDitoUser } from "../config";
+import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoUser } from "../config";
 import { fetch } from "undici";
 import { capitalize } from "../util";
 import { CompletionResponse, IaAbstractApi, IaApiInterface } from "./interfaceApi";
 import { logger } from "../logger";
-import { log } from "console";
+
+//import { encode, decode, labels } from 'windows-1252';
+//let windows1252 = await import('windows-1252')
+const windows1252 = require('windows-1252');
 
 export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
@@ -26,43 +29,53 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         return Promise.resolve(await this.checkHealth(false) === undefined)
     }
 
-    private async textRequest(method: "GET" | "POST", url: string, data?: any): Promise<string | Error> {
-        let resp: any = {};
-        let result: Error & { cause?: string } | undefined;
-        this.logRequest(url, data);
+    private async textRequest(method: "GET" | "POST", url: string, data?: string, headers?: {}): Promise<string | Error> {
+        logger.profile("textRequest");
 
+        let result: Error & { cause?: string } | string;
+        this.logRequest(url, method, headers || {}, data || "");
+
+        let resp: any = {};
         try {
             resp = await fetch(url, {
                 method: method,
                 body: data,
+                headers: headers
             });
 
+            const bodyResp: string = await resp.text();
             if (!resp.ok) {
                 result = new Error();
-                result.cause = "Error requesting [type: " + method + ", url: " + url + "]";
+                result.name = `REQUEST_${method.toUpperCase()}`;
+                result.cause = "Error requesting [type: " + method + ", url: " + url + " ]";
                 result.message = `${resp.status}: ${resp.statusText}`;
                 Error.captureStackTrace(result);
-                this.logError(result);
-                return Promise.resolve(result);
-
+                this.logError(url, result, bodyResp);
+            } else {
+                this.logResponse(url, bodyResp);
             }
-            const bodyResp: string = await resp.text();
-            this.logResponse(url, bodyResp);
-            resp = bodyResp.trim();
+            result = bodyResp.trim();
         } catch (error: any) {
             result = new Error();
-            result.name = "Error requesting [type: " + method + ", url: " + url + "]";
             result.message = `${resp.statusCode}: ${resp.statusText}`;
             result.cause = error;
-
-            return Promise.resolve(result);
+            this.logError(url, error, "");
         }
 
-        return Promise.resolve(resp);
+        logger.profile("textRequest");//, { message: typeof (result) == "object" ? "Error" : "OK" });
+        return Promise.resolve(result);
     }
 
     private async jsonRequest(method: "GET" | "POST", url: string, data: any): Promise<{} | Error> {
-        let resp: any = this.textRequest(method, url, data);
+        const headers: {} = {
+            //"authorization": `Bearer ${this._token} `,
+            "accept": "application/json",
+            "Content-Type": "application/json"
+            //"x-use-cache": "false",
+            //            "origin": "https://ui.endpoints.huggingface.co"
+        };
+
+        let resp: any = await this.textRequest(method, url, JSON.stringify(data), headers);
 
         if (typeof (resp) === "string") {
             const json = JSON.parse(resp);
@@ -80,14 +93,11 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
         if (typeof (resp) === "object") {
             result = resp
-            if (detail) {
-                logger.error(`${result.cause}\n ${result.stack}`);
-            }
         } if (resp !== "\"Server is on.\"") {
-            result = new Error("Error getting health check");
-            result.name = "Error getting health check";
-            result.message = resp;
+            result = new Error("Server is off-line or not responding.");
+            result.cause = resp;
             Error.captureStackTrace(result);
+            logger.error(result);
         } else {
             logger.info("IA Service on-line");
         }
@@ -135,7 +145,8 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     }
 
     async getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse> {
-        logger.info("Code completions...");
+        logger.debug("Code completions...");
+        logger.profile("getCompletions");
 
         const body: {} = {
             "prefix": textBeforeCursor,
@@ -154,9 +165,20 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         }
 
         const response: CompletionResponse = { completions: [] };
-        Object.keys(json).forEach((key: string) => {
-            response.completions.push(json[key]);
-        });
+        for (let index = 0; index < json.length; index++) {
+            const lines: string[] = json[index];
+            let blockCode: string = "";
+
+            // blockCode += `//\n//\n//bloco ${index}\n//\n//`;
+            lines.forEach((line: string) => {
+                blockCode += line + "\n";
+            });
+
+            response.completions.push({ generated_text: blockCode });
+        }
+
+        logger.debug(`Code completions end with ${response.completions.length} suggestions`);
+        logger.debug(JSON.stringify(response.completions, undefined, 2));
 
         return response;
     }

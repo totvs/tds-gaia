@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
-import { TDitoConfig, getDitoConfiguration, isDitoLogged, isDitoShowBanner } from './config';
+import { TDitoConfig, getDitoConfiguration, getDitoLogLevel, isDitoLogged, isDitoShowBanner } from './config';
 import { inlineCompletionItemProvider } from './completionItemProvider';
-import { IaApiInterface } from './api/interfaceApi';
+import { CompletionResponse, IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
-import { logger } from './logger';
+import { PREFIX_DITO, logger } from './logger';
 
 let ctx: vscode.ExtensionContext;
 
@@ -29,7 +29,6 @@ export function activate(context: vscode.ExtensionContext) {
 			iaApi.start(apiToken).then(async (value: boolean) => {
 				if (await iaApi.login()) {
 					logger.info('Logged in successfully');
-					//vscode.window.showInformationMessage(`Hi ${getDitoUser()?.name || "<not logged>"}. I am ready to help you in any way possible.`);
 					return;
 				}
 			});
@@ -49,10 +48,10 @@ export function activate(context: vscode.ExtensionContext) {
 			if (await iaApi.start(input)) {
 				if (await iaApi.login()) {
 					await context.secrets.store('apiToken', input);
-					vscode.window.showInformationMessage('TDS-Dito: Logged in successfully');
+					vscode.window.showInformationMessage(`${PREFIX_DITO} Logged in successfully`);
 				} else {
 					await context.secrets.delete('apiToken');
-					vscode.window.showErrorMessage('TDS-Dito: Login failure');
+					vscode.window.showErrorMessage(`${PREFIX_DITO} Login failure`);
 				}
 			}
 		}
@@ -62,7 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const logout = vscode.commands.registerCommand('tds-dito.logout', async (...args) => {
 		iaApi.logout();
 		await context.secrets.delete('apiToken');
-		vscode.window.showInformationMessage('TDS-Dito: Logged out');
+		vscode.window.showInformationMessage(`${PREFIX_DITO} Logged out`);
 	});
 	context.subscriptions.push(logout);
 
@@ -71,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
 			updateContextKey("readyForUse", error === undefined);
 
 			if (error !== undefined) {
-				vscode.window.showErrorMessage('TDS-Dito: Desculpe. Problemas técnicos. Verifique o log.');
+				vscode.window.showErrorMessage(`${PREFIX_DITO} Desculpe. Problemas técnicos. Verifique o log.`);
 			} else {
 				vscode.commands.executeCommand("tds-dito.login", [true])
 			}
@@ -98,6 +97,20 @@ export function activate(context: vscode.ExtensionContext) {
 	const inlineRegister: vscode.Disposable = vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
 	context.subscriptions.push(inlineRegister);
 
+	const afterInsert = vscode.commands.registerCommand('tds-dito.afterInsert', async (response: CompletionResponse) => {
+		const { request_id, completions } = response;
+		const params = {
+			requestId: request_id,
+			acceptedCompletion: 0,
+			shownCompletions: [0],
+			completions,
+		};
+			logger.debug("Params: %s", JSON.stringify(params, undefined, 2));
+
+		//await client.sendRequest("llm-ls/acceptCompletion", params);
+	});
+	ctx.subscriptions.push(afterInsert);
+
 	vscode.commands.executeCommand("tds-dito.detail-health");
 }
 
@@ -113,11 +126,10 @@ function updateContextKey(key: string, value: boolean | string | number) {
 function handleConfigChange(context: vscode.ExtensionContext) {
 	const listener: vscode.Disposable = vscode.workspace.onDidChangeConfiguration(async event => {
 		if (event.affectsConfiguration('tds-dito')) {
-			updateStatusBarItems();
-
 			updateContextKey("logged", isDitoLogged());
+			logger.level = getDitoLogLevel();
 
-			logger.level = getDitoConfiguration().verbose;
+			updateStatusBarItems();
 		}
 	});
 
@@ -229,7 +241,6 @@ function showBanner(force: boolean = false): void {
 				"  //  //  //    //    //  //    |",
 				" ////    //    //    //////     |  https://github.com/totvs/tds-dito",
 				"--------------------------------^----------------------------------------------",
-				"",
 			];
 
 			logger.info(lines.join("\n"));

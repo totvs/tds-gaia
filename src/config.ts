@@ -1,5 +1,5 @@
-import { log } from 'console';
 import * as vscode from 'vscode';
+import winston = require('winston');
 
 let customConfig: TDitoCustomConfig = {};
 
@@ -21,7 +21,7 @@ export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
 //outras configurações, de preferência não persistentes, devem ser efetuadas em TDitoCustomConfig
 export type TDitoConfig = {
   showBanner: boolean;
-  verbose: string
+  logLevel: "off" | "error" | "warn" | "info" | "http" | "verbose" | "debug";
   endPoint: string;
   apiVersion: string;
   lastLogin: string;
@@ -32,6 +32,10 @@ export type TDitoConfig = {
   requestDelay: number;
   maxLine: number;
   maxSuggestions: number;
+
+  trace: {
+    server: string | undefined
+  }
 
   //deprecated: used in HF Api
   maxNewTokens: number;
@@ -48,7 +52,7 @@ const EMPTY_USER: LoggedUser = {
   displayName: "<not logged>",
   avatarUrl: "",
   expiration: undefined,
-  expiresAt: undefined
+  expiresAt: undefined,
 }
 
 export type TDitoCustomConfig = {
@@ -92,5 +96,10 @@ export function isDitoLogged(): boolean {
 
 export function isDitoShowBanner(): boolean {
 
-  return getDitoConfiguration().showBanner
+  return getDitoConfiguration().showBanner;
+}
+
+export function getDitoLogLevel(): string {
+
+  return getDitoConfiguration().logLevel;
 }

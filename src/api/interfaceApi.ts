@@ -1,11 +1,5 @@
-import * as vscode from "vscode";
-import * as fse from "fs-extra";
-import { isDitoShowBanner } from "../config";
 import { logger } from "../logger";
 
-const fileLog = "W:\\ws_tds_vscode\\tds-vscode\\test\\resources\\projects\\dss\\src\\communication.log"
-fse.writeFileSync(fileLog, `Start at ${new Date().toLocaleTimeString()}\n\n`);
-const file = fse.openSync(fileLog, "a");
 let execBeginTime: Date;
 
 interface Completion {
@@ -30,7 +24,6 @@ export interface IaApiInterface {
 }
 
 export class IaAbstractApi {
-    private fistStart: boolean = true;
 
     constructor() {
 
@@ -42,23 +35,11 @@ export class IaAbstractApi {
      * Writes the request body as a JSON string and object to the log file, 
      * along with the request start time.
      */
-    protected logRequest(uri: string, body: {}) {
+    protected logRequest(url: string, method: string, headers: {}, body: string) {
         execBeginTime = new Date();
-        const data: string = JSON.stringify(body || {}).replace('\\"', '\\"');
+        logger.profile(url);
 
-        fse.writeSync(file, `uri: ${execBeginTime.toLocaleTimeString()} \n`);
-        fse.writeSync(file, `request: ${execBeginTime.toLocaleTimeString()} \n`);
-        fse.writeSync(file, `data: ${data} \n\n`);
-
-        if (body) {
-            const json: string = JSON.stringify(body, undefined, 2);
-            fse.writeSync(file, json);
-        }
-
-        logger.http(`Request: ${uri}`);
-        if (body) {
-            logger.verbose(`Data: ${data}`);
-        }
+        logger.http("%s: %s", method, url, { headers: headers, body: body });
     }
 
     /**
@@ -67,21 +48,12 @@ export class IaAbstractApi {
      * Writes the response body as a JSON string and object to the log file,
      * along with the request end time and duration.
      */
-    protected logResponse(uri: string, response: {}) {
-        const execEndTime = new Date();
-        const data: string = JSON.stringify(response || {}).replace('\\"', '\\"');
+    protected logResponse(url: string, response: string) {
+        logger.profile(url);
+        const execEndTime: Date = new Date();
+        const duration: number = execEndTime.getMilliseconds() - execBeginTime.getMilliseconds();
 
-        fse.writeSync(file, `request: ${execEndTime.toLocaleTimeString()} (${execEndTime.getMilliseconds() - execBeginTime.getMilliseconds()} ms}\n`);
-        fse.writeSync(file, `data: ${data} \n`);
-        fse.writeSync(file, `${'-'.repeat(20)} \n\n`);
-
-        const json: string = JSON.stringify(response, undefined, 2);
-        fse.writeSync(file, json);
-
-        logger.http(`Response: ${uri} ${execEndTime.toLocaleTimeString()} (${execEndTime.getMilliseconds() - execBeginTime.getMilliseconds()} ms}\n`);
-        if (json) {
-            logger.verbose(json);
-        }
+        logger.http("Response: %s (%d ms)", url, duration, { body: response });
     }
 
     /**
@@ -90,15 +62,9 @@ export class IaAbstractApi {
      * Writes the error details including the end time, 
      * elapsed time, message, cause, and stack trace.
      */
-    protected logError(error: any) {
-        console.error(error);
-
-        const execEndTime = new Date();
-
-        fse.writeSync(file, `ERROR: ${execEndTime.toLocaleTimeString()} (${execEndTime.getMilliseconds() - execBeginTime.getMilliseconds()} ms}\n`);
-        fse.writeSync(file, `Message: ${error.message} \n`);
-        fse.writeSync(file, `Cause: ${error.cause} \n`);
-        fse.writeSync(file, `Cause: ${error.stack} \n`);
-        fse.writeSync(file, `${'-'.repeat(20)} \n\n`);
+    protected logError(url: string, error: any, complement: string) {
+        logger.profile(url);
+        logger.error(error);
+        logger.verbose(complement);
     }
 }

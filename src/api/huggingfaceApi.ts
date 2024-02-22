@@ -6,7 +6,6 @@ import { AuthInfo, Credentials, WhoAmI, WhoAmIOrg, WhoAmIUser, whoAmI } from "@h
 import { TDitoConfig, getDitoConfiguration, getDitoUser, isDitoShowBanner, setDitoUser } from "../config";
 import { fetch } from "undici";
 import { capitalize } from "../util";
-import * as fse from 'fs-extra';
 import { CompletionResponse, IaAbstractApi, IaApiInterface } from "./interfaceApi";
 import { logger } from "../logger";
 
@@ -95,11 +94,7 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
 
             result = true;
         }).catch((reason: any) => {
-            this.logError(reason);
-
-            logger.info("ERROR login: " + reason);
-            logger.info(reason.cause);
-            logger.info(reason.stack);
+            this.logError("", reason, "");
 
             setDitoUser(undefined);
         });
@@ -115,21 +110,21 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
     }
 
     generateCode(text: string): Promise<string[]> {
-        this.logRequest(getDitoConfiguration().endPoint, { calledBy: "_generateCode", params: text });
+        this.logRequest(getDitoConfiguration().endPoint, "", "", JSON.stringify({ calledBy: "_generateCode", params: text }));
         logger.info("Generating code...");
 
         this._agent.generateCode(text).then((code: string) => {
-            this.logResponse(getDitoConfiguration().endPoint, {
-                calledBy: "_generateCode", code: code
-            });
+            this.logResponse(getDitoConfiguration().endPoint,
+                JSON.stringify({ calledBy: "_generateCode", code: code })
+            );
 
             return this._agent.evaluateCode(code);
         }).then((value: any[]) => {
-            this.logResponse(getDitoConfiguration().endPoint, {
-                calledBy: ".evaluateCode", value: value
-            });
+            this.logResponse(getDitoConfiguration().endPoint,
+                JSON.stringify({ calledBy: ".evaluateCode", value: value })
+            );
         }).catch((reason: any) => {
-            this.logError(reason);
+            this.logError("", reason, "");
         });
 
         return Promise.resolve([""]);
@@ -159,7 +154,7 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
             }
         };
 
-        this.logRequest(getDitoConfiguration().endPoint, body);
+        this.logRequest(getDitoConfiguration().endPoint, "", JSON.stringify(headers, undefined, 2), JSON.stringify(body, undefined, 2));
 
         let resp: any = {};
         try {
@@ -170,8 +165,7 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
             });
 
         } catch (error: any) {
-            this.logError(error);
-            logger.error("Catch (Fetch) error: ", error);
+            this.logError("", error, "");
 
             resp.ok = false;
         }

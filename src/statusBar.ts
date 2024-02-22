@@ -1,10 +1,18 @@
 import * as vscode from "vscode";
-import { LoggedUser, TDitoConfig, UserOrganization, getDitoConfiguration, getDitoUser, isDitoLogged } from "./config";
-import { WhoAmI, WhoAmIOrg, WhoAmIUser } from "@huggingface/hub";
+import { LoggedUser, UserOrganization, getDitoUser, isDitoLogged } from "./config";
 
 let statusBarItem: vscode.StatusBarItem;
 
 const priorityStatusBarItem: number = 200;
+
+let loadingIndicator: vscode.StatusBarItem;
+
+function createLoadingIndicator(): vscode.StatusBarItem {
+  let li = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10)
+  li.text = "$(loading~spin) LLM"
+  li.tooltip = "Generating completions..."
+  return li
+}
 
 export function initStatusBarItems(): vscode.StatusBarItem[] {
   const result: vscode.StatusBarItem[] = [];

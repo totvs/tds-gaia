@@ -3,6 +3,7 @@ import { delay } from "./util";
 import { getDitoConfiguration } from "./config";
 import { CompletionResponse } from "./api/interfaceApi";
 import { iaApi } from "./extension"
+import { logger } from "./logger";
 
 //acionamento manual: F1 + editor.action.inlineSuggest.trigger
 export function inlineCompletionItemProvider(context: vscode.ExtensionContext): vscode.InlineCompletionItemProvider {
@@ -26,9 +27,11 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
             }
 
             if (requestDelay > 0) {
-                const cancelled = await delay(requestDelay, token);
+                logger.debug("Delay " + requestDelay + "ms before requesting completions");
+                const cancelled = await delay(requestDelay * 10, token);
                 if (cancelled) {
-                    return
+                    logger.debug("Request cancelled by user");
+                    return;
                 }
             }
 
@@ -39,46 +42,32 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
             textBeforeCursor = document.getText().substring(0, offset);
             textAfterCursor = document.getText().substring(offset + 1);
 
-            // let params = {
-            //     position,
-            //     //textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
-            //     model: config.get("modelIdOrEndpoint") as string,
-            //     tokens_to_clear: config.get("tokensToClear") as string[],
-            //     api_token: await context.secrets.get('apiToken'),
-            //     request_params: {
-            //         max_new_tokens: config.get("maxNewTokens") as number,
-            //         temperature: config.get("temperature") as number,
-            //         do_sample: true,
-            //         top_p: 0.95,
-            //     },
-            //     fim: config.get("fillInTheMiddle") as number,
-            //     context_window: config.get("contextWindow") as number,
-            //     tls_skip_verify_insecure: config.get("tlsSkipVerifyInsecure") as boolean,
-            //     ide: "vscode",
-            //     tokenizer_config: config.get("tokenizer") as object | null,
-            // };
             try {
                 const response: CompletionResponse =
                     await iaApi.getCompletions(textBeforeCursor, textAfterCursor);
 
-                const items = [];
+                const items: vscode.InlineCompletionItem[] = [];
+                if (token.isCancellationRequested) {
+                    logger.warn('Request cancelled by user');
+                    return;
+                }
+                
                 if (response !== undefined && response.completions.length) {
                     for (const completion of response.completions) {
                         items.push({
                             insertText: completion.generated_text,
                             range: new vscode.Range(position, position),
-                            command: {
-                                title: 'afterInsert',
-                                command: 'tds-dito.afterInsert',
-                                arguments: [response],
-                            }
+                            // command: {
+                            //     title: 'afterInsert',
+                            //     command: 'tds-dito.afterInsert',
+                            //     arguments: [completion],
+                            // }
                         });
                     }
                 }
 
-                return {
-                    items,
-                };
+                const list: vscode.InlineCompletionList = new vscode.InlineCompletionList(items);
+                return list;
             } catch (e) {
                 const err_msg = (e as Error);
 
