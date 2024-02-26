@@ -25,6 +25,9 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
     constructor() {
         super();
     }
+    explainCode(code: string): Promise<string> {
+        throw new Error("Method not implemented.");
+    }
 
     checkHealth(): Promise<Error | undefined> {
         throw new Error("Method not implemented.");

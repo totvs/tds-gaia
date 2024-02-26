@@ -60,14 +60,9 @@
   "main": "./out/extension.js",
   "contributes": {
     "views": {
-      "totvs-platform": [
-        {
-          "id": "tds-dito-view",
-          "name": "Dito: Chat"
-        }
-      ],
       "explorer": [
         {
+          "type": "webview",
           "id": "tds-dito-view",
           "name": "Dito: Chat",
           "visibility": "collapsed",
@@ -75,18 +70,6 @@
         }
       ]
     },
-    "viewsWelcome": [
-      {
-        "view": "tds-dito-view",
-        "contents": "Olá, sou o Benedito, mas pode me chamar de Dito.\nPara que possamos ser parceiros, preciso saber quem é você.\n[Identificar-me](command:tds-dito.login)",
-        "when": "tds-dito.logged !== true && tds-dito.readyForUse == true"
-      },
-      {
-        "view": "tds-dito-view",
-        "contents": "Olá, sou o Benedito, mas no momento estou com dificuldades técnicas para atendê-lo.\n[Tentar novamente](command:tds-dito.detail-health)",
-        "when": "tds-dito.readyForUse !== true"
-      }
-    ],
     "commands": [
       {
         "command": "tds-dito.afterInsert",
@@ -116,6 +99,11 @@
       {
         "command": "tds-dito.generateCode",
         "title": "Generate Code",
+        "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.explain",
+        "title": "Explain Code",
         "category": "TDS-Dito"
       }
     ],
@@ -311,12 +299,22 @@
       {
         "key": "cmd+shift+a",
         "command": "tds-dito.attribution"
+      },
+      {
+        "key": "ctrl+d ctrl+e",
+        "command": "tds-dito.explain"
       }
     ]
   },
   "scripts": {
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "--BUILD--": "",
+    "compile": "npm-run-all compile:*",
+    "compile:extension": "tsc -p ./src",
+    "compile:views": "cd webview-ui && npm run compile",
+    "--WATCH--": "",
+    "watch": "npm-run-all watch:*",
+    "watch:extension": "tsc -watch -p ./",
+    "watch:views": "cd webview-ui && npm run watch",
     "lint": "eslint src --ext ts",
     "--PUBLISH--": "",
     "vscode:prepublish": "npm run compile",

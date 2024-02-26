@@ -21,6 +21,7 @@ export interface IaApiInterface {
 
     generateCode(text: string): Promise<string[]>;
     getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse>
+    explainCode(code: string): Promise<string>;
 }
 
 export class IaAbstractApi {
@@ -37,7 +38,6 @@ export class IaAbstractApi {
      */
     protected logRequest(url: string, method: string, headers: {}, body: string) {
         execBeginTime = new Date();
-        logger.profile(url);
 
         logger.http("%s: %s", method, url, { headers: headers, body: body });
     }

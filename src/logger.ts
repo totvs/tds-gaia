@@ -73,9 +73,12 @@ if (fse.existsSync(logFilename)) {
 const formatCause = (cause: any, prefix: string = "\t"): string => {
     let text: string = "";
 
-    text += `${prefix}Cause: ${cause.message}\n`
-    text += `${prefix}Stack: ${cause.stack.replace(/\t/g, prefix + "\t")}\n`;
+    text += `${prefix}Cause: ${cause.message}\n`;
 
+    if (cause.stack) {
+        text += `${prefix}Stack: ${cause.stack.replace(/\t/g, prefix + "\t")}\n`;
+    }
+    
     Object.keys(cause).forEach((key: string) => {
         if (key == "cause") {
             text += formatCause(cause.cause, prefix + "\t");

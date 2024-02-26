@@ -1,4 +1,6 @@
 advpl
+codicon
+codicons
 fullname
 HOMEPATH
 huggingface

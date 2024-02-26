@@ -1,0 +1,46 @@
+[name="serverType"] {
+	width: 20rem;
+}
+
+section.tds-chat {
+	margin: 0px;
+	background-color: aliceblue;
+}
+
+
+section.tds-chat section.tds-header {
+	display: flex;
+	flex-grow: 0;
+	flex-shrink: 1;
+	flex-basis: auto;
+	align-self: auto;
+	order: 0;
+	flex-direction: row;
+	align-items: flex-end;
+	/* width: 100%; */
+	margin-bottom: var(--type-ramp-minus2-line-height);
+	background-color: antiquewhite
+}
+
+section.tds-chat section.tds-content {
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: auto;
+	align-self: auto;
+	order: 0;
+	background-color: aqua;
+}
+
+section.tds-chat section.tds-footer {
+	display: flex;
+	flex-grow: 0;
+	flex-shrink: 1;
+	flex-basis: auto;
+	align-self: auto;
+	order: 0;
+	/* width: 100%; */
+	flex-direction: row;
+	align-items: flex-end;
+	margin-top: calc(var(--type-ramp-minus2-line-height)/2);
+	background-color: aquamarine;
+}

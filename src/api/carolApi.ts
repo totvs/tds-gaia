@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoUser } from "../config";
-import { fetch } from "undici";
+import { fetch, Response } from "undici";
 import { capitalize } from "../util";
 import { CompletionResponse, IaAbstractApi, IaApiInterface } from "./interfaceApi";
 import { logger } from "../logger";
@@ -13,6 +13,7 @@ const windows1252 = require('windows-1252');
 export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
     // prefixo _ indica envolvidas com a API CAROL
+    private _requestId: number = 0;
     private _token: string = "";
     private _endPoint: string = getDitoConfiguration().endPoint;
     private _apiVersion: string = getDitoConfiguration().apiVersion;
@@ -29,57 +30,106 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         return Promise.resolve(await this.checkHealth(false) === undefined)
     }
 
-    private async textRequest(method: "GET" | "POST", url: string, data?: string, headers?: {}): Promise<string | Error> {
-        logger.profile("textRequest");
+    private async fetch(url: string, method: string, headers: Record<string, string>, data: any): Promise<string | {} | Error> {
+        logger.profile(`${url}-${this._requestId++}`);
+        logger.http(url, { method, headers, data });
 
-        let result: Error & { cause?: string } | string;
-        this.logRequest(url, method, headers || {}, data || "");
+        let result: any;
 
-        let resp: any = {};
         try {
-            resp = await fetch(url, {
+            let resp: Response = await fetch(url, {
                 method: method,
-                body: data,
+                body: typeof (data) == "string" ? data : JSON.stringify(data),
                 headers: headers
             });
 
+            logger.info(`Status: ${resp.status}`);
+
             const bodyResp: string = await resp.text();
             if (!resp.ok) {
+                let statusText = "";
+
+                if (resp.status === 502) { //bad gateway
+                    const pos_s: number = bodyResp.indexOf("<h2>");
+                    const pos_e: number = bodyResp.indexOf("</h2>");
+
+                    statusText = "\n" + bodyResp.substring(pos_s + 4, pos_e).replace(/<p>/g, " ");
+                }
+                
                 result = new Error();
                 result.name = `REQUEST_${method.toUpperCase()}`;
                 result.cause = "Error requesting [type: " + method + ", url: " + url + " ]";
-                result.message = `${resp.status}: ${resp.statusText}`;
+                result.message = `${resp.status}: ${resp.statusText}${statusText}`;
+
+                if (resp.headers.get("content-type") == "application/json") {
+                    const json = JSON.parse(bodyResp);
+                    if (json) {
+                        if (json.detail) {
+                            result.message += `\n Detail: ${json.detail}`;
+                        }
+                    }
+                } else {
+                    result.message += `\n Detail: ${bodyResp}`;
+
+                }
                 Error.captureStackTrace(result);
                 this.logError(url, result, bodyResp);
             } else {
                 this.logResponse(url, bodyResp);
+                if (resp.headers.get("content-type") == "application/json") {
+                    try {
+                        result = JSON.parse(bodyResp);
+                    } catch (error) {
+                        result = bodyResp.trim();
+                    }
+                } else {
+                    result = bodyResp.trim();
+                }
             }
-            result = bodyResp.trim();
         } catch (error: any) {
             result = new Error();
-            result.message = `${resp.statusCode}: ${resp.statusText}`;
+            result.message = "Unexpected error";
             result.cause = error;
             this.logError(url, error, "");
         }
 
-        logger.profile("textRequest");//, { message: typeof (result) == "object" ? "Error" : "OK" });
+        logger.profile(`${url}-${this._requestId++}`);
+        return result;
+    }
+
+    private async textRequest(method: "GET" | "POST", url: string, data?: string): Promise<string | Error> {
+        logger.debug("textRequest");
+        const headers: {} = {};
+        //  = {
+        //     "accept": "*/*",
+        //     "Content-Type": "*/* ; charset=UTF8"
+        // };
+
+        let result: Error & { cause?: string } | string;
+        this.logRequest(url, method, headers || {}, data || "");
+
+        let resp: any = await this.fetch(url, method, headers, data);
+        if (typeof (resp) === "object" && resp instanceof Error) {
+            result = resp;
+        } else {
+            result = resp;
+        }
+
         return Promise.resolve(result);
     }
 
     private async jsonRequest(method: "GET" | "POST", url: string, data: any): Promise<{} | Error> {
         const headers: {} = {
-            //"authorization": `Bearer ${this._token} `,
             "accept": "application/json",
             "Content-Type": "application/json"
-            //"x-use-cache": "false",
-            //            "origin": "https://ui.endpoints.huggingface.co"
         };
+        let result: {} | Error;
+        let resp: string | {} | Error = await this.fetch(url, method, headers, data);
 
-        let resp: any = await this.textRequest(method, url, JSON.stringify(data), headers);
-
-        if (typeof (resp) === "string") {
-            const json = JSON.parse(resp);
-            return Promise.resolve(json);
+        if (typeof (resp) === "object" && resp instanceof Error) {
+            result = resp;
+        } else {
+            result = resp;
         }
 
         return Promise.resolve(resp);
@@ -93,7 +143,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
         if (typeof (resp) === "object") {
             result = resp
-        } if (resp !== "\"Server is on.\"") {
+        } else if (resp !== "Server is on.") {
             result = new Error("Server is off-line or not responding.");
             result.cause = resp;
             Error.captureStackTrace(result);
@@ -138,14 +188,11 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     }
 
     async generateCode(text: string): Promise<string[]> {
-        //this.logRequest({ calledBy: "_generateCode", params: text });
-        logger.error("Generating code... (not implemented");
-
-        return [""]
+        throw new Error("Method not implemented.");
     }
 
     async getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse> {
-        logger.debug("Code completions...");
+        logger.info("Code completions...");
         logger.profile("getCompletions");
 
         const body: {} = {
@@ -181,6 +228,29 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         logger.debug(JSON.stringify(response.completions, undefined, 2));
 
         return response;
+    }
+
+    async explainCode(code: string): Promise<string> {
+        logger.info("Code explain...");
+        logger.profile("explainCode");
+
+        const body: {} = {
+            "code": code,
+        };
+
+        let response: {} | Error = await this.jsonRequest("POST", `${this._apiRequest}/explain`, JSON.stringify(body));
+
+        if (typeof (response) === "object") {
+            return "";
+        } else if (!response) {// } || response.length === 0) {
+            void vscode.window.showInformationMessage("No explain found");
+            return "";
+        }
+
+        //  logger.debug(`Code explain end with ${response.length} size`);
+        logger.debug(response);
+
+        return JSON.stringify(response);
     }
 
     stop(): Promise<boolean> {

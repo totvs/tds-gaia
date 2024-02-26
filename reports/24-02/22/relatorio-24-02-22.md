@@ -5,16 +5,22 @@
 - Utilizado nova [URL](https://advpl.ds.dta.totvs.ai)
 - O formato do retorno da API ``complete`` ficou bom e fácil de usar`
 - Parece que o IA está conseguindo detectar o estilo (orientado a objetos ou comandos) e apresentar sugestões coerentes com o estilo.
-- As sugestões passaram a ser mais completas, não truncando a última linhas (limite de _tokens_ na versão anterior).
-- Parece que o IA está conseguindo aprender e evoluir a cada interação.
+- Parece que o IA está conseguindo **aprender e evoluir** a cada interação.
 - Eliminado efeito de colocar/tirar espaços (na versão anterior, ao adicionar/retirar um espaço, as sugestões eram diferentes).
+- Em relação a versão anterior:
+  - Retorno da API ``complete`` limpo, ou seja, sem ``\n`` em excesso e padronizado;
+  - Sugestões seguindo o mesmo estilo e padrões de código do código existente;
+  - Sem truncamento de linhas (limite de _tokens_ na anterior)
 
 ## Comentários
 
 - Padronizar o retorno das API (sempre JSON). A ``health`` retorna texto bruto.
   Sugiro colocar também algo como "em manutenção", com previsão de término, como uma das resposta desta API.
-- Retorno aparenta estar mais rápido.
-  Na versão anterior não fiz medições, portanto é _sentimento_ e passarei a fazê-las, nesta versão e próximas.
+
+- ~~Retorno aparenta estar mais rápido.
+  Na versão anterior não fiz medições, portanto é _sentimento_ e passarei a fazê-las, nesta versão e próximas.~~
+
+- Após análise mais cuidadosa, devido ao uso de ``Promise`` no processo de comunicação com a IA que mascara o tempo real, os tempos de execução da API ``complete`` ficam entre 15 e 20 seg, com acesso via WI-FI. Via cabo, entre 10s e 13 seg.
 
 ## Destaques
 
@@ -80,3 +86,19 @@ Fiquei acionando o ``tab`` para aceitar e continuar solicitando novas sugestões
 
 No caso do ``button``, isso não ocorreu.
 ![Sugestão button](sugestao-button.png)
+
+### @..say
+
+No comando ``@..say``, especificamente, as sugestões apresentas são mais simples em relação a versão anterior.
+
+Anterior:
+![Amostra anterior](../../24-01/uso-comando-4.png)
+
+Atual:
+![Amostra atual](command-say.png)
+
+## Refinamento
+
+![Definição classe](definção-classe.png)
+
+Após indicar fim de classe (``end class``), uma das sugestões foi a prototipação de métodos.

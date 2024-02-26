@@ -5,6 +5,7 @@ import { inlineCompletionItemProvider } from './completionItemProvider';
 import { CompletionResponse, IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
 import { PREFIX_DITO, logger } from './logger';
+import { ChatViewProvider } from './panels/chatViewProvider';
 
 let ctx: vscode.ExtensionContext;
 
@@ -78,14 +79,21 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(detailHealth);
 
-	const attribution = vscode.commands.registerTextEditorCommand('tds-dito.generateCode', () => {
+	const generateCode = vscode.commands.registerTextEditorCommand('tds-dito.generateCode', () => {
 		const text: string = "Gerar código para varrer um array";
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.selection.active.lineText);
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.document.getText());
 		iaApi.generateCode(text);
 	});
+	context.subscriptions.push(generateCode);
 
-	context.subscriptions.push(attribution);
+	const explainCode = vscode.commands.registerTextEditorCommand('tds-dito.explain', () => {
+		const text: string = "local a := {}";
+		iaApi.explainCode(text).then((value: string) => {
+			logger.info(value)
+		});
+	});
+	context.subscriptions.push(explainCode);
 
 	// const attribution = vscode.commands.registerTextEditorCommand('tds-dito.attribution', () => {
 	// 	void highlightStackAttributions();
@@ -105,12 +113,18 @@ export function activate(context: vscode.ExtensionContext) {
 			shownCompletions: [0],
 			completions,
 		};
-			logger.debug("Params: %s", JSON.stringify(params, undefined, 2));
+		logger.debug("Params: %s", JSON.stringify(params, undefined, 2));
 
 		//await client.sendRequest("llm-ls/acceptCompletion", params);
 	});
 	ctx.subscriptions.push(afterInsert);
 
+	//Chat DITO
+	const chat: ChatViewProvider = new ChatViewProvider(context.extensionUri);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(ChatViewProvider.viewType, chat));
+
+	//aciona a verificação do serviço no ar e posterior login
 	vscode.commands.executeCommand("tds-dito.detail-health");
 }
 
