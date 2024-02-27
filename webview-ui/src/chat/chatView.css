@@ -3,44 +3,63 @@
 }
 
 section.tds-chat {
+	display: flex;
+	flex-direction: column;
 	margin: 0px;
-	background-color: aliceblue;
+	height: 90vh;
 }
-
 
 section.tds-chat section.tds-header {
 	display: flex;
+	flex-direction: row;
 	flex-grow: 0;
 	flex-shrink: 1;
-	flex-basis: auto;
-	align-self: auto;
 	order: 0;
-	flex-direction: row;
-	align-items: flex-end;
-	/* width: 100%; */
-	margin-bottom: var(--type-ramp-minus2-line-height);
-	background-color: antiquewhite
+	/* align-items: flex-end; */
 }
 
 section.tds-chat section.tds-content {
+	display: flex;
+	flex-direction: column;
 	flex-grow: 1;
 	flex-shrink: 1;
-	flex-basis: auto;
-	align-self: auto;
 	order: 0;
-	background-color: aqua;
 }
 
 section.tds-chat section.tds-footer {
 	display: flex;
+	flex-direction: row;
 	flex-grow: 0;
 	flex-shrink: 1;
 	flex-basis: auto;
 	align-self: auto;
 	order: 0;
 	/* width: 100%; */
-	flex-direction: row;
-	align-items: flex-end;
-	margin-top: calc(var(--type-ramp-minus2-line-height)/2);
-	background-color: aquamarine;
+}
+
+section.tds-chat div.tds-message-row {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+}
+
+section.tds-chat div.tds-message-row+div.tds-message-row {
+	margin-bottom: calc(var(--type-ramp-minus2-line-height) / 2);
+}
+
+section.tds-chat div.tds-message-row div.tds-message-author {
+	display: flex;
+}
+
+section.tds-chat div.tds-message-row div.tds-message-author #author {
+	font-weight: bold;
+	flex-grow: 1;
+}
+
+section.tds-chat div.tds-message-row div.tds-message-author #timeStamp {
+	font-style: italic;
+}
+
+section.tds-chat div.tds-message-row div.tds-message {
+	margin: 0;
 }

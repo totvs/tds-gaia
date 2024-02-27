@@ -6,10 +6,12 @@ import { CompletionResponse, IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
 import { PREFIX_DITO, logger } from './logger';
 import { ChatViewProvider } from './panels/chatViewProvider';
+import { ChatApi } from './api/chatApi';
 
 let ctx: vscode.ExtensionContext;
 
 export const iaApi: IaApiInterface = new CarolApi();
+export const chatApi: ChatApi = new ChatApi();
 
 export function activate(context: vscode.ExtensionContext) {
 	logger.info(
@@ -67,11 +69,15 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(logout);
 
 	const detailHealth = vscode.commands.registerCommand('tds-dito.detail-health', async () => {
+		chatApi.dito("Verificando disponibilidade do serviço. Aguarde...");
+
 		iaApi.checkHealth(true).then((error: any) => {
 			updateContextKey("readyForUse", error === undefined);
 
 			if (error !== undefined) {
-				vscode.window.showErrorMessage(`${PREFIX_DITO} Desculpe. Problemas técnicos. Verifique o log.`);
+				const message: string = "Desculpe, estou com dificuldades técnicas. Verifique o log.";
+				chatApi.dito(message);
+				vscode.window.showErrorMessage(`${PREFIX_DITO} ${message}`);
 			} else {
 				vscode.commands.executeCommand("tds-dito.login", [true])
 			}

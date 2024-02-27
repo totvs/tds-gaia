@@ -1,12 +1,57 @@
 #include "protheus.ch"
 
+class TstClass
+	data nVar1
+	data nVar2
+	data nVar3
+	data nVar4
+	method new() constructor
+	method metodo1()
+	method metodo2()
+	method metodo3()
+	method metodo4()
+end class
+
+method new() class TstClass
+	::nVar1 := 1
+	::nVar2 := 2
+	::nVar3 := 3
+	::nVar4 := 4
+return
+
+method metodo1() class TstClass
+	conout("metodo1")
+return
+
+method metodo2() class TstClass
+	conout("metodo2")
+return
+
+method metodo3() class TstClass
+	conout("metodo3")
+return
+
+method metodo4() class TstClass
+	conout("metodo4")
+
+	define dialog oDlg title "Teste" from 10,10 to 300,300 of oMainWnd
+	@ 10,10 Say "Teste" of oDlg
+	@ 20,10 Button "Teste" of oDlg
+	ACTIVATE DIALOG oDlg CENTERED
+	
+return
+
+
+
+
+
+
 user function escolheNum(replay, replayPath, numbers)
 	local n, cResp := "xxxxx", cMsg := ""
 	local aOpcoes := {}
 	private cOpcao
 	private ondeEstou := "escolheNum"
 	public aPublic := {}
-
 
 	if replay == "true"
 		replay = .t.
@@ -96,7 +141,7 @@ static function tela(aaOpcoes)
 	oDlg:lCentered :=.T.
 	oDlg:lCentered :=.T.
 	oDlg:lCentered :=.T.
-
+	
 	oSay1 := TSAY():Create(oDlg)
 		
 	// oSay1:cName := "oSay1"
@@ -128,7 +173,6 @@ static function tela(aaOpcoes)
 		oBtn:nWidth := 90,;
 		oBtn:nTop := 90 + (i * 30),;
 		oBtn:nLeft := 10;
-
 		})
 
 //ACTIVATE DIALOG oDlg CENTERED

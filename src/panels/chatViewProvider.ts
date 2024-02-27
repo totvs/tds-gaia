@@ -1,15 +1,31 @@
 
 import * as vscode from 'vscode';
-import { CommonCommandFromWebViewEnum, ReceiveMessage } from './utilities/common-command-panel';
+import { CommonCommandFromWebViewEnum, CommonCommandToWebViewEnum, ReceiveMessage } from './utilities/common-command-panel';
 import { TChatModel } from '../model/chatModel';
-import { getCspSource, getWebviewContent } from './utilities/webview-utils';
+import { getWebviewContent } from './utilities/webview-utils';
+import { TMessageModel } from '../model/messageModel';
+import { TFieldErrors } from '../model/abstractMode';
+import { chatApi } from '../extension';
+import { TQueueMessages } from '../api/chatApi';
+import { getDitoUser } from '../config';
+
+enum ChatCommandEnum {
+
+}
+
+type ChatCommand = CommonCommandFromWebViewEnum & ChatCommandEnum;
 
 export class ChatViewProvider implements vscode.WebviewViewProvider {
 
   public static readonly viewType = 'tds-dito-view';
 
   private _view?: vscode.WebviewView;
-  private chatModel: TChatModel = {};
+  private chatModel: TChatModel = {
+    lastPublication: new Date(),
+    loggedUser: getDitoUser()?.displayName || "XXXXXXXXXX",
+    newMessage: "",
+    messages: []
+  };
 
   constructor(
     private readonly _extensionUri: vscode.Uri,
@@ -21,22 +37,28 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     _token: vscode.CancellationToken,
   ) {
 
+    chatApi.onMessage((queueMessage: TQueueMessages) => {
+      while (queueMessage.size() > 0) {
+        const message: TMessageModel = queueMessage.dequeue() as TMessageModel;
+
+        this.chatModel.messages.push(message);
+      }
+
+      this.sendUpdateModel(this.chatModel, undefined);
+    })
+
     this._view = webviewView;
 
     webviewView.webview.options = {
       // Allow scripts in the webview
       enableScripts: true,
-
-      localResourceRoots: [
-        this._extensionUri
-      ]
+      localResourceRoots: [this._extensionUri]
     };
 
     const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-dito-vscode');
     const extensionUri: vscode.Uri = ext!.extensionUri;
 
-    //webviewView.webview.cspSource = getCspSource(extensionUri);
-    webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatDito", { title: "Dito: Chat" });
+    webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView", { title: "Dito: Chat" });
     webviewView.webview.onDidReceiveMessage(this._getWebviewMessageListener(webviewView.webview));
   }
 
@@ -113,11 +135,34 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   private _getWebviewMessageListener(webview: vscode.Webview) {
     return (
       async (message: ReceiveMessage<CommonCommandFromWebViewEnum, TChatModel>) => {
-        //const value: any = await this.defaultListener(message);
-        //await this.panelListener(message, value);
+        const command: ChatCommand = message.command as ChatCommand;
+        const data = message.data;
+
+        switch (command) {
+          case CommonCommandFromWebViewEnum.Ready:
+            if (data.model == undefined) {
+              this.sendUpdateModel(this.chatModel, undefined);
+            }
+
+            break;
+          case CommonCommandFromWebViewEnum.Save:
+            chatApi.user(data.model.newMessage);
+
+            break;
+        }
       }
     );
 
+  }
+
+  protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {
+    this._view!.webview.postMessage({
+      command: CommonCommandToWebViewEnum.UpdateModel,
+      data: {
+        model: model,
+        errors: errors
+      }
+    });
   }
 
   private logWarning(message: string) {

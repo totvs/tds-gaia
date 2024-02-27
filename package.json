@@ -70,6 +70,18 @@
         }
       ]
     },
+    "menus": {
+      "webview/context": [
+        {
+          "command": "tds-dito.login",
+          "when": "webviewId == 'tds-dito-view' && !tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.logout",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "tds-dito.afterInsert",
@@ -84,12 +96,22 @@
       {
         "command": "tds-dito.login",
         "title": "Login",
-        "category": "TDS-Dito"
+        "category": "TDS-Dito",
+        "enablement": "!tds-dito.logged",
+        "icon": {
+          "dark": "icons/dark/_login.png",
+          "light": "icons/light/_login.png"
+        }
       },
       {
         "command": "tds-dito.logout",
         "title": "Logout",
-        "category": "TDS-Dito"
+        "category": "TDS-Dito",
+        "enablement": "tds-dito.logged",
+        "icon": {
+          "dark": "icons/dark/_logout.png",
+          "light": "icons/light/_logout.png"
+        }
       },
       {
         "command": "tds-dito.attribution",

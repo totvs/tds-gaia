@@ -1,56 +1,103 @@
 import "./chatView.css";
 import React from "react";
-import { FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { CommonCommandFromPanelEnum, ReceiveMessage, sendReady, sendSaveAndClose } from "../utilities/common-command-webview";
+import { Control, FieldArrayWithId, FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { CommonCommandFromPanelEnum, ReceiveMessage, sendReady, sendSave, sendSaveAndClose } from "../utilities/common-command-webview";
 import { VSCodeButton, VSCodeDataGrid, VSCodeDataGridCell, VSCodeDataGridRow } from "@vscode/webview-ui-toolkit/react";
-import { TdsForm, setDataModel, setErrorModel } from "../components/form";
+import { TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
 import TdsPage from "../components/page";
 import TdsHeader from "../components/header";
 import TdsContent from "../components/content";
 import TdsFooter from "../components/footer";
+import { time } from "console";
 
 enum ReceiveCommandEnum {
 }
 
 type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
 
-type TFields = {
-  serverName: string;
+export type TMessageModel = {
+  timeStamp: Date;
+  author: string;
+  message: string;
+  actions?: any[];
 }
 
-const ROWS_LIMIT: number = 5;
+type TFields = {
+  lastPublication: Date;
+  loggedUser: string;
+  newMessage: string;
+  messages: TMessageModel[];
+}
 
-export default function AddServerView() {
+let oldAuthor: string | undefined = "";
+let oldTimeStamp: string | undefined = "";
+
+function MessageRow(row: any, index: number, control: Control<TFields, any, TFields>): any {
+  let timeStamp: string | undefined = new Date(row.timeStamp).toTimeString().substring(0, 5);
+  let author: string | undefined = row.author;
+  let show: boolean = true;
+
+  console.log("***************************************");
+  console.log(timeStamp, author);
+  console.log(oldTimeStamp, oldAuthor);
+  if ((timeStamp === oldTimeStamp) && (oldAuthor === row.author)) {
+    show = false;
+  } else {
+    oldTimeStamp = timeStamp;
+    oldAuthor = author;
+  }
+  console.log(show);
+
+  return (
+    <div key={row.id} className="tds-message-row">
+      {true &&
+        <div className="tds-message-author">
+          <span id="author">{author}</span><span id="timeStamp">{timeStamp}</span>
+        </div>
+      }
+      <div className="tds-message">{row.message}</div>
+    </div>
+  )
+}
+
+export default function ChatView() {
   const methods = useForm<TFields>({
     defaultValues: {
-      serverName: "",
+      lastPublication: new Date(),
+      loggedUser: "",
+      messages: []
     },
     mode: "all"
   })
 
-  // const { fields, remove, insert } = useFieldArray(
-  //   {
-  //     control: methods.control,
-  //     name: "includePaths"
-  //   });
+  const { fields, remove, insert } = useFieldArray(
+    {
+      control: methods.control as any,
+      name: "messages"
+    });
 
   const onSubmit: SubmitHandler<TFields> = (data) => {
-    sendSaveAndClose(data);
+    sendSave(data);
   }
 
   React.useEffect(() => {
     let listener = (event: any) => {
       const command: ReceiveCommand = event.data as ReceiveCommand;
+      console.log(event);
 
       switch (command.command) {
         case CommonCommandFromPanelEnum.UpdateModel:
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
 
+          console.log("************************");
+          console.dir(model);
+
           setDataModel<TFields>(methods.setValue, model);
           setErrorModel(methods.setError, errors);
 
           break;
+
         default:
           break;
       }
@@ -64,6 +111,7 @@ export default function AddServerView() {
   }, []);
 
   const model: TFields = methods.getValues();
+
   /*
               <VSCodeDataGrid id="includeGrid" grid-template-columns="30px">
                 {model && model.includePaths.map((row: TIncludeData, index: number) => (
@@ -113,24 +161,37 @@ export default function AddServerView() {
               </VSCodeDataGrid>
   */
   return (
-    <section className="tds-chat">
-      <section className="tds-header">
-        <p>Header com a comandos</p>
+    <main>
+      <section className="tds-chat">
+        <section className="tds-content">
+          {fields.map((row: any, index: number) => MessageRow(row, index, methods.control))}
+        </section >
+        <section className="tds-footer">
+          <FormProvider {...methods} >
+            <TdsForm<TFields>
+              id="chatForm"
+              onSubmit={onSubmit}
+              methods={methods}
+              actions={[]}
+              
+            >
+              {model.loggedUser &&
+                <section className="tds-row-container" >
+                  <TdsTextField name="newMessage" label={model.loggedUser} />
+                  <VSCodeButton
+                    type="submit"
+                    appearance="icon"
+                    className={`tds-button-button`}
+                  >
+                    <span className="codicon codicon-send"></span>
+                  </VSCodeButton>
+                </section>
+              }
+            </TdsForm>
+          </FormProvider>
+        </section>
       </section>
-      <div className="tds-content">
-        <p>Grid com a conversa</p>
-      </div>
-      <section className="tds-footer">
-        <FormProvider {...methods} >
-          <TdsForm<TFields>
-            onSubmit={onSubmit}
-            methods={methods} children={undefined}>
-
-
-          </TdsForm>
-        </FormProvider>
-      </section>
-    </section>
+    </main >
   );
 }
 
