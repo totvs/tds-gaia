@@ -94,6 +94,11 @@
         "category": "TDS-Dito"
       },
       {
+        "command": "tds-dito.open-manual",
+        "title": "Open Manual",
+        "category": "TDS-Dito"
+      },
+      {
         "command": "tds-dito.login",
         "title": "Login",
         "category": "TDS-Dito",

@@ -57,6 +57,7 @@ const EMPTY_USER: LoggedUser = {
 
 export type TDitoCustomConfig = {
   currentUser?: LoggedUser
+  ready?: boolean;
 }
 
 export function getDitoConfiguration(): TDitoConfig {
@@ -102,4 +103,14 @@ export function isDitoShowBanner(): boolean {
 export function getDitoLogLevel(): string {
 
   return getDitoConfiguration().logLevel;
+}
+
+export function isDitoReady(): boolean {
+
+  return customConfig["ready"] || false;
+}
+
+export function setDitoReady(ready: boolean) {
+
+  setDitoCustomConfiguration("ready", ready);
 }

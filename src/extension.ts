@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
-import { TDitoConfig, getDitoConfiguration, getDitoLogLevel, isDitoLogged, isDitoShowBanner } from './config';
+import { TDitoConfig, getDitoConfiguration, getDitoLogLevel, isDitoLogged, isDitoShowBanner, setDitoReady, setDitoUser } from './config';
 import { inlineCompletionItemProvider } from './completionItemProvider';
 import { CompletionResponse, IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
@@ -44,7 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const input = await vscode.window.showInputBox({
-			prompt: 'Please enter your API token:',
+			prompt: 'Please enter your API token or @your name):',
 			placeHolder: 'Your token goes here ...'
 		});
 		if (input !== undefined) {
@@ -56,6 +56,8 @@ export function activate(context: vscode.ExtensionContext) {
 					await context.secrets.delete('apiToken');
 					vscode.window.showErrorMessage(`${PREFIX_DITO} Login failure`);
 				}
+
+				chatApi.checkUser();
 			}
 		}
 	});
@@ -69,21 +71,30 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(logout);
 
 	const detailHealth = vscode.commands.registerCommand('tds-dito.detail-health', async () => {
-		chatApi.dito("Verificando disponibilidade do serviço. Aguarde...");
+		chatApi.dito("Verificando disponibilidade do serviço.");
 
 		iaApi.checkHealth(true).then((error: any) => {
 			updateContextKey("readyForUse", error === undefined);
+			setDitoReady(error === undefined);
 
 			if (error !== undefined) {
-				const message: string = "Desculpe, estou com dificuldades técnicas. Verifique o log.";
+				const message: string = "Desculpe, estou com dificuldades técnicas. {command:tds-dito.detail-health}";
 				chatApi.dito(message);
 				vscode.window.showErrorMessage(`${PREFIX_DITO} ${message}`);
 			} else {
-				vscode.commands.executeCommand("tds-dito.login", [true])
+				vscode.commands.executeCommand("tds-dito.login", [true]).then(() => {
+					chatApi.checkUser();
+				});
 			}
 		});
 	});
 	context.subscriptions.push(detailHealth);
+
+	const openManual = vscode.commands.registerCommand('tds-dito.open-manual', async () => {
+		const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md";
+		vscode.env.openExternal(vscode.Uri.parse(url));
+	});
+	context.subscriptions.push(openManual);
 
 	const generateCode = vscode.commands.registerTextEditorCommand('tds-dito.generateCode', () => {
 		const text: string = "Gerar código para varrer um array";

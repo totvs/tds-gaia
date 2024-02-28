@@ -6,7 +6,7 @@ import { getWebviewContent } from './utilities/webview-utils';
 import { TMessageModel } from '../model/messageModel';
 import { TFieldErrors } from '../model/abstractMode';
 import { chatApi } from '../extension';
-import { TQueueMessages } from '../api/chatApi';
+import { ChatApi, TQueueMessages } from '../api/chatApi';
 import { getDitoUser } from '../config';
 
 enum ChatCommandEnum {
@@ -22,7 +22,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
   private chatModel: TChatModel = {
     lastPublication: new Date(),
-    loggedUser: getDitoUser()?.displayName || "XXXXXXXXXX",
+    loggedUser: getDitoUser()?.displayName || "<Not logged>",
     newMessage: "",
     messages: []
   };
@@ -142,6 +142,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
           case CommonCommandFromWebViewEnum.Ready:
             if (data.model == undefined) {
               this.sendUpdateModel(this.chatModel, undefined);
+              this.sendConfiguration()
             }
 
             break;
@@ -149,13 +150,52 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             chatApi.user(data.model.newMessage);
 
             break;
+          case CommonCommandFromWebViewEnum.Execute:
+            chatApi.user(data.command);
+
+            if (data.command == "clear") {
+              this.chatModel.messages = [];
+              this.sendUpdateModel(this.chatModel, undefined);
+            }
+
+            //TODO: limpar comando da mensagem original (messageId)? 
+            break;
         }
       }
     );
 
   }
 
+  protected sendConfiguration(): void {
+    //this._view!.webview.postMessage({
+    //   command: CommonCommandToWebViewEnum.Configuration,
+    //   data: {
+    //     commandsMap: ChatApi.getCommandsMap()
+    //   }
+    // });
+
+  }
+
   protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {
+    //model.loggedUser = getDitoUser()!.displayName || "<Not logged>";
+    //model.newMessage = "";
+
+    if (this.chatModel.messages.length > 0) {
+      let oldAuthor: string | undefined;
+      let oldTimestamp: string | undefined;
+
+      this.chatModel.messages = this.chatModel.messages.map((message: TMessageModel) => {
+        if ((oldAuthor != message.author) || (oldTimestamp != message.timeStamp.toTimeString().substring(0, 5))) {
+          oldAuthor = message.author;
+          oldTimestamp = message.timeStamp.toTimeString().substring(0, 5);
+        } else {
+          message.author = "";
+        }
+
+        return message;
+      });
+    }
+
     this._view!.webview.postMessage({
       command: CommonCommandToWebViewEnum.UpdateModel,
       data: {

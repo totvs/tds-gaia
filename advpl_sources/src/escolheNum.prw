@@ -1,50 +1,6 @@
 #include "protheus.ch"
 
-class TstClass
-	data nVar1
-	data nVar2
-	data nVar3
-	data nVar4
-	method new() constructor
-	method metodo1()
-	method metodo2()
-	method metodo3()
-	method metodo4()
-end class
-
-method new() class TstClass
-	::nVar1 := 1
-	::nVar2 := 2
-	::nVar3 := 3
-	::nVar4 := 4
-return
-
-method metodo1() class TstClass
-	conout("metodo1")
-return
-
-method metodo2() class TstClass
-	conout("metodo2")
-return
-
-method metodo3() class TstClass
-	conout("metodo3")
-return
-
-method metodo4() class TstClass
-	conout("metodo4")
-
-	define dialog oDlg title "Teste" from 10,10 to 300,300 of oMainWnd
-	@ 10,10 Say "Teste" of oDlg
-	@ 20,10 Button "Teste" of oDlg
-	ACTIVATE DIALOG oDlg CENTERED
-	
-return
-
-
-
-
-
+#define ABC "xxxxxxx"
 
 user function escolheNum(replay, replayPath, numbers)
 	local n, cResp := "xxxxx", cMsg := ""
@@ -52,6 +8,9 @@ user function escolheNum(replay, replayPath, numbers)
 	private cOpcao
 	private ondeEstou := "escolheNum"
 	public aPublic := {}
+
+	conout(ABC)
+	conout()
 
 	if replay == "true"
 		replay = .t.
@@ -124,55 +83,25 @@ static function tela(aaOpcoes)
 	endif
 
 	oDlg := MSDIALOG():Create()
-	oDlg:cCaption := "Escolha um número"
 	oDlg:cName := "oDlg"
-	oDlg:lBorder :=.T.
-	oDlg:lCaption :=.T.
-	oDlg:nWidth := 300
-	oDlg:nHeight := 150
+	oDlg:cCaption := "Escolha um número"
+	oDlg:nLeft := 0
+	oDlg:nTop := 0
+	oDlg:nWidth := 200
+	oDlg:nHeight := 100
 	oDlg:lCentered :=.T.
-	oDlg:lEscClose :=.T.
-	oDlg:lMaximized :=.T.
-	oDlg:lMinimized :=.T.
-	oDlg:lSysMenu :=.T.
-	oDlg:lSysButtons :=.T.
-	oDlg:lSysClose :=.T.
-	oDlg:lVisible :=.T.
-	oDlg:lCentered :=.T.
-	oDlg:lCentered :=.T.
-	oDlg:lCentered :=.T.
-	
-	oSay1 := TSAY():Create(oDlg)
-		
-	// oSay1:cName := "oSay1"
-	// oSay1:xxxxxxxxxx := "Escolha um número acionando um dos botões abaixo."
-	// oSay1:nLeft := 10
-	// oSay1:nTop := 28
-	// oSay1:nWidth := 250
-	// oSay1:nHeight := 17
-	// oSay1:lTransparent := .T.
 
-	oBtn := TButton():Create(oDlg)
-	oBtn:cCaption := "<nenhum>"
-	oBtn:blClicked := {|| cOpcao := "", oDlg:end() }
-	oBtn:nWidth := 90
-	oBtn:nTop := 90
-	oBtn:nLeft := 10
 
-	oBtn := TButton():Create(oDlg)
-	oBtn:cCaption := "<encerrar>"
-	oBtn:blClicked := {|| cOpcao := "*", oDlg:end() }
-	oBtn:nWidth := 90
-	oBtn:nTop := 90
-	oBtn:nLeft := 110
 
 	aEval(aaOpcoes, { |x,i| ;
 		oBtn := TButton():Create(oDlg),;
+		oBtn:cName := "oBtn" + strZero(i,1,0),;
 		oBtn:cCaption := x,;
-		oBtn:blClicked := {|| cOpcao := x, oDlg:end() },;
-		oBtn:nWidth := 90,;
-		oBtn:nTop := 90 + (i * 30),;
-		oBtn:nLeft := 10;
+		oBtn:nLeft := 10,;
+		oBtn:nTop := 10 + i * 20,;
+		oBtn:nWidth := 180,;
+		oBtn:nHeight := 20,;
+		oBtn:onClick := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
 		})
 
 //ACTIVATE DIALOG oDlg CENTERED

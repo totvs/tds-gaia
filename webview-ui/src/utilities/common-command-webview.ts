@@ -4,6 +4,7 @@ import { vscode } from "./vscodeWrapper";
 export enum CommonCommandFromPanelEnum {
 	InitialData = "INITIAL_DATA",
 	UpdateModel = "UPDATE_MODEL",
+	//Configuration = "CONFIGURATION",
 }
 
 export type CommonCommandFromPanel = CommonCommandFromPanelEnum;
@@ -20,15 +21,11 @@ export enum CommonCommandToPanelEnum {
 	Save = "SAVE",
 	SaveAndClose = "SAVE_AND_CLOSE",
 	Close = "CLOSE",
+	Execute = "EXECUTE",
 	Ready = "READY",
 	Reset = "RESET",
 	Validate = "VALIDATE",
-	CheckDir = "CHECK_DIR",
-	SelectResource = "SELECT_RESOURCE",
-	UpdateModel = "UPDATE_MODEL",
-	MoveElements = "MOVE_ELEMENTS",
-	IncludeTRes = "INCLUDE_TRES",
-	GetInfoPatch = "GET_INFO_PATCH",
+	UpdateModel  = "UPDATE_MODEL",
 }
 
 export type CommonCommandToPanel = CommonCommandToPanelEnum;
@@ -81,18 +78,6 @@ export type TSendSelectResourceProps = {
 	filters: {
 		[key: string]: string[]
 	}
-}
-
-export function sendSelectResource(firedBy: string, props: TSendSelectResourceProps & { model: TAbstractModel }) {
-	const message: SendMessage<CommonCommandToPanelEnum, TAbstractModel> = {
-		command: CommonCommandToPanelEnum.SelectResource,
-		data: {
-			...props,
-			firedBy: firedBy
-		}
-	}
-
-	vscode.postMessage(message);
 }
 
 export function sendValidateModel(model: TAbstractModel) {

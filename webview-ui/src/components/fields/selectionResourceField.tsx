@@ -1,8 +1,8 @@
-import { VSCodeButton, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
+import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 import { useController, useFormContext } from "react-hook-form";
 import PopupMessage from "../popup-message";
 import { TdsFieldProps } from "../form";
-import { TSendSelectResourceProps, sendSelectResource } from "../../utilities/common-command-webview";
+import { TSendSelectResourceProps } from "../../utilities/common-command-webview";
 
 type TdsSelectionResourceFieldProps = Omit<TdsFieldProps, "label"> & Omit<TSendSelectResourceProps, "label">;
 type TdsSelectionFolderFieldProps = Omit<TdsSelectionResourceFieldProps, "model" | "canSelectMany" | "canSelectFiles" | "canSelectFolders" | "filters">;
@@ -48,7 +48,7 @@ export function TdsSelectionResourceField(props: TdsSelectionResourceFieldProps)
 		>
 			<VSCodeButton
 				onClick={() => {
-					sendSelectResource(props.name, { ...props, model: getValues() });;
+					//sendSelectResource(props.name, { ...props, model: getValues() });;
 				}}
 				{...registerField}
 			>

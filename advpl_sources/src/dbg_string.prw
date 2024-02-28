@@ -30,26 +30,6 @@ user function dbgString()
 	conout(s10000)
 	conout(s100000)
 
-	@ 10,01 say s010
-	@ 11,01 say s050
-	@ 12,01 say s100
-	@ 13,01 say s1000
-	@ 14,01 say s10000
-
-	@ 10,010 say s010
-	@ 11,010 say s050
-	@ 12,010 say s100
-	@ 13,010 say s1000
-	@ 14,010 say s10000
-
-	for i:=1 to 10
-		@ 10,010+i*10 say s010
-		@ 11,010+i*10 say s050
-		@ 12,010+i*10 say s100
-		@ 13,010+i*10 say s1000
-		@ 14,010+i*10 say s10000
-	next
-
 return
 
 static function geraArray(n, d)

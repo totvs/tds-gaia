@@ -1,14 +1,14 @@
 import { CommonCommandToPanelEnum, SendMessage } from "../utilities/common-command-webview";
 import { vscode } from "../utilities/vscodeWrapper";
 
-export function sendCheckDir(model: any, selectedDir: string) {
+export function sendExecute(messageId: number, command: string) {
 	vscode.postMessage({
-		command: CommonCommandToPanelEnum.CheckDir,
+		command: CommonCommandToPanelEnum.Execute,
 		data: {
-			model: model,
-			selectedDir: selectedDir
+			model: undefined,
+			messageId: messageId,
+			command: command
 		}
 	});
 }
-
 

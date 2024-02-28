@@ -3,11 +3,11 @@
     "totvsLanguageServer.editor.linter.includes": "M:\\protheus\\includes;M:\\protheus\\includes_tlpp",
     "totvsLanguageServer.askCompileResult": false,
     "totvsLanguageServer.trace.server": "verbose",
-    "totvsLanguageServer.editor.index.cache": "off",
+    "totvsLanguageServer.editor.index.cache": "onMemory",
     "totvsLanguageServer.launch.args": [
         "--log-file=totvsls.log",
         "--record=totvsls"
     ],
-    "tds-dito.lastLogin": "Mon, 26 Feb 2024 21:33:09 GMT",
+    "tds-dito.lastLogin": "Wed, 28 Feb 2024 12:30:52 GMT",
     "tds-dito.maxLine": 2
 }

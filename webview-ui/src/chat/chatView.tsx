@@ -2,24 +2,31 @@ import "./chatView.css";
 import React from "react";
 import { Control, FieldArrayWithId, FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { CommonCommandFromPanelEnum, ReceiveMessage, sendReady, sendSave, sendSaveAndClose } from "../utilities/common-command-webview";
-import { VSCodeButton, VSCodeDataGrid, VSCodeDataGridCell, VSCodeDataGridRow } from "@vscode/webview-ui-toolkit/react";
+import { VSCodeButton, VSCodeDataGrid, VSCodeDataGridCell, VSCodeDataGridRow, VSCodeLink } from "@vscode/webview-ui-toolkit/react";
 import { TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
 import TdsPage from "../components/page";
 import TdsHeader from "../components/header";
 import TdsContent from "../components/content";
 import TdsFooter from "../components/footer";
 import { time } from "console";
+import { sendExecute } from "./sendCommand";
 
 enum ReceiveCommandEnum {
 }
 
 type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
 
-export type TMessageModel = {
+type TMessageActionModel = {
+  caption: string;
+  command: string;
+}
+
+type TMessageModel = {
+  messageId: number;
   timeStamp: Date;
   author: string;
   message: string;
-  actions?: any[];
+  actions?: TMessageActionModel[];
 }
 
 type TFields = {
@@ -29,33 +36,70 @@ type TFields = {
   messages: TMessageModel[];
 }
 
-let oldAuthor: string | undefined = "";
-let oldTimeStamp: string | undefined = "";
+function HandleCommand(message: TMessageModel, action: TMessageActionModel) {
+  return (<VSCodeLink onClick={() => sendExecute(message.messageId, action.command)}>
+    {action.caption}
+  </VSCodeLink>
+  );
+}
 
-function MessageRow(row: any, index: number, control: Control<TFields, any, TFields>): any {
-  let timeStamp: string | undefined = new Date(row.timeStamp).toTimeString().substring(0, 5);
-  let author: string | undefined = row.author;
-  let show: boolean = true;
+function HandleText(part: string) {
 
-  console.log("***************************************");
-  console.log(timeStamp, author);
-  console.log(oldTimeStamp, oldAuthor);
-  if ((timeStamp === oldTimeStamp) && (oldAuthor === row.author)) {
-    show = false;
+  return <span>{part}</span>
+}
+
+function ShowMessage(message: TMessageModel) {
+  let children: any[] = [];
+
+  if (message.actions?.length) {
+    let text: string = message.message;
+
+    message.actions?.forEach((action) => {
+      const pos_s: number = text.indexOf("{command:");
+      const pos_e: number = text.indexOf("}", pos_s);
+
+      if (pos_s > -1 && pos_e > -1) {
+        children.push(HandleText(text.substring(0, pos_s)));
+        children.push(HandleCommand(message, action));
+      } else {
+        children.push(HandleText(text));
+      }
+
+      text = text.substring(pos_e + 1);
+    });
+
+    if (text.length > 0) {
+      children.push(HandleText(text));
+    }
   } else {
-    oldTimeStamp = timeStamp;
-    oldAuthor = author;
+    children.push(HandleText(message.message));
   }
-  console.log(show);
 
   return (
-    <div key={row.id} className="tds-message-row">
-      {true &&
-        <div className="tds-message-author">
-          <span id="author">{author}</span><span id="timeStamp">{timeStamp}</span>
-        </div>
-      }
-      <div className="tds-message">{row.message}</div>
+    <div className="tds-message">
+      {...children}
+    </div>
+  )
+}
+
+function MessageRow(row: TMessageModel, index: number, control: Control<TFields, any, TFields>): any {
+  let children: any[] = [];
+  let timeStamp: string | undefined = new Date(row.timeStamp).toTimeString().substring(0, 5);
+  let author: string | undefined = row.author;
+
+  if (row.author.length > 0) {
+    children.push(
+      <div className="tds-message-author">
+        <span id="author">{author}</span><span id="timeStamp">{timeStamp}</span>
+      </div>
+    )
+  }
+
+  children.push(ShowMessage(row));
+
+  return (
+    <div key={row.messageId.toString()} className="tds-message-row">
+      {...children}
     </div>
   )
 }
@@ -83,7 +127,6 @@ export default function ChatView() {
   React.useEffect(() => {
     let listener = (event: any) => {
       const command: ReceiveCommand = event.data as ReceiveCommand;
-      console.log(event);
 
       switch (command.command) {
         case CommonCommandFromPanelEnum.UpdateModel:
@@ -97,9 +140,15 @@ export default function ChatView() {
           setErrorModel(methods.setError, errors);
 
           break;
+        // case CommonCommandFromPanelEnum.Configuration,
+        //   const model: TFields = command.data.commandsMap;
+        //     commandsMap: ChatApi.getCommandsMap()
+        //}
+        //});
 
         default:
-          break;
+          console.error("Unknown command received: " + command.command);
+          console.dir(event);
       }
     };
 
@@ -173,20 +222,17 @@ export default function ChatView() {
               onSubmit={onSubmit}
               methods={methods}
               actions={[]}
-              
             >
-              {model.loggedUser &&
-                <section className="tds-row-container" >
-                  <TdsTextField name="newMessage" label={model.loggedUser} />
-                  <VSCodeButton
-                    type="submit"
-                    appearance="icon"
-                    className={`tds-button-button`}
-                  >
-                    <span className="codicon codicon-send"></span>
-                  </VSCodeButton>
-                </section>
-              }
+              <section className="tds-row-container" >
+                <TdsTextField name="newMessage" label={model.loggedUser} />
+                <VSCodeButton
+                  type="submit"
+                  appearance="icon"
+                  className={`tds-button-button`}
+                >
+                  <span className="codicon codicon-send"></span>
+                </VSCodeButton>
+              </section>
             </TdsForm>
           </FormProvider>
         </section>

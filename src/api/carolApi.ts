@@ -6,12 +6,7 @@ import { capitalize } from "../util";
 import { CompletionResponse, IaAbstractApi, IaApiInterface } from "./interfaceApi";
 import { logger } from "../logger";
 
-//import { encode, decode, labels } from 'windows-1252';
-//let windows1252 = await import('windows-1252')
-const windows1252 = require('windows-1252');
-
 export class CarolApi extends IaAbstractApi implements IaApiInterface {
-
     // prefixo _ indica envolvidas com a API CAROL
     private _requestId: number = 0;
     private _token: string = "";
@@ -27,7 +22,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
         logger.info(`Extension is using [${this._urlRequest}]`);
 
-        return Promise.resolve(await this.checkHealth(false) === undefined)
+        return Promise.resolve(true)
     }
 
     private async fetch(url: string, method: string, headers: Record<string, string>, data: any): Promise<string | {} | Error> {
@@ -55,7 +50,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
                     statusText = "\n" + bodyResp.substring(pos_s + 4, pos_e).replace(/<p>/g, " ");
                 }
-                
+
                 result = new Error();
                 result.name = `REQUEST_${method.toUpperCase()}`;
                 result.cause = "Error requesting [type: " + method + ", url: " + url + " ]";
@@ -118,19 +113,16 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         return Promise.resolve(result);
     }
 
-    private async jsonRequest(method: "GET" | "POST", url: string, data: any): Promise<{} | Error> {
+    private async jsonRequest(method: "GET" | "POST", url: string, data: any = undefined): Promise<{} | Error> {
         const headers: {} = {
             "accept": "application/json",
             "Content-Type": "application/json"
         };
         let result: {} | Error;
-        let resp: string | {} | Error = await this.fetch(url, method, headers, data);
+        this.logRequest(url, method, headers || {}, data || "");
 
-        if (typeof (resp) === "object" && resp instanceof Error) {
-            result = resp;
-        } else {
-            result = resp;
-        }
+        const resp: string | {} | Error = await this.fetch(url, method, headers, data);
+        result = resp;
 
         return Promise.resolve(resp);
     }
@@ -139,12 +131,12 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         let result: any = undefined
         logger.info("Getting health check...");
 
-        let resp: string | Error = await this.textRequest("GET", `${this._apiRequest}/health_check`);
+        let resp: any = await this.jsonRequest("GET", `${this._apiRequest}/health_check`);
 
-        if (typeof (resp) === "object") {
+        if (typeof (resp) === "object" && resp instanceof Error) {
             result = resp
-        } else if (resp !== "Server is on.") {
-            result = new Error("Server is off-line or not responding.");
+        } else if (resp.message !== "Server is on.") {
+            result = new Error("Server is off-line or unreachable.");
             result.cause = resp;
             Error.captureStackTrace(result);
             logger.error(result);
@@ -160,16 +152,37 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
         let result: boolean = false;
 
-        setDitoUser({
-            id: "XXXXXX",
-            email: "xxxxxx@xxxxxxx.xxxx",
-            name: capitalize("xxxxx"),
-            fullname: capitalize("xxxxxxxxxx da xxxxxxxxxxxx"),
-            displayName: capitalize("xxxx"),
-            avatarUrl: "",
-            expiration: new Date(2024, 0, 1, 0, 0, 0, 0),
-            expiresAt: new Date(2024, 11, 31, 23, 59, 59, 999),
-        });
+        if (this._token.startsWith("@")) {
+            const parts: string[] = this._token.split(" ");
+
+            if (parts[0].length == 0) {
+                parts[0] = "@<uninformed>"
+            } else {
+                parts[0] = parts[0].substring(1);
+            }
+
+            setDitoUser({
+                id: `ID:${this._token}`,
+                email: "",
+                name: capitalize(parts[0]),
+                fullname: capitalize(`${parts[0]} ${parts[1]}`) || capitalize(parts[0]),
+                displayName: capitalize(parts[0]),
+                avatarUrl: "",
+                expiration: new Date(2024, 0, 1, 0, 0, 0, 0),
+                expiresAt: new Date(2024, 11, 31, 23, 59, 59, 999),
+            });
+        } else {
+            setDitoUser({
+                id: `$ID:{this._token}`,
+                email: "",
+                name: capitalize(this._token),
+                fullname: capitalize(this._token),
+                displayName: capitalize(this._token),
+                avatarUrl: "",
+                expiration: new Date(2024, 0, 1, 0, 0, 0, 0),
+                expiresAt: new Date(2024, 11, 31, 23, 59, 59, 999),
+            });
+        }
 
         let message: string = `Logged in as ${getDitoUser()?.displayName}`;
         logger.info(message);

@@ -5,13 +5,14 @@ export enum CommonCommandFromWebViewEnum {
 	Reset = "RESET",
 	Save = "SAVE",
 	SaveAndClose = "SAVE_AND_CLOSE",
-	SelectResource = "SELECT_RESOURCE",
+	Execute = "EXECUTE",
 }
 
 export type CommonCommandFromWebView = CommonCommandFromWebViewEnum;
 
 export enum CommonCommandToWebViewEnum {
 	InitialData = "INITIAL_DATA",
+	Configuration = "CONFIGURATION",
 	UpdateModel = "UPDATE_MODEL",
 }
 
