@@ -1,6 +1,6 @@
 {
   "name": "tds-dito-vscode",
-  "displayName": "TDS-Dito, your partner in AdvPL programming",
+  "displayName": "TDS-Dito, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Dito will assist you in AdvPL programming",
   "version": "0.0.2",
   "publisher": "TOTVS",
@@ -130,7 +130,13 @@
       },
       {
         "command": "tds-dito.explain",
-        "title": "Explain Code",
+        "title": "Explain source or function/method Code",
+        "shortTitle": "Explain",
+        "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.typify",
+        "title": "Typify variables",
         "category": "TDS-Dito"
       }
     ],
