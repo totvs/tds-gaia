@@ -13,6 +13,8 @@ const LOGIN_RE = /^login$/i;
 const MANUAL_RE = /^manual$/i;
 const DETAIL_HEALTH_RE = /^detail$/i;
 const CLEAR_RE = /^clear$/i;
+const EXPLAIN_RE = /^explain\s(source)?$/i;
+const TYPIFY_RE = /^typify\s(source)?$/i;
 
 const COMMAND_IN_MESSAGE = /\{command:([^\}]*)\}/i;
 
@@ -68,6 +70,20 @@ const commandsMap: Record<string, TCommand> = {
         regex: CLEAR_RE,
         alias: ["c"],
         process: (chat: ChatApi) => doClear(chat)
+    },
+    "explain": {
+        caption: "Explain",
+        command: "explain",
+        regex: EXPLAIN_RE,
+        alias: ["ex", "e"],
+        commandId: "tds-dito.explain",
+    },
+    "typify": {
+        caption: "Typify",
+        command: "typify",
+        regex: TYPIFY_RE,
+        alias: ["ty", "t"],
+        commandId: "tds-dito.typify",
     }
 };
 
@@ -114,6 +130,7 @@ export class ChatApi {
     async dito(message: string): Promise<void> {
 
         this.sendMessage({
+            inProcess: true,
             messageId: this.messageId++,
             timeStamp: new Date(),
             author: "Dito",
@@ -160,6 +177,7 @@ export class ChatApi {
         this.beginMessageGroup();
 
         this.sendMessage({
+            inProcess: false,
             messageId: this.messageId++,
             timeStamp: new Date(),
             author: getDitoUser()?.displayName || "Unknown",
@@ -175,15 +193,18 @@ export class ChatApi {
         let commands: string[] = [];
         const command = (command: TCommand) => `${command.command}`;
 
-        commands.push(command(commandsMap["help"]));
-        commands.push(command(commandsMap["clear"]));
+        commands.push(`${this.commandText("help")}`);
+        commands.push(`${this.commandText("manual")}`);
+        commands.push(`${this.commandText("clear")}`);
 
         if (!isDitoReady()) {
-            commands.push(command(commandsMap["details"]));
+            commands.push(`${this.commandText("details")}`);
         } else if (isDitoLogged()) {
-            commands.push(command(commandsMap["logout"]));
+            commands.push(`${this.commandText("logout")}`);
+            commands.push(`${this.commandText("explain")}`);
+            commands.push(`${this.commandText("typify")}`);
         } else {
-            commands.push(command(commandsMap["login"]));
+            commands.push(`${this.commandText("login")}`);
         }
 
         return commands.join(", ");

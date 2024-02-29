@@ -105,12 +105,45 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(generateCode);
 
 	const explainCode = vscode.commands.registerTextEditorCommand('tds-dito.explain', () => {
-		const text: string = "local a := {}";
-		iaApi.explainCode(text).then((value: string) => {
+		const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+		let codeToExplain: string = "";
+
+		if (editor !== undefined) {
+			const selection: vscode.Selection = editor.selection;
+
+			if (selection && !selection.isEmpty) {
+				const selectionRange = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
+				codeToExplain = editor.document.getText(selectionRange);
+			} else {
+				const curPos: vscode.Position = selection.start;
+				const curLineStart = new vscode.Position(curPos.line, 0);
+				const nextLineStart = new vscode.Position(curPos.line + 1, 0);
+				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
+				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
+
+				codeToExplain = contentWithFirstCharOfNextLine.trim();
+			}
+
+			if (codeToExplain.length > 0) {
+				iaApi.explainCode(codeToExplain).then((value: string) => {
+					logger.info(value)
+				});
+			} else {
+				logger.error("Empty code to explain");
+			}
+
+		} else {
+			logger.error("Editor undefined");
+		}
+	});
+	context.subscriptions.push(explainCode);
+
+	const typify = vscode.commands.registerCommand('tds-dito.typify', async (...args) => {
+		iaApi.logout();
+		iaApi.typify("").then((value: string) => {
 			logger.info(value)
 		});
 	});
-	context.subscriptions.push(explainCode);
 
 	// const attribution = vscode.commands.registerTextEditorCommand('tds-dito.attribution', () => {
 	// 	void highlightStackAttributions();

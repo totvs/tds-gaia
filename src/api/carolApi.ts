@@ -221,24 +221,30 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage("No code found in the stack");
+            logger.profile("getCompletions");
             return { completions: [] };
         }
 
         const response: CompletionResponse = { completions: [] };
-        for (let index = 0; index < json.length; index++) {
-            const lines: string[] = json[index];
+        for (let index = 0; index < json.completions.length; index++) {
+            const lines: string[] = json.completions[index];
             let blockCode: string = "";
 
             // blockCode += `//\n//\n//bloco ${index}\n//\n//`;
             lines.forEach((line: string) => {
-                blockCode += line + "\n";
+                if (line.length > 0) {
+                    blockCode += line + "\n";
+                }
             });
 
-            response.completions.push({ generated_text: blockCode });
+            if (blockCode.length > 0) {
+                response.completions.push({ generated_text: blockCode });
+            }
         }
 
-        logger.debug(`Code completions end with ${response.completions.length} suggestions`);
+        logger.debug(`Code completions end with ${response.completions.length} suggestions in ${json.elapsed_time} ms`);
         logger.debug(JSON.stringify(response.completions, undefined, 2));
+        logger.profile("getCompletions");
 
         return response;
     }
@@ -256,12 +262,38 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         if (typeof (response) === "object") {
             return "";
         } else if (!response) {// } || response.length === 0) {
+            logger.profile("explainCode");
             void vscode.window.showInformationMessage("No explain found");
             return "";
         }
 
         //  logger.debug(`Code explain end with ${response.length} size`);
         logger.debug(response);
+        logger.profile("explainCode");
+
+        return JSON.stringify(response);
+    }
+
+    async typify(code: string): Promise<string> {
+        logger.info("Code typify...");
+        logger.profile("typify");
+
+        const body: {} = {
+            "code": code,
+        };
+
+        let response: {} | Error = await this.jsonRequest("POST", `${this._apiRequest}/typify`, JSON.stringify(body));
+
+        if (typeof (response) === "object") {
+            return "";
+        } else if (!response) {// } || response.length === 0) {
+            void vscode.window.showInformationMessage("No typify found");
+            return "";
+        }
+
+        //  logger.debug(`Code explain end with ${response.length} size`);
+        logger.debug(response);
+        logger.profile("typify");
 
         return JSON.stringify(response);
     }

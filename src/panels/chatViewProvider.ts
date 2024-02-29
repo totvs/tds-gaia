@@ -183,6 +183,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     if (this.chatModel.messages.length > 0) {
       let oldAuthor: string | undefined;
       let oldTimestamp: string | undefined;
+      const countMessages: number = this.chatModel.messages.length;
 
       this.chatModel.messages = this.chatModel.messages.map((message: TMessageModel) => {
         if ((oldAuthor != message.author) || (oldTimestamp != message.timeStamp.toTimeString().substring(0, 5))) {
@@ -190,6 +191,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
           oldTimestamp = message.timeStamp.toTimeString().substring(0, 5);
         } else {
           message.author = "";
+        }
+
+        if ((countMessages > 1) && message.inProcess) {
+          message.inProcess = false;
         }
 
         return message;
@@ -202,6 +207,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         model: model,
         errors: errors
       }
+    });
+
+    this.chatModel.messages.forEach((message: TMessageModel, index: number) => {
+      message.inProcess = false;
     });
   }
 

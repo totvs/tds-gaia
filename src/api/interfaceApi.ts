@@ -22,6 +22,7 @@ export interface IaApiInterface {
     generateCode(text: string): Promise<string[]>;
     getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse>
     explainCode(code: string): Promise<string>;
+    typify(code: string): Promise<string>;
 }
 
 export class IaAbstractApi {

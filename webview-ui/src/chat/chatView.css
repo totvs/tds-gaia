@@ -51,6 +51,10 @@ section.tds-chat div.tds-message-row div.tds-message-author {
 	display: flex;
 }
 
+section.tds-chat div.tds-message-row div.tds-message-author vscode-progress-ring {
+	height: 1.2rem;
+}
+
 section.tds-chat div.tds-message-row div.tds-message-author #author {
 	font-weight: bold;
 	flex-grow: 1;

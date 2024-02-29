@@ -6,6 +6,7 @@ export type TMessageActionModel = {
 }
 
 export type TMessageModel = TAbstractModel & {
+    inProcess: boolean;
     messageId: number;
     timeStamp: Date;
     author: string;

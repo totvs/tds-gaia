@@ -1,14 +1,9 @@
 import "./chatView.css";
 import React from "react";
-import { Control, FieldArrayWithId, FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { CommonCommandFromPanelEnum, ReceiveMessage, sendReady, sendSave, sendSaveAndClose } from "../utilities/common-command-webview";
-import { VSCodeButton, VSCodeDataGrid, VSCodeDataGridCell, VSCodeDataGridRow, VSCodeLink } from "@vscode/webview-ui-toolkit/react";
+import { Control, FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { CommonCommandFromPanelEnum, ReceiveMessage, sendSave } from "../utilities/common-command-webview";
+import { VSCodeButton, VSCodeLink, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
 import { TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
-import TdsPage from "../components/page";
-import TdsHeader from "../components/header";
-import TdsContent from "../components/content";
-import TdsFooter from "../components/footer";
-import { time } from "console";
 import { sendExecute } from "./sendCommand";
 
 enum ReceiveCommandEnum {
@@ -22,6 +17,7 @@ type TMessageActionModel = {
 }
 
 type TMessageModel = {
+  inProcess: boolean
   messageId: number;
   timeStamp: Date;
   author: string;
@@ -90,6 +86,7 @@ function MessageRow(row: TMessageModel, index: number, control: Control<TFields,
   if (row.author.length > 0) {
     children.push(
       <div className="tds-message-author">
+        {row.inProcess && <VSCodeProgressRing />}
         <span id="author">{author}</span><span id="timeStamp">{timeStamp}</span>
       </div>
     )
@@ -209,6 +206,8 @@ export default function ChatView() {
                 ))}
               </VSCodeDataGrid>
   */
+
+  // model.loggedUser
   return (
     <main>
       <section className="tds-chat">
@@ -224,8 +223,9 @@ export default function ChatView() {
               actions={[]}
             >
               <section className="tds-row-container" >
-                <TdsTextField name="newMessage" label={model.loggedUser} />
+                <TdsTextField name="newMessage" label={""} />
                 <VSCodeButton
+                  name="btnSend"
                   type="submit"
                   appearance="icon"
                   className={`tds-button-button`}

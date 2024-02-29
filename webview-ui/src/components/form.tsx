@@ -170,6 +170,17 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 			id={id}
 			onSubmit={props.methods.handleSubmit(props.onSubmit)}
 			onReset={() => sendReset(props.methods.getValues())}
+			onKeyUp={(ev: React.KeyboardEvent<HTMLElement>) => {
+				console.log(ev.key, ev.ctrlKey, ev.metaKey, ev.altKey, ev.shiftKey);
+				//TODO: ainda com erro, não envia newMessage
+				if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) {
+					ev.preventDefault();
+					ev.stopPropagation();
+					document.getElementById("btnSend")?.focus();
+					document.getElementById("btnSend")?.click();
+				}
+			}}
+			autoComplete="off"
 		>
 			<section className={"tds-form-content"}>
 				{...children}
