@@ -68,6 +68,8 @@ user function escolheNum(replay, replayPath, numbers)
 
 	enddo
 
+	substr
+
 	if replay
 		TDSReplay(.F.)
 	endif
@@ -86,12 +88,6 @@ static function tela(aaOpcoes)
 	oDlg:cName := "oDlg"
 	oDlg:cCaption := "Escolha um número"
 	oDlg:nLeft := 0
-	oDlg:nTop := 0
-	oDlg:nWidth := 200
-	oDlg:nHeight := 100
-	oDlg:lCentered :=.T.
-
-
 
 	aEval(aaOpcoes, { |x,i| ;
 		oBtn := TButton():Create(oDlg),;
@@ -102,6 +98,9 @@ static function tela(aaOpcoes)
 		oBtn:nWidth := 180,;
 		oBtn:nHeight := 20,;
 		oBtn:onClick := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
+		oBtn:bLClicked := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
+		oBtn:bRClicked := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
+
 		})
 
 //ACTIVATE DIALOG oDlg CENTERED

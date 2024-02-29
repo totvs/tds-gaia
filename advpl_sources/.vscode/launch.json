@@ -46,8 +46,11 @@
 		},
 		{
 			"label": "u_fwcad02"
+		},
+		{
+			"label": "u_dbgString2"
 		}
 	],
-	"lastProgramExecuted": "<cancel>",
+	"lastProgramExecuted": "u_dbgString2",
 	"lastProgramArguments": []
 }
