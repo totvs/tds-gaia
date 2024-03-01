@@ -1,6 +1,6 @@
 # TDS-Dito, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
 
-> **NÃO USO EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
+> **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
 >
 > Por ser um projeto **experimental**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
 >
@@ -31,17 +31,14 @@ A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://co
 
 ## Funcionalidades (_status_)
 
-- \[X\] Complemento de código
-- \[X\] Explicação de código
-- \[X\] Tipificação de variáveis
-- \[?\] Geração de código a partir de uma descrição
-- \[ \] Análise de código
-- \[ \] Tradução automatizada de _strings_
+:white_check_mark: Complemento de código
+:white_check_mark: Explicação de código
+:white_check_mark: Tipificação de variáveis
+:walking: Geração de código a partir de uma descrição
+:white_square_button: Análise de código
+:white_square_button: Tradução automatizada de _strings_
 
-**Legendas**
-- \[X\] Experimental 
-- \[?\] Previsto, mas sem prazo 
-- \[ \] Em estudo (pode ser cancelado)
+**Legendas**: :white_check_mark: Experimental :walking: Em andamento, sem prazo :white_square_button: Em estudo (pode ser cancelado)
 
 ## Guia \(ultra\) rápido
 
