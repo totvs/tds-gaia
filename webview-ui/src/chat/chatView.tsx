@@ -86,7 +86,7 @@ function MessageRow(row: TMessageModel, index: number, control: Control<TFields,
   if (row.author.length > 0) {
     children.push(
       <div className="tds-message-author">
-        {row.inProcess && <VSCodeProgressRing />}
+        {row.inProcess && false && <VSCodeProgressRing />}
         <span id="author">{author}</span><span id="timeStamp">{timeStamp}</span>
       </div>
     )

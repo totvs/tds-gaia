@@ -14,7 +14,7 @@ const MANUAL_RE = /^manual$/i;
 const HEALTH_RE = /^health$/i;
 const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
-const TYPIFY_RE = /^typify\s(source)?$/i;
+const typify_RE = /^typify\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
 
@@ -84,7 +84,7 @@ const commandsMap: Record<string, TCommand> = {
     },
     "typify": {
         command: "typify",
-        regex: TYPIFY_RE,
+        regex: typify_RE,
         alias: ["ty", "t"],
         commandId: "tds-dito.typify",
     }
@@ -172,6 +172,18 @@ export class ChatApi {
             messageId: this.messageId++,
             timeStamp: new Date(),
             author: "Dito",
+            message: message,
+            actions: this.extractActions(message)
+        });
+    }
+
+    async ditoInfo(message: string): Promise<void> {
+
+        this.sendMessage({
+            inProcess: true,
+            messageId: this.messageId++,
+            timeStamp: new Date(),
+            author: "Dito (info)",
             message: message,
             actions: this.extractActions(message)
         });

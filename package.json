@@ -164,7 +164,7 @@
       {
         "command": "tds-dito.typify",
         "title": "Typify variables",
-        "shortTitle": "Typify",
+        "shortTitle": "typify",
         "category": "TDS-Dito"
       }
     ],

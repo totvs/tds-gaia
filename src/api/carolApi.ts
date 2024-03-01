@@ -259,11 +259,10 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
         let response: {} | Error = await this.jsonRequest("POST", `${this._apiRequest}/explain`, JSON.stringify(body));
 
-        if (typeof (response) === "object") {
+        if (typeof (response) === "object" && response instanceof Error) {
             return "";
         } else if (!response) {// } || response.length === 0) {
             logger.profile("explainCode");
-            void vscode.window.showInformationMessage("No explain found");
             return "";
         }
 
@@ -271,7 +270,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         logger.debug(response);
         logger.profile("explainCode");
 
-        return JSON.stringify(response);
+        return JSON.stringify(JSON.stringify(response, undefined, 2));
     }
 
     async typify(code: string): Promise<string> {
@@ -282,12 +281,11 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             "code": code,
         };
 
-        let response: {} | Error = await this.jsonRequest("POST", `${this._apiRequest}/typify`, JSON.stringify(body));
+        let response: {} | Error = await this.jsonRequest("POST", `${this._apiRequest}/typefy`, JSON.stringify(body));
 
-        if (typeof (response) === "object") {
+        if (typeof (response) === "object" && response instanceof Error) {
             return "";
         } else if (!response) {// } || response.length === 0) {
-            void vscode.window.showInformationMessage("No typify found");
             return "";
         }
 
@@ -295,7 +293,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         logger.debug(response);
         logger.profile("typify");
 
-        return JSON.stringify(response);
+        return JSON.stringify(JSON.stringify(response, undefined, 2));
     }
 
     stop(): Promise<boolean> {

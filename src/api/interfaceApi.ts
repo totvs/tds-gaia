@@ -15,10 +15,10 @@ export interface IaApiInterface {
     start(token: string): Promise<boolean>;
     stop(): Promise<boolean>;
     checkHealth(detail: boolean): Promise<Error | undefined>;
-    
+
     login(): Promise<boolean>;
     logout(): Promise<boolean>;
-    
+
     generateCode(text: string): Promise<string[]>;
     getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse>
     explainCode(code: string): Promise<string>;

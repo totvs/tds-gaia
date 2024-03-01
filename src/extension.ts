@@ -128,24 +128,87 @@ export function activate(context: vscode.ExtensionContext) {
 
 			if (codeToExplain.length > 0) {
 				iaApi.explainCode(codeToExplain).then((value: string) => {
-					logger.info(value)
+					chatApi.dito(value);
 				});
 			} else {
-				logger.error("Empty code to explain");
+				chatApi.dito("Empty code to explain");
 			}
-
 		} else {
-			logger.error("Editor undefined");
+			chatApi.dito("Editor undefined");
 		}
 	});
 	context.subscriptions.push(explainCode);
 
 	const typify = vscode.commands.registerCommand('tds-dito.typify', async (...args) => {
-		iaApi.logout();
-		iaApi.typify("").then((value: string) => {
-			logger.info(value)
-		});
+		const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+		let codeToTypify: string = "";
+
+		if (editor !== undefined) {
+			const selection: vscode.Selection = editor.selection;
+			const function_re: RegExp = /(function|method(...)class)/i
+			const curPos: vscode.Position = selection.start;
+			let curLine = curPos.line;
+
+			let startFunction: vscode.Position | undefined = undefined;
+			let endFunction: vscode.Position | undefined = undefined;
+
+			//começo da função
+			while ((curLine > 0) && (!startFunction)) {
+				const lineStart = new vscode.Position(curLine - 1, 0);
+				const curLineStart = new vscode.Position(lineStart.line, 0);
+				const nextLineStart = new vscode.Position(lineStart.line + 1, 0);
+				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
+				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
+
+				if (contentWithFirstCharOfNextLine.match(function_re)) {
+					startFunction = new vscode.Position(curLine, 0);
+				}
+
+				curLine--;
+			}
+
+			curLine = curPos.line;
+
+			while ((curLine < editor.document.lineCount) && (!endFunction)) {
+				const lineStart = new vscode.Position(curLine + 1, 0);
+				const curLineStart = new vscode.Position(lineStart.line, 0);
+				const nextLineStart = new vscode.Position(lineStart.line + 1, 0);
+				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
+				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
+
+				if (contentWithFirstCharOfNextLine.match(function_re)) {
+					endFunction = new vscode.Position(curLine, 0);
+				}
+
+				curLine++;
+			}
+
+			if (startFunction) {
+				if (!endFunction) {
+					endFunction = new vscode.Position(editor.document.lineCount - 1, 0);
+				}
+
+				const rangeForTypify = new vscode.Range(startFunction, endFunction);
+				codeToTypify = editor.document.getText(rangeForTypify);
+			}
+
+			if (codeToTypify.length > 0) {
+				iaApi.typify(codeToTypify).then((value: string) => {
+					if (value.length == 0) {
+						chatApi.ditoInfo("Desculpe. Não consegui tipificar essa função.");
+					} else {
+						chatApi.dito(value);
+					}
+				});
+			} else {
+				chatApi.dito("Empty code to typify");
+			}
+		} else {
+			chatApi.dito("Editor undefined");
+		}
 	});
+
+	context.subscriptions.push(typify);
 
 	const provider: vscode.InlineCompletionItemProvider = inlineCompletionItemProvider(context);
 	const documentFilter = config.documentFilter;
