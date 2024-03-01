@@ -2,9 +2,9 @@
 
 > **NÃO USO EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
 >
-> Por ser um projeto **experimental**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral.
-> No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
+> Por ser um projeto **experimental**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
 >
+> No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
 
 <!--[![GitHub stars](https://img.shields.io/github/stars/brodao2/tds-dito?style=plastic)](https://github.com/brodao2/tds-dito/stargazers)
 ![GitHub top language](https://img.shields.io/github/languages/top/brodao2/tds-dito)
@@ -29,7 +29,7 @@
 
 A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://code.visualstudio.com/) que fornece uma interface visual para o serviço de IA da **TOTVS**, que provê serviço de inteligência artificial para ajudá-lo no desenvolvimento de aplicações AdvPL/TLPP.
 
-## Funcionalidades
+## Funcionalidades (_status_)
 
 - \[X\] Complemento de código
 - \[X\] Explicação de código
@@ -40,12 +40,24 @@ A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://co
 
 \[X\] Experimental \[?\] Previsto, mas sem prazo \[ \] Em estudo (pode ser cancelado)
 
+## Guia \(ultra\) rápido
+
+> Indicado para quem já tem familiaridade com o **VS-Code**. Caso contrário, recomenda-se começar por [Instalação](#instalação).
+
+Após a instalação da extensão **TDS-Dito**. Identifique-se acionando o comando ``TDS-Dito: Login``. Uma verificação do ambiente e disponibilidade do serviço de IA é efetuada. 
+
+Se estiver tudo em ordem, informe seu _token_ de acesso e aguarde validação. Após validado, abra um fonte AdvPL/TLPP.
+
+Posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP ou aguarde alguns instantes, que sugestões de códigos lhe serão apresentadas.
+
+Leia [Funcionalidades](#funcionalidades), para saber tudo que o **TDS-Dito** pode fazer **junto** com você.
+
 ## Instalação
 
 > Requer a extensão [**TDS-VSCode**](/https://github.com/totvs/tds-vscode). Caso não o tenha, este será instalado automaticamente. Atente-se ao requisitos desta extensão.
 >
 > O **VS Code** pode apresentar problemas em suas funcionalidades em sistemas operacionais da linha **Windows Server**.
-> Veja os requisitos para uso do **VS Code** em [Requirements](https://code.visualstudio.com/docs/supporting/requirements).
+> Veja os requisitos para uso do **VS Code** em [Requirements](https://code.visualstudio.comdocs/supporting/requirements).
 
 ### Procurando pela extensão (não disponível)
 
@@ -59,9 +71,9 @@ Acione  o botão ``Instalar``. Após completar a instalação, o botão ``Instal
 
 ### Instalando de um arquivo VSIX
 
-Você pode instalar manualmente uma extensão do **VS Code** empacotada em um arquivo ``.vsix``. Utilize o comando ``Instalar do VSIX...`` na visão de extensões após clicar em ``Modo de Exibição e Mais Ações...`` (ícone com "...") ou acione o comando ``Extensões: Instalar do VSIX...`` após acionar (``CTRL+SHIFT+P``) e selecione o arquivo ``.vsix``.
+Você pode instalar manualmente uma extensão do **VS Code** que foi empacotada em um arquivo ``.vsix``. Utilize o comando ``Instalar do VSIX...`` na visão de extensões após acionar ``Modo de Exibição e Mais Ações...`` (ícone com "...") ou acione o comando ``Extensões: Instalar do VSIX...`` no painel de comandos (``CTRL+SHIFT+P``) e selecione o arquivo ``.vsix``.
 
-Acesse o [releases](https://github.com/brodao2/tds-dito/releases) para baixar a última versão liberada.
+Acesse [releases](https://github.com/brodao2/tds-dito/releases) para baixar a última versão liberada.
 
 > Caso o acesso seja negado, solicite liberação.
 > Sua solicitação será analisada, podendo ser liberado ou negada sem maiores explicações.
@@ -70,7 +82,9 @@ Você pode instalar também usando a opção ``--install-extension`` através da
 
 > ``code --install-extension tds-dito-0.0.1.vsix``
 
-Ao finalizar a instalação, lhe será apresentado um bate-bato (_chat_). É através dele que você pode falar com o **Dito, seu parceiro na programação AdvPL/TLPP**.
+Ao finalizar a instalação, lhe será apresentado um bate-bato (_chat_). É através dele que você e  **Dito, seu parceiro na programação AdvPL/TLPP**, iram interagir.
+
+![Dito: Chat](images/chat.png)
 
 ### Revertendo uma atualização
 
@@ -84,16 +98,54 @@ Para desinstalar a extensão, selecione o comando "Desinstalar" após acionar o 
 
 ### Configuração
 
-A extensão já vem configurada pronto para uso, não requerendo nenhuma configuração adicional. Caso queira saber mais, acesse [Configuração](/docs/configuration.md).
+A extensão já vem configurada pronto para uso, não requerendo nenhuma configuração adicional. Caso queira saber mais, acesse [Configuração](docs/configuration.md).
 
-### Complemento de código
+### Começando a usar
 
-A extensão fornece um complemento de código para o códigos AdvPL/TLPP. Para ativar o complemento, abra um arquivo AdvPL/TLPP e digite algum código (ou aguarde) e uma lista de possíveis complementos será exibido.
+Você pode utilizar  as funcionalidades através de comandos, que podem ser acionados de diversas formas. 
 
-> A funcionalidade pode ser configurada para ser acionada [manualmente](/docs/configuration.md) ou ter o [intervalo de espera](/docs/configuration.md) alterado.
+- Acionando um atalho;
+- Acionando o painel de comandos (``Ctrl+Shit-P`` ou ``F1``), comece a digitar o comando para filtrar e acione-o quando localizado;
+- Acionando ligações no bate-papo;
+- Digitando o comando pelo _prompt_ do bate-bato;
+- Acionando o menu de contexto do bate-papo ou fonte em edição. 
+
+Neste documento, quando citado "Acionar o comando ...", entenda que você pode aciona-lo pelo atalho a ele associado, pelo painel de comandos ou digitando-o no _prompt_ do bate-papo. Se for digitar, digite apenas a palavra informada entre chaves do final do comando ou acione o atalho entre parenteses. Lembrando que os atalhos aqui citados, são os atribuídos por padrão.
+
+Por exemplo: "... identifique-se acionando ``TDS-Dito: Login\(Ctrl+D Ctrl+L)\[login]``", você pode acionar o painel de comandos e localizar o comando ou digitar ``login`` no _prompt_ ou acionar o atalho ``Ctrl+D Ctrl+L`` ou acionar a ligação no bate-papo, se existir ou, ainda, pelo menu de contexto do bate-papo ou fonte em edição.
+
+Quando o **TDS-Dito**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando ``TDS-Dito: Login\(Ctrl+D Ctrl+L)\[login]``. 
+
+Caso não saiba o que fazer ou aparenta não estar funcionando, veja o que o **TDS-Dito** está lhe dizendo no bate-papo.
+
+## Funcionalidades
+
+## Complemento de código
+
+A extensão fornece sugestões de código analisando seu código AdvPL/TLPP do fonte sendo editado. Para ativar o complemento, abra um arquivo AdvPL/TLPP, posicione o cursor no local desejado e digite algum código (ou aguarde) e uma lista de possíveis complementos será exibido.
+
+> A funcionalidade pode ser configurada para ser acionada [manualmente](docs/configuration.md) ou em um [intervalo de espera](docs/configuration.md).
 
 ### Explicação de código
 
+A extensão pode lhe fornecer explicações sobre o código ao acionar o comando ``TDS-Dito: Explain\(Ctrl+D Ctrl+E\)\[explain\]``. 
+ Se não ficar satisfeito, acione novamente o comando, que lhe será apresentado uma nova explicação.
+
+#### Linha corrente
+
+Posicione o cursor na linha na qual deseja uma explicação e acione o comando. 
+
+#### Bloco selecionado
+
+Selecione o bloco de código do qual deseja uma explicação e acione o comando.
+
+#### Função ou método
+
+Posicione o cursor no cabeçalho da implementação da função ou método e acione o comando.
+
+### Tipificação de variáveis
+
+Em códigos TLPP, a extensão pode analisar uma função ou método e lhe fornecer a tipificação de variáveis com base no seu uso. Com o cursor posicionado em qualquer lugar dentro da função ou método, acionar o comando ``TDS-Dito: Typify\(Ctrl+D Ctrl+T\)\[typify\]``. 
 
 ## Erros comuns
 

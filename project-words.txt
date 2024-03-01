@@ -11,3 +11,4 @@ totvs
 TOTVS
 totvsls
 undici
+vsix
