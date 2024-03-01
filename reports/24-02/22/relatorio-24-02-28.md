@@ -18,7 +18,16 @@
 
 ## Comentários
 
-## Destaques: API ``explain``
+## API ``typefy``
+
+> Salvo engano meu, a grafia correta é _typify_.
+
+- Código vazio
+  Ao efetuar a chamada com parâmetro ``code`` vazio, aparenta travamento da API.
+
+  
+
+## API ``explain``
 
 Durante os testes da API ``explain``, reparei que o retorno hora tem um ``\n`` e outros ``\n\n``. Supondo que o retorno está em formato MD, o duplo ``\n\n`` indica um parágrafo novo. Correto isso?
 

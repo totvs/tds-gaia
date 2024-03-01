@@ -46,11 +46,19 @@ A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://co
 
 Após a instalação da extensão **TDS-Dito**. Identifique-se acionando o comando ``TDS-Dito: Login``. Uma verificação do ambiente e disponibilidade do serviço de IA é efetuada. 
 
-Se estiver tudo em ordem, informe seu _token_ de acesso e aguarde validação. Após validado, abra um fonte AdvPL/TLPP.
+Se estiver tudo em ordem, identifique-se efetuado ``Login``. Após validado, abra um fonte AdvPL/TLPP, 
+posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP ou aguarde alguns instantes, que sugestões de códigos lhe serão apresentadas.
 
-Posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP ou aguarde alguns instantes, que sugestões de códigos lhe serão apresentadas.
+| Funcionalidade | Atalho        | Ação |
+| -------------- | ------------- | ---- |
+| Login          | Ctrl+D Ctrl+L | Apresenta o usuário ao IA. |
+| Complemento    |               | Acionado automaticamente durante a edição. |
+| Explicação*    | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
+| Tipificação*   | Ctrl+D Ctrl+E | Tipifica variáveis de uma função/método. |
 
-Leia [Funcionalidades](#funcionalidades), para saber tudo que o **TDS-Dito** pode fazer **junto** com você.
+_* Funcionalidades ainda em desenvolvimento. Podem levar 1 minuto ou mais para responder._
+
+Leia [Funcionalidades](#funcionalidades), para saber maiores detalhes.
 
 ## Instalação
 
@@ -145,7 +153,7 @@ Posicione o cursor no cabeçalho da implementação da função ou método e aci
 
 ### Tipificação de variáveis
 
-Em códigos TLPP, a extensão pode analisar uma função ou método e lhe fornecer a tipificação de variáveis com base no seu uso. Com o cursor posicionado em qualquer lugar dentro da função ou método, acionar o comando ``TDS-Dito: Typify\(Ctrl+D Ctrl+T\)\[typify\]``. 
+Em códigos TLPP, a extensão pode analisar uma função ou método e lhe fornecer a tipificação de variáveis com base no seu uso. Com o cursor posicionado em qualquer lugar dentro da função ou método, acionar o comando ``TDS-Dito: typify\(Ctrl+D Ctrl+T\)\[typify\]``. 
 
 ## Erros comuns
 
