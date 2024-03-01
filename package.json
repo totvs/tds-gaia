@@ -55,12 +55,21 @@
   ],
   "homepage": "https://github.com/totvs/tds-dito-vscode",
   "activationEvents": [
-    "onLanguage:advpl"
+    "onStartupFinished:TOTVS.tds-vscode"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "tds-dito-container",
+          "title": "Dito",
+          "icon": "icons/tds-dito-24x24.png"
+        }
+      ]
+    },
     "views": {
-      "explorer": [
+      "tds-dito-container": [
         {
           "type": "webview",
           "id": "tds-dito-view",
@@ -79,6 +88,26 @@
         {
           "command": "tds-dito.logout",
           "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.health",
+          "when": "webviewId == 'tds-dito-view' && !tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.open-manual",
+          "when": "webviewId == 'tds-dito-view'"
+        },
+        {
+          "command": "tds-dito.generate-code",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.explain",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.typify",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
         }
       ]
     },
@@ -89,13 +118,15 @@
         "category": "TDS-Dito"
       },
       {
-        "command": "tds-dito.detail-health",
-        "title": "Detail Health",
+        "command": "tds-dito.health",
+        "title": "Health Service",
+        "shortTitle": "Health",
         "category": "TDS-Dito"
       },
       {
         "command": "tds-dito.open-manual",
         "title": "Open Manual",
+        "shortTitle": "Manual",
         "category": "TDS-Dito"
       },
       {
@@ -119,13 +150,9 @@
         }
       },
       {
-        "command": "tds-dito.attribution",
-        "title": "Show Code Attribution",
-        "category": "TDS-Dito"
-      },
-      {
-        "command": "tds-dito.generateCode",
+        "command": "tds-dito.generate-code",
         "title": "Generate Code",
+        "shortTitle": "Generate",
         "category": "TDS-Dito"
       },
       {
@@ -137,6 +164,7 @@
       {
         "command": "tds-dito.typify",
         "title": "Typify variables",
+        "shortTitle": "Typify",
         "category": "TDS-Dito"
       }
     ],
@@ -326,16 +354,32 @@
     ],
     "keybindings": [
       {
+        "key": "ctrl+d ctrl+l",
+        "command": "tds-dito.login"
+      },
+      {
+        "key": "ctrl+d ctrl+b",
+        "command": "tds-dito.logout"
+      },
+      {
+        "key": "ctrl+d ctrl+t",
+        "command": "tds-dito.typify"
+      },
+      {
         "key": "cmd+shift+l",
         "command": "editor.action.inlineSuggest.trigger"
       },
       {
-        "key": "cmd+shift+a",
-        "command": "tds-dito.attribution"
-      },
-      {
         "key": "ctrl+d ctrl+e",
         "command": "tds-dito.explain"
+      },
+      {
+        "key": "ctrl+d ctrl+g",
+        "command": "tds-dito.generate-code"
+      },
+      {
+        "key": "ctrl+d ctrl+m",
+        "command": "tds-dito.open-manual"
       }
     ]
   },

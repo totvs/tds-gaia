@@ -6,7 +6,7 @@ import { CompletionResponse, IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
 import { PREFIX_DITO, logger } from './logger';
 import { ChatViewProvider } from './panels/chatViewProvider';
-import { ChatApi } from './api/chatApi';
+import { ChatApi, completeCommandsMap } from './api/chatApi';
 
 let ctx: vscode.ExtensionContext;
 
@@ -17,6 +17,8 @@ export function activate(context: vscode.ExtensionContext) {
 	logger.info(
 		vscode.l10n.t('Congratulations, your extension "tds-dito" is now active!')
 	);
+
+	completeCommandsMap(context.extension);
 
 	ctx = context;
 	handleConfigChange(context);
@@ -70,7 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(logout);
 
-	const detailHealth = vscode.commands.registerCommand('tds-dito.detail-health', async () => {
+	const detailHealth = vscode.commands.registerCommand('tds-dito.health', async () => {
 		chatApi.dito("Verificando disponibilidade do serviço.");
 
 		iaApi.checkHealth(true).then((error: any) => {
@@ -78,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
 			setDitoReady(error === undefined);
 
 			if (error !== undefined) {
-				const message: string = "Desculpe, estou com dificuldades técnicas. {command:tds-dito.detail-health}";
+				const message: string = `Desculpe, estou com dificuldades técnicas. ${chatApi.commandText("health")}`;
 				chatApi.dito(message);
 				vscode.window.showErrorMessage(`${PREFIX_DITO} ${message}`);
 			} else {
@@ -96,7 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(openManual);
 
-	const generateCode = vscode.commands.registerTextEditorCommand('tds-dito.generateCode', () => {
+	const generateCode = vscode.commands.registerTextEditorCommand('tds-dito.generate-code', () => {
 		const text: string = "Gerar código para varrer um array";
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.selection.active.lineText);
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.document.getText());
@@ -145,11 +147,6 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	});
 
-	// const attribution = vscode.commands.registerTextEditorCommand('tds-dito.attribution', () => {
-	// 	void highlightStackAttributions();
-	// });
-	// context.subscriptions.push(attribution);
-
 	const provider: vscode.InlineCompletionItemProvider = inlineCompletionItemProvider(context);
 	const documentFilter = config.documentFilter;
 	const inlineRegister: vscode.Disposable = vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
@@ -175,7 +172,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.registerWebviewViewProvider(ChatViewProvider.viewType, chat));
 
 	//aciona a verificação do serviço no ar e posterior login
-	vscode.commands.executeCommand("tds-dito.detail-health");
+	vscode.commands.executeCommand("tds-dito.health");
 }
 
 export function deactivate() {

@@ -100,7 +100,6 @@ static function tela(aaOpcoes)
 		oBtn:onClick := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
 		oBtn:bLClicked := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
 		oBtn:bRClicked := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
-
 		})
 
 //ACTIVATE DIALOG oDlg CENTERED

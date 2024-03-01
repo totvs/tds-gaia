@@ -51,17 +51,17 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
                     logger.warn('Request cancelled by user');
                     return;
                 }
-                
+
                 if (response !== undefined && response.completions.length) {
                     for (const completion of response.completions) {
                         items.push({
                             insertText: completion.generated_text,
                             range: new vscode.Range(position, position),
-                            // command: {
-                            //     title: 'afterInsert',
-                            //     command: 'tds-dito.afterInsert',
-                            //     arguments: [completion],
-                            // }
+                            command: {
+                                title: 'afterInsert',
+                                command: 'tds-dito.afterInsert',
+                                arguments: [completion],
+                            }
                         });
                     }
                 }

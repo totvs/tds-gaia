@@ -6,7 +6,7 @@ import { getWebviewContent } from './utilities/webview-utils';
 import { TMessageModel } from '../model/messageModel';
 import { TFieldErrors } from '../model/abstractMode';
 import { chatApi } from '../extension';
-import { ChatApi, TQueueMessages } from '../api/chatApi';
+import { TQueueMessages } from '../api/chatApi';
 import { getDitoUser } from '../config';
 
 enum ChatCommandEnum {
@@ -147,11 +147,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
             break;
           case CommonCommandFromWebViewEnum.Save:
-            chatApi.user(data.model.newMessage);
+            chatApi.user(data.model.newMessage, true);
 
             break;
           case CommonCommandFromWebViewEnum.Execute:
-            chatApi.user(data.command);
+            chatApi.user(data.command, false);
 
             if (data.command == "clear") {
               this.chatModel.messages = [];
@@ -179,32 +179,35 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {
     //model.loggedUser = getDitoUser()!.displayName || "<Not logged>";
     //model.newMessage = "";
+    let messagesToSend: TMessageModel[] = [];
 
     if (this.chatModel.messages.length > 0) {
       let oldAuthor: string | undefined;
       let oldTimestamp: string | undefined;
       const countMessages: number = this.chatModel.messages.length;
 
-      this.chatModel.messages = this.chatModel.messages.map((message: TMessageModel) => {
-        if ((oldAuthor != message.author) || (oldTimestamp != message.timeStamp.toTimeString().substring(0, 5))) {
-          oldAuthor = message.author;
-          oldTimestamp = message.timeStamp.toTimeString().substring(0, 5);
+      this.chatModel.messages.forEach((message: TMessageModel) => {
+        let formattedMessage: TMessageModel = { ...message };
+
+        if ((oldAuthor != formattedMessage.author) || (oldTimestamp != formattedMessage.timeStamp.toTimeString().substring(0, 5))) {
+          oldAuthor = formattedMessage.author;
+          oldTimestamp = formattedMessage.timeStamp.toTimeString().substring(0, 5);
         } else {
-          message.author = "";
+          formattedMessage.author = "";
         }
 
-        if ((countMessages > 1) && message.inProcess) {
+        if ((countMessages > 1) && formattedMessage.inProcess) {
           message.inProcess = false;
         }
 
-        return message;
+        messagesToSend.push(formattedMessage);
       });
     }
 
     this._view!.webview.postMessage({
       command: CommonCommandToWebViewEnum.UpdateModel,
       data: {
-        model: model,
+        model: { ...model, messages: messagesToSend },
         errors: errors
       }
     });

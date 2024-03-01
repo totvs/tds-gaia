@@ -95,6 +95,10 @@ export function isDitoLogged(): boolean {
   return getDitoUser() !== undefined;
 }
 
+export function isDitoFirstUse(): boolean {
+  return getDitoConfiguration().lastLogin.length == 0;
+}
+
 export function isDitoShowBanner(): boolean {
 
   return getDitoConfiguration().showBanner;
