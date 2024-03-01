@@ -586,3 +586,6 @@ Resposta:
 >
 >local a100000 := geraArray(100000)
   
+- Ao acionar o ``tab``, foi sugerido o mesmo código logo abaixo.
+
+  ![Código existente](exist_code.png)
