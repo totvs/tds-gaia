@@ -3,10 +3,10 @@
     "totvsLanguageServer.editor.linter.includes": "M:\\protheus\\includes;M:\\protheus\\includes_tlpp",
     "totvsLanguageServer.askCompileResult": false,
     "totvsLanguageServer.trace.server": "verbose",
-    "totvsLanguageServer.editor.index.cache": "off",
+    "totvsLanguageServer.editor.index.cache": "onMemory",
     "totvsLanguageServer.launch.args": [
         "--log-file=totvsls.log",
         "--record=totvsls"
     ],
-    "tds-dito.endPoint": ""
+    "tds-dito.maxLine": 2
 }

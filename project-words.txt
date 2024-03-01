@@ -1,3 +1,14 @@
+advpl
+codicon
+codicons
 fullname
+HOMEPATH
+huggingface
+Logform
+protheus
 TLPP
+totvs
+TOTVS
 totvsls
+undici
+vsix

@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"module": "commonjs",
+		"target": "es2020",
+		"outDir": "../out",
+		"lib": [
+			"es2016",
+			"dom"
+		],
+		"sourceMap": true,
+		"strict": true,
+		"skipDefaultLibCheck": true,
+		"skipLibCheck": true
+	},
+	"exclude": [
+		"node_modules/",
+	]
+}

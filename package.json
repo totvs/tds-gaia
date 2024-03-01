@@ -1,8 +1,8 @@
 {
   "name": "tds-dito-vscode",
-  "displayName": "TDS-Dito, your partner in AdvPL programming",
+  "displayName": "TDS-Dito, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Dito will assist you in AdvPL programming",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "TOTVS",
   "preview": true,
   "author": {
@@ -12,9 +12,9 @@
   "license": "Apache-2.0",
   "keywords": [
     "advpl",
-    "tlpp",
+    "TLPP",
     "tds",
-    "totvs",
+    "TOTVS",
     "protheus",
     "artificial intelligence",
     "code",
@@ -23,7 +23,7 @@
     "development"
   ],
   "engines": {
-    "vscode": "^1.63.1"
+    "vscode": "^1.85.1"
   },
   "icon": "icons/tds-dito.png",
   "categories": [
@@ -55,10 +55,62 @@
   ],
   "homepage": "https://github.com/totvs/tds-dito-vscode",
   "activationEvents": [
-    "onLanguage:advpl"
+    "onStartupFinished:TOTVS.tds-vscode"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "tds-dito-container",
+          "title": "Dito",
+          "icon": "icons/tds-dito-24x24.png"
+        }
+      ]
+    },
+    "views": {
+      "tds-dito-container": [
+        {
+          "type": "webview",
+          "id": "tds-dito-view",
+          "name": "Dito: Chat",
+          "visibility": "collapsed",
+          "icon": "icons/tds-dito-24x24.png"
+        }
+      ]
+    },
+    "menus": {
+      "webview/context": [
+        {
+          "command": "tds-dito.login",
+          "when": "webviewId == 'tds-dito-view' && !tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.logout",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.health",
+          "when": "webviewId == 'tds-dito-view' && !tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.open-manual",
+          "when": "webviewId == 'tds-dito-view'"
+        },
+        {
+          "command": "tds-dito.generate-code",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.explain",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.typify",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "tds-dito.afterInsert",
@@ -66,23 +118,53 @@
         "category": "TDS-Dito"
       },
       {
+        "command": "tds-dito.health",
+        "title": "Health Service",
+        "shortTitle": "Health",
+        "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.open-manual",
+        "title": "Open Manual",
+        "shortTitle": "Manual",
+        "category": "TDS-Dito"
+      },
+      {
         "command": "tds-dito.login",
         "title": "Login",
-        "category": "TDS-Dito"
+        "category": "TDS-Dito",
+        "enablement": "!tds-dito.logged",
+        "icon": {
+          "dark": "icons/dark/_login.png",
+          "light": "icons/light/_login.png"
+        }
       },
       {
         "command": "tds-dito.logout",
         "title": "Logout",
-        "category": "TDS-Dito"
+        "category": "TDS-Dito",
+        "enablement": "tds-dito.logged",
+        "icon": {
+          "dark": "icons/dark/_logout.png",
+          "light": "icons/light/_logout.png"
+        }
       },
       {
-        "command": "tds-dito.attribution",
-        "title": "Show Code Attribution",
-        "category": "TDS-Dito"
-      },
-      {
-        "command": "tds-dito.generateCode",
+        "command": "tds-dito.generate-code",
         "title": "Generate Code",
+        "shortTitle": "Generate",
+        "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.explain",
+        "title": "Explain source or function/method Code",
+        "shortTitle": "Explain",
+        "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.typify",
+        "title": "Typify variables",
+        "shortTitle": "typify",
         "category": "TDS-Dito"
       }
     ],
@@ -90,47 +172,20 @@
       {
         "title": "TDS-Dito",
         "properties": {
-          "tds-dito.showBanner": {
-            "type": "boolean",
-            "default": true,
-            "description": "Displays banner when starting"
-          },
-          "tds-dito.verbose": {
-            "scope": "application",
-            "type": "string",
-            "enum": [
-              "off",
-              "messages",
-              "verbose"
-            ],
-            "default": "off",
-            "description": "%tds.package.trace.vscode.server%",
-            "enumDescriptions": [
-              "%tds.package.trace.vscode.off%",
-              "%tds.package.trace.vscode.messages%",
-              "%tds.package.trace.vscode.verbose%"
-            ]
-          },
-          "tds-dito.version": {
-            "scope": "application",
-            "type": "string",
-            "value": "0.0.1",
-            "description": "Schema Configuration Version"
-          },
           "tds-dito.endPoint": {
-            "scope": "application",
+            "order": 1,
             "type": "string",
-            "default": "https://bgit1s84n6bop23h.us-east-1.aws.endpoints.huggingface.cloud",
+            "default": "https://advpl.ds.dta.totvs.ai",
             "description": "endPoint"
           },
-          "tds-dito.userLogin": {
-            "scope": "application",
-            "type": "boolean",
-            "default": false,
-            "description": "User login status"
+          "tds-dito.apiVersion": {
+            "order": 2,
+            "type": "string",
+            "default": "v1",
+            "description": "API Version"
           },
           "tds-dito.documentFilter": {
-            "scope": "application",
+            "order": 3,
             "type": [
               "object",
               "array"
@@ -146,94 +201,197 @@
             "description": "Filter documents to enable suggestions for"
           },
           "tds-dito.enableAutoSuggest": {
-            "scope": "application",
+            "order": 4,
             "type": "boolean",
             "default": true,
             "description": "enableAutoSuggest"
           },
           "tds-dito.requestDelay": {
-            "scope": "application",
+            "order": 5,
             "type": "number",
-            "default": 30,
-            "description": "requestDelay"
+            "default": 600,
+            "description": "Delay in typing to activate the IA"
+          },
+          "tds-dito.maxLine": {
+            "order": 6,
+            "type": "number",
+            "default": 5,
+            "description": "Maximum lines per suggestion"
+          },
+          "tds-dito.maxSuggestions": {
+            "order": 7,
+            "type": "number",
+            "default": 3,
+            "description": "Maximum suggestions per requisition"
+          },
+          "tds-dito.showBanner": {
+            "type": "boolean",
+            "default": true,
+            "description": "Displays banner when starting"
+          },
+          "tds-dito.logLevel": {
+            "type": "string",
+            "enum": [
+              "off",
+              "debug",
+              "verbose",
+              "http",
+              "info",
+              "warn",
+              "error"
+            ],
+            "default": "debug",
+            "description": "Nível de severidade mínima a ser gravada no arquivo de ocorrências.",
+            "enumDescriptions": [
+              "Desligado (não recomendado)",
+              "Depuração",
+              "Detalhado",
+              "Requisições HTTP",
+              "Informações",
+              "Avisos",
+              "Erros"
+            ]
+          },
+          "tds-dito.trace": {
+            "type": "string",
+            "enum": [
+              "off",
+              "trace",
+              "debug",
+              "info",
+              "warning",
+              "error"
+            ],
+            "default": "info",
+            "description": "Nível de severidade mínima a ser apresentada no console da extensão.",
+            "enumDescriptions": [
+              "Desligado (não recomendado)",
+              "Rastreamento",
+              "Depuração",
+              "Informações",
+              "Avisos",
+              "Erros"
+            ]
+          },
+          "tds-dito.lastLogin": {
+            "type": "string",
+            "default": "",
+            "description": "When last user logged",
+            "deprecationMessage": "For internal use. Don´t edit please."
           },
           "tds-dito.tokensToClear": {
             "scope": "application",
             "type": "array",
             "default": [],
-            "description": "tokensToClear"
+            "description": "tokensToClear",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.maxNewTokens": {
             "scope": "application",
             "type": "number",
             "default": 128,
-            "description": "maxNewTokens"
+            "description": "maxNewTokens",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.temperature": {
             "scope": "application",
             "type": "number",
             "default": 0.2,
-            "description": "temperature"
+            "description": "temperature",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.top_p": {
             "scope": "application",
             "type": "number",
             "default": 0.95,
-            "description": "top_p"
+            "description": "top_p",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.top_k": {
             "scope": "application",
             "type": "number",
             "default": 50,
-            "description": "top_p"
+            "description": "top_p",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.stop_sequence": {
             "scope": "application",
             "type": "array",
             "default": [],
-            "description": "stop_sequence"
+            "description": "stop_sequence",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.fillInTheMiddle": {
             "scope": "application",
             "type": "number",
             "default": 1,
-            "description": "fillInTheMiddle"
+            "description": "fillInTheMiddle",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.contextWindow": {
             "scope": "application",
             "type": "number",
             "default": 0,
-            "description": "contextWindow"
+            "description": "contextWindow",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.tlsSkipVerifyInsecure": {
             "scope": "application",
             "type": "boolean",
             "default": false,
-            "description": "contextWindow"
+            "description": "tlsSkipVerifyInsecure",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           },
           "tds-dito.tokenizer": {
             "scope": "application",
             "type": "object",
             "default": {},
-            "description": "tokenizer"
+            "description": "tokenizer",
+            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           }
         }
       }
     ],
     "keybindings": [
       {
+        "key": "ctrl+d ctrl+l",
+        "command": "tds-dito.login"
+      },
+      {
+        "key": "ctrl+d ctrl+b",
+        "command": "tds-dito.logout"
+      },
+      {
+        "key": "ctrl+d ctrl+t",
+        "command": "tds-dito.typify"
+      },
+      {
         "key": "cmd+shift+l",
         "command": "editor.action.inlineSuggest.trigger"
       },
       {
-        "key": "cmd+shift+a",
-        "command": "tds-dito.attribution"
+        "key": "ctrl+d ctrl+e",
+        "command": "tds-dito.explain"
+      },
+      {
+        "key": "ctrl+d ctrl+g",
+        "command": "tds-dito.generate-code"
+      },
+      {
+        "key": "ctrl+d ctrl+m",
+        "command": "tds-dito.open-manual"
       }
     ]
   },
   "scripts": {
-    "compile": "tsc -p ./",
-    "xwatch": "tsc -watch -p ./",
+    "--BUILD--": "",
+    "compile": "npm-run-all compile:*",
+    "compile:extension": "tsc -p ./src",
+    "compile:views": "cd webview-ui && npm run compile",
+    "--WATCH--": "",
+    "watch": "npm-run-all watch:*",
+    "watch:extension": "tsc -watch -p ./",
+    "watch:views": "cd webview-ui && npm run watch",
     "lint": "eslint src --ext ts",
     "--PUBLISH--": "",
     "vscode:prepublish": "npm run compile",
@@ -247,7 +405,6 @@
     "@huggingface/inference": "^2.6.4",
     "@vscode/l10n": "^0.0.18",
     "@vscode/l10n-dev": "^0.0.31",
-    "@xenova/transformers": "^2.14.0",
     "fs-extra": "^11.2.0",
     "undici": "^6.4.0",
     "vscode-languageclient": "^9.0.1",

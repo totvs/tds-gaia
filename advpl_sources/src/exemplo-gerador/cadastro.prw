@@ -6,9 +6,11 @@ user function cadastro()
 
 	process()
 
+
 return
 
 static function process()
+
 	// Local aRotAdic :={}
 	// Local bPre := {||MsgAlert('Chamada antes da função')}
 	// Local bOK  := {||MsgAlert('Chamada ao clicar em OK'), .T.}

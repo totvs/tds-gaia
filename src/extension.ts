@@ -1,109 +1,263 @@
 import * as vscode from 'vscode';
-import * as hf from './huggingfaceApi';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
-import { TDitoConfig, getDitoConfiguration, getDitoUser } from './config';
+import { TDitoConfig, getDitoConfiguration, getDitoLogLevel, isDitoLogged, isDitoShowBanner, setDitoReady, setDitoUser } from './config';
 import { inlineCompletionItemProvider } from './completionItemProvider';
-import { capitalize } from './util';
+import { CompletionResponse, IaApiInterface } from './api/interfaceApi';
+import { CarolApi } from './api/carolApi';
+import { PREFIX_DITO, logger } from './logger';
+import { ChatViewProvider } from './panels/chatViewProvider';
+import { ChatApi, completeCommandsMap } from './api/chatApi';
 
 let ctx: vscode.ExtensionContext;
 
-export function activate(context: vscode.ExtensionContext) {
+export const iaApi: IaApiInterface = new CarolApi();
+export const chatApi: ChatApi = new ChatApi();
 
-	console.log(
+export function activate(context: vscode.ExtensionContext) {
+	logger.info(
 		vscode.l10n.t('Congratulations, your extension "tds-dito" is now active!')
 	);
+
+	completeCommandsMap(context.extension);
 
 	ctx = context;
 	handleConfigChange(context);
 	const config: TDitoConfig = getDitoConfiguration();
 	context.subscriptions.push(...initStatusBarItems());
 
-	//args[0], bool, quando true, ignora processamento se  login automático falhar
+	showBanner()
+	//args[0], bool, quando true, ignora processamento se login automático falhar
 	const login = vscode.commands.registerCommand('tds-dito.login', async (...args) => {
 		let apiToken = await context.secrets.get('apiToken');
 
 		if (apiToken !== undefined) {
-			hf.HuggingFaceApi.start(apiToken);
-			if (await hf.HuggingFaceApi.login()) {
-				//vscode.window.showInformationMessage(`TDS-Dito: Logged in successfully`);
-				vscode.window.showInformationMessage(`TDS-Dito: Hi ${capitalize(getDitoUser()?.name || "<not logged>")}. I am ready to help you in any way possible.`);
-				return;
-			}
+			iaApi.start(apiToken).then(async (value: boolean) => {
+				if (await iaApi.login()) {
+					logger.info('Logged in successfully');
+					return;
+				}
+			});
 		}
 
 		if (args) {
-			if (args[0]) { //indica que login automático
+			if (args[0]) { //indica que login foi acionado automaticamente
 				return;
 			}
 		}
 
 		const input = await vscode.window.showInputBox({
-			prompt: 'Please enter your API token:',
+			prompt: 'Please enter your API token or @your name):',
 			placeHolder: 'Your token goes here ...'
 		});
 		if (input !== undefined) {
-			hf.HuggingFaceApi.start(input);
-			if (await hf.HuggingFaceApi.login()) {
-				await context.secrets.store('apiToken', input);
-				vscode.window.showInformationMessage('TDS-Dito: Logged in successfully');
-			} else {
-				await context.secrets.delete('apiToken');
-				vscode.window.showErrorMessage('TDS-Dito: Login failure');
+			if (await iaApi.start(input)) {
+				if (await iaApi.login()) {
+					await context.secrets.store('apiToken', input);
+					vscode.window.showInformationMessage(`${PREFIX_DITO} Logged in successfully`);
+				} else {
+					await context.secrets.delete('apiToken');
+					vscode.window.showErrorMessage(`${PREFIX_DITO} Login failure`);
+				}
+
+				chatApi.checkUser();
 			}
 		}
 	});
 	context.subscriptions.push(login);
 
 	const logout = vscode.commands.registerCommand('tds-dito.logout', async (...args) => {
-		hf.HuggingFaceApi.logout();
+		iaApi.logout();
 		await context.secrets.delete('apiToken');
-		vscode.window.showInformationMessage('TDS-Dito: Logged out');
+		vscode.window.showInformationMessage(`${PREFIX_DITO} Logged out`);
 	});
 	context.subscriptions.push(logout);
 
+	const detailHealth = vscode.commands.registerCommand('tds-dito.health', async () => {
+		chatApi.dito("Verificando disponibilidade do serviço.");
 
-	const attribution = vscode.commands.registerTextEditorCommand('tds-dito.generateCode', () => {
+		iaApi.checkHealth(true).then((error: any) => {
+			updateContextKey("readyForUse", error === undefined);
+			setDitoReady(error === undefined);
+
+			if (error !== undefined) {
+				const message: string = `Desculpe, estou com dificuldades técnicas. ${chatApi.commandText("health")}`;
+				chatApi.dito(message);
+				vscode.window.showErrorMessage(`${PREFIX_DITO} ${message}`);
+			} else {
+				vscode.commands.executeCommand("tds-dito.login", [true]).then(() => {
+					chatApi.checkUser();
+				});
+			}
+		});
+	});
+	context.subscriptions.push(detailHealth);
+
+	const openManual = vscode.commands.registerCommand('tds-dito.open-manual', async () => {
+		const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md";
+		vscode.env.openExternal(vscode.Uri.parse(url));
+	});
+	context.subscriptions.push(openManual);
+
+	const generateCode = vscode.commands.registerTextEditorCommand('tds-dito.generate-code', () => {
 		const text: string = "Gerar código para varrer um array";
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.selection.active.lineText);
 		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.document.getText());
-		hf.HuggingFaceApi._generateCode(text);
+		iaApi.generateCode(text);
+	});
+	context.subscriptions.push(generateCode);
+
+	const explainCode = vscode.commands.registerTextEditorCommand('tds-dito.explain', () => {
+		const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+		let codeToExplain: string = "";
+
+		if (editor !== undefined) {
+			const selection: vscode.Selection = editor.selection;
+
+			if (selection && !selection.isEmpty) {
+				const selectionRange = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
+				codeToExplain = editor.document.getText(selectionRange);
+			} else {
+				const curPos: vscode.Position = selection.start;
+				const curLineStart = new vscode.Position(curPos.line, 0);
+				const nextLineStart = new vscode.Position(curPos.line + 1, 0);
+				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
+				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
+
+				codeToExplain = contentWithFirstCharOfNextLine.trim();
+			}
+
+			if (codeToExplain.length > 0) {
+				iaApi.explainCode(codeToExplain).then((value: string) => {
+					chatApi.dito(value);
+				});
+			} else {
+				chatApi.dito("Empty code to explain");
+			}
+		} else {
+			chatApi.dito("Editor undefined");
+		}
+	});
+	context.subscriptions.push(explainCode);
+
+	const typify = vscode.commands.registerCommand('tds-dito.typify', async (...args) => {
+		const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+		let codeToTypify: string = "";
+
+		if (editor !== undefined) {
+			const selection: vscode.Selection = editor.selection;
+			const function_re: RegExp = /(function|method(...)class)/i
+			const curPos: vscode.Position = selection.start;
+			let curLine = curPos.line;
+
+			let startFunction: vscode.Position | undefined = undefined;
+			let endFunction: vscode.Position | undefined = undefined;
+
+			//começo da função
+			while ((curLine > 0) && (!startFunction)) {
+				const lineStart = new vscode.Position(curLine - 1, 0);
+				const curLineStart = new vscode.Position(lineStart.line, 0);
+				const nextLineStart = new vscode.Position(lineStart.line + 1, 0);
+				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
+				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
+
+				if (contentWithFirstCharOfNextLine.match(function_re)) {
+					startFunction = new vscode.Position(curLine, 0);
+				}
+
+				curLine--;
+			}
+
+			curLine = curPos.line;
+
+			while ((curLine < editor.document.lineCount) && (!endFunction)) {
+				const lineStart = new vscode.Position(curLine + 1, 0);
+				const curLineStart = new vscode.Position(lineStart.line, 0);
+				const nextLineStart = new vscode.Position(lineStart.line + 1, 0);
+				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
+				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
+
+				if (contentWithFirstCharOfNextLine.match(function_re)) {
+					endFunction = new vscode.Position(curLine, 0);
+				}
+
+				curLine++;
+			}
+
+			if (startFunction) {
+				if (!endFunction) {
+					endFunction = new vscode.Position(editor.document.lineCount - 1, 0);
+				}
+
+				const rangeForTypify = new vscode.Range(startFunction, endFunction);
+				codeToTypify = editor.document.getText(rangeForTypify);
+			}
+
+			if (codeToTypify.length > 0) {
+				iaApi.typify(codeToTypify).then((value: string) => {
+					if (value.length == 0) {
+						chatApi.ditoInfo("Desculpe. Não consegui tipificar essa função.");
+					} else {
+						chatApi.dito(value);
+					}
+				});
+			} else {
+				chatApi.dito("Empty code to typify");
+			}
+		} else {
+			chatApi.dito("Editor undefined");
+		}
 	});
 
-	context.subscriptions.push(attribution);
-
-	// const attribution = vscode.commands.registerTextEditorCommand('tds-dito.attribution', () => {
-	// 	void highlightStackAttributions();
-	// });
-	// context.subscriptions.push(attribution);
+	context.subscriptions.push(typify);
 
 	const provider: vscode.InlineCompletionItemProvider = inlineCompletionItemProvider(context);
 	const documentFilter = config.documentFilter;
 	const inlineRegister: vscode.Disposable = vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
 	context.subscriptions.push(inlineRegister);
 
-	vscode.commands.executeCommand("tds-dito.login", [true])
+	const afterInsert = vscode.commands.registerCommand('tds-dito.afterInsert', async (response: CompletionResponse) => {
+		const { request_id, completions } = response;
+		const params = {
+			requestId: request_id,
+			acceptedCompletion: 0,
+			shownCompletions: [0],
+			completions,
+		};
+		logger.debug("Params: %s", JSON.stringify(params, undefined, 2));
+
+		//await client.sendRequest("llm-ls/acceptCompletion", params);
+	});
+	ctx.subscriptions.push(afterInsert);
+
+	//Chat DITO
+	const chat: ChatViewProvider = new ChatViewProvider(context.extensionUri);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(ChatViewProvider.viewType, chat));
+
+	//aciona a verificação do serviço no ar e posterior login
+	vscode.commands.executeCommand("tds-dito.health");
 }
 
 export function deactivate() {
-	if (!hf) {
-		return undefined;
-	}
-	return hf.HuggingFaceApi.stop();
+
+	return iaApi.stop();
+}
+
+function updateContextKey(key: string, value: boolean | string | number) {
+	vscode.commands.executeCommand('setContext', `tds-dito.${key}`, value);
 }
 
 function handleConfigChange(context: vscode.ExtensionContext) {
-	const listener = vscode.workspace.onDidChangeConfiguration(async event => {
+	const listener: vscode.Disposable = vscode.workspace.onDidChangeConfiguration(async event => {
 		if (event.affectsConfiguration('tds-dito')) {
+			updateContextKey("logged", isDitoLogged());
+			logger.level = getDitoLogLevel();
+
 			updateStatusBarItems();
-			// const config = vscode.workspace.getConfiguration("llm");
-			// const configKey = config.get("configTemplate") as TemplateKey;
-			// const template = templates[configKey];
-			// if (template) {
-			// 	const updatePromises = Object.entries(template).map(([key, val]) => config.update(key, val, vscode.ConfigurationTarget.Global));
-			// 	await Promise.all(updatePromises);
-			// }
 		}
 	});
+
+	updateContextKey("logged", isDitoLogged());
 
 	context.subscriptions.push(listener);
 }
@@ -117,7 +271,7 @@ export default async function highlightStackAttributions(): Promise<void> {
 	const attributionWindowSize = config.get("attributionWindowSize") as number;
 	const attributionEndpoint = config.get("attributionEndpoint") as string;
 
-	// get cursor postion and offset
+	// get cursor position and offset
 	const cursorPosition = vscode.window.activeTextEditor?.selection.active;
 	if (!cursorPosition) return;
 	const cursorOffset = document.offsetAt(cursorPosition);
@@ -129,7 +283,6 @@ export default async function highlightStackAttributions(): Promise<void> {
 	if (!vscode.window.activeTextEditor) return;
 	vscode.window.activeTextEditor.selection = new vscode.Selection(document.positionAt(start), document.positionAt(end));
 	// new Range(document.positionAt(start), document.positionAt(end));
-
 
 	const text = document.getText();
 	const textAroundCursor = text.slice(start, end);
@@ -190,4 +343,31 @@ export default async function highlightStackAttributions(): Promise<void> {
 	setTimeout(() => {
 		vscode.window.activeTextEditor?.setDecorations(decorationType, []);
 	}, 5000);
+}
+
+/**
+   * Shows a welcome banner on the first start of the extension.
+   * The banner contains the extension name, version, info, and link to the repo.
+  */
+function showBanner(force: boolean = false): void {
+	const showBanner: boolean = isDitoShowBanner();
+
+	if (showBanner || force) {
+		let ext = vscode.extensions.getExtension("TOTVS.tds-dito-vscode");
+		// prettier-ignore
+		{
+			const lines: string[] = [
+				"",
+				"--------------------------------v---------------------------------------------",
+				"     ////    //  //////  ////// |  TDS-Dito, your partner in AdvPL programming",
+				`    //  //        //    //  //  |  Version ${ext?.packageJSON["version"]} (EXPERIMENTAL)`,
+				`   //  //  //    //    //  //   |  TOTVS Technology`,
+				"  //  //  //    //    //  //    |",
+				" ////    //    //    //////     |  https://github.com/totvs/tds-dito",
+				"--------------------------------^----------------------------------------------",
+			];
+
+			logger.info(lines.join("\n"));
+		}
+	}
 }

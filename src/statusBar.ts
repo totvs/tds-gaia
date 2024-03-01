@@ -1,10 +1,18 @@
 import * as vscode from "vscode";
-import { TDitoConfig, getDitoConfiguration, getDitoUser } from "./config";
-import { WhoAmI, WhoAmIOrg, WhoAmIUser } from "@huggingface/hub";
+import { LoggedUser, UserOrganization, getDitoUser, isDitoLogged } from "./config";
 
 let statusBarItem: vscode.StatusBarItem;
 
 const priorityStatusBarItem: number = 200;
+
+let loadingIndicator: vscode.StatusBarItem;
+
+function createLoadingIndicator(): vscode.StatusBarItem {
+  let li = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10)
+  li.text = "$(loading~spin) LLM"
+  li.tooltip = "Generating completions..."
+  return li
+}
 
 export function initStatusBarItems(): vscode.StatusBarItem[] {
   const result: vscode.StatusBarItem[] = [];
@@ -32,13 +40,14 @@ function initStatusBarItem(): vscode.StatusBarItem {
 }
 
 function updateStatusBarItem(): void {
-  const user: WhoAmI | undefined = getDitoUser();
   statusBarItem.text = "Dito: ";
 
-  if (user) {
-    statusBarItem.text += `User: $(config.userLogin) `;
+  if (isDitoLogged()) {
+    const user: LoggedUser | undefined = getDitoUser();
+
+    statusBarItem.text += `$(account) ${user!.displayName} `;
     statusBarItem.command = "tds-dito.logout";
-    statusBarItem.tooltip = buildTooltip(user as WhoAmIUser);
+    statusBarItem.tooltip = buildTooltip(user!);
   } else {
     statusBarItem.text += `Need login`;
     statusBarItem.command = "tds-dito.login";
@@ -48,18 +57,19 @@ function updateStatusBarItem(): void {
   statusBarItem.show();
 }
 
-function buildTooltip(user: WhoAmIUser) {
+function buildTooltip(user: LoggedUser) {
   let result: string = "";
 
-  result += `Tipo: ${user.type}\n`;
   result += `Nome: ${user.fullname} [${user.name}]\n`;
   result += `Id: ${user.id}\n`;
 
-  if (user.orgs.length) {
-    result += `Organizações\n`;
-    user.orgs.forEach((org: WhoAmIOrg) => {
-      result += `${org.name}\n`;
-    })
+  if (user.orgs) {
+    if (user.orgs.length) {
+      result += `Organizações\n`;
+      user.orgs.forEach((org: UserOrganization) => {
+        result += `${org.name}\n`;
+      })
+    }
   }
 
   return result;
