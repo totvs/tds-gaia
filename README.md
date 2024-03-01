@@ -36,25 +36,27 @@ A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://co
 - \[X\] Tipificação de variáveis
 - \[?\] Geração de código a partir de uma descrição
 - \[ \] Análise de código
-- \[ \] Tradução automatizada
+- \[ \] Tradução automatizada de _strings_
 
-\[X\] Experimental \[?\] Previsto, mas sem prazo \[ \] Em estudo (pode ser cancelado)
+**Legendas**
+- \[X\] Experimental 
+- \[?\] Previsto, mas sem prazo 
+- \[ \] Em estudo (pode ser cancelado)
 
 ## Guia \(ultra\) rápido
 
 > Indicado para quem já tem familiaridade com o **VS-Code**. Caso contrário, recomenda-se começar por [Instalação](#instalação).
 
-Após a instalação da extensão **TDS-Dito**. Identifique-se acionando o comando ``TDS-Dito: Login``. Uma verificação do ambiente e disponibilidade do serviço de IA é efetuada. 
-
-Se estiver tudo em ordem, identifique-se efetuado ``Login``. Após validado, abra um fonte AdvPL/TLPP, 
+Após a instalação da extensão **TDS-Dito**. Uma verificação de disponibilidade do serviço de IA é efetuada. 
+Se estiver tudo em ordem, identifique-se efetuando ``Login\[]``. Após validado, abra um fonte AdvPL/TLPP, 
 posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP ou aguarde alguns instantes, que sugestões de códigos lhe serão apresentadas.
 
 | Funcionalidade | Atalho        | Ação |
 | -------------- | ------------- | ---- |
-| Login          | Ctrl+D Ctrl+L | Apresenta o usuário ao IA. |
+| Login          | ctrl+d ctrl+l  | Apresenta o usuário ao IA. |
 | Complemento    |               | Acionado automaticamente durante a edição. |
-| Explicação*    | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
-| Tipificação*   | Ctrl+D Ctrl+E | Tipifica variáveis de uma função/método. |
+| Explicação*    | ctrl+d ctrl+e | Explica o código da linha corrente ou bloco. |
+| Tipificação*   | ctrl+d ctrl+t | Tipifica variáveis de uma função/método. |
 
 _* Funcionalidades ainda em desenvolvimento. Podem levar 1 minuto ou mais para responder._
 
@@ -69,7 +71,7 @@ Leia [Funcionalidades](#funcionalidades), para saber maiores detalhes.
 
 ### Procurando pela extensão (não disponível)
 
-Você pode procurar e instalar extensões de dentro do **VS Code**. Abra a visão de extensões clicando no ícone de extensões na barra de atividades na lateral do **VS Code** ou acione o comando "Visão: Extensões" (``Ctrl+Shift+X``).
+Você pode procurar e instalar extensões de dentro do **VS Code**. Abra a visão de extensões clicando no ícone de extensões na barra de atividades na lateral do **VS Code** ou acione o comando "Visão: Extensões" (``ctrl+shift+x``).
 
 ![Ícone da Visão Extensões](images/extensions-view-icon.png)
 
@@ -113,16 +115,16 @@ A extensão já vem configurada pronto para uso, não requerendo nenhuma configu
 Você pode utilizar  as funcionalidades através de comandos, que podem ser acionados de diversas formas. 
 
 - Acionando um atalho;
-- Acionando o painel de comandos (``Ctrl+Shit-P`` ou ``F1``), comece a digitar o comando para filtrar e acione-o quando localizado;
+- Acionando o painel de comandos (``ctrl+shit+p`` ou ``F1``), comece a digitar o comando para filtrar e acione-o quando localizado;
 - Acionando ligações no bate-papo;
 - Digitando o comando pelo _prompt_ do bate-bato;
 - Acionando o menu de contexto do bate-papo ou fonte em edição. 
 
 Neste documento, quando citado "Acionar o comando ...", entenda que você pode aciona-lo pelo atalho a ele associado, pelo painel de comandos ou digitando-o no _prompt_ do bate-papo. Se for digitar, digite apenas a palavra informada entre chaves do final do comando ou acione o atalho entre parenteses. Lembrando que os atalhos aqui citados, são os atribuídos por padrão.
 
-Por exemplo: "... identifique-se acionando ``TDS-Dito: Login\(Ctrl+D Ctrl+L)\[login]``", você pode acionar o painel de comandos e localizar o comando ou digitar ``login`` no _prompt_ ou acionar o atalho ``Ctrl+D Ctrl+L`` ou acionar a ligação no bate-papo, se existir ou, ainda, pelo menu de contexto do bate-papo ou fonte em edição.
+Por exemplo: "... identifique-se acionando ``TDS-Dito: Login (ctrl+d ctrl+l) [login]``", você pode acionar o painel de comandos e localizar o comando ou digitar ``login`` no _prompt_ ou acionar o atalho ``ctrl+d ctrl+l `` ou acionar a ligação no bate-papo, se existir ou, ainda, pelo menu de contexto do bate-papo ou fonte em edição.
 
-Quando o **TDS-Dito**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando ``TDS-Dito: Login\(Ctrl+D Ctrl+L)\[login]``. 
+Quando o **TDS-Dito**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando ``TDS-Dito: Login (ctrl+d ctrl+l) [login]``. 
 
 Caso não saiba o que fazer ou aparenta não estar funcionando, veja o que o **TDS-Dito** está lhe dizendo no bate-papo.
 
@@ -136,7 +138,7 @@ A extensão fornece sugestões de código analisando seu código AdvPL/TLPP do f
 
 ### Explicação de código
 
-A extensão pode lhe fornecer explicações sobre o código ao acionar o comando ``TDS-Dito: Explain\(Ctrl+D Ctrl+E\)\[explain\]``. 
+A extensão pode lhe fornecer explicações sobre o código ao acionar o comando ``TDS-Dito: Explain (ctrl+d ctrl+e) [explain]``. 
  Se não ficar satisfeito, acione novamente o comando, que lhe será apresentado uma nova explicação.
 
 #### Linha corrente
@@ -153,7 +155,7 @@ Posicione o cursor no cabeçalho da implementação da função ou método e aci
 
 ### Tipificação de variáveis
 
-Em códigos TLPP, a extensão pode analisar uma função ou método e lhe fornecer a tipificação de variáveis com base no seu uso. Com o cursor posicionado em qualquer lugar dentro da função ou método, acionar o comando ``TDS-Dito: typify\(Ctrl+D Ctrl+T\)\[typify\]``. 
+Em códigos TLPP, a extensão pode analisar uma função ou método e lhe fornecer a tipificação de variáveis com base no seu uso. Com o cursor posicionado em qualquer lugar dentro da função ou método, acionar o comando ``TDS-Dito: typify (ctrl+d ctrl+t) [typify]``. 
 
 ## Erros comuns
 
