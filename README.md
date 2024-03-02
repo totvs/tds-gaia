@@ -45,15 +45,15 @@ A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://co
 > Indicado para quem já tem familiaridade com o **VS-Code**. Caso contrário, recomenda-se começar por [Instalação](#instalação).
 
 Após a instalação da extensão **TDS-Dito**. Uma verificação de disponibilidade do serviço de IA é efetuada. 
-Se estiver tudo em ordem, identifique-se efetuando ``Login\[]``. Após validado, abra um fonte AdvPL/TLPP, 
+Se estiver tudo em ordem, identifique-se efetuando `Login [Ctrl+D Ctrl+E]`. Após validado, abra um fonte AdvPL/TLPP, 
 posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP ou aguarde alguns instantes, que sugestões de códigos lhe serão apresentadas.
 
 | Funcionalidade | Atalho        | Ação |
 | -------------- | ------------- | ---- |
-| Login          | ctrl+d ctrl+l  | Apresenta o usuário ao IA. |
+| Login          | Ctrl+D Ctrl+L | Apresenta o usuário ao IA. |
 | Complemento    |               | Acionado automaticamente durante a edição. |
-| Explicação*    | ctrl+d ctrl+e | Explica o código da linha corrente ou bloco. |
-| Tipificação*   | ctrl+d ctrl+t | Tipifica variáveis de uma função/método. |
+| Explicação*    | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
+| Tipificação*   | Ctrl+D Ctrl+T | Tipifica variáveis de uma função/método. |
 
 _* Funcionalidades ainda em desenvolvimento. Podem levar 1 minuto ou mais para responder._
 
@@ -68,26 +68,26 @@ Leia [Funcionalidades](#funcionalidades), para saber maiores detalhes.
 
 ### Procurando pela extensão (não disponível)
 
-Você pode procurar e instalar extensões de dentro do **VS Code**. Abra a visão de extensões clicando no ícone de extensões na barra de atividades na lateral do **VS Code** ou acione o comando "Visão: Extensões" (``ctrl+shift+x``).
+Você pode procurar e instalar extensões de dentro do **VS Code**. Abra a visão de extensões clicando no ícone de extensões na barra de atividades na lateral do **VS Code** ou acione o comando "Visão: Extensões" (`ctrl+shift+x`).
 
 ![Ícone da Visão Extensões](images/extensions-view-icon.png)
 
-Em seguida digite ``tds`` no campo de pesquisa e selecione a extensão ``TDS-Dito``.
+Em seguida digite `tds` no campo de pesquisa e selecione a extensão `TDS-Dito`.
 
-Acione  o botão ``Instalar``. Após completar a instalação, o botão ``Instalar`` será alterado para ``Gerenciar``. 
+Acione  o botão `Instalar`. Após completar a instalação, o botão `Instalar` será alterado para `Gerenciar`. 
 
 ### Instalando de um arquivo VSIX
 
-Você pode instalar manualmente uma extensão do **VS Code** que foi empacotada em um arquivo ``.vsix``. Utilize o comando ``Instalar do VSIX...`` na visão de extensões após acionar ``Modo de Exibição e Mais Ações...`` (ícone com "...") ou acione o comando ``Extensões: Instalar do VSIX...`` no painel de comandos (``CTRL+SHIFT+P``) e selecione o arquivo ``.vsix``.
+Você pode instalar manualmente uma extensão do **VS Code** que foi empacotada em um arquivo `.vsix`. Utilize o comando `Instalar do VSIX...` na visão de extensões após acionar `Modo de Exibição e Mais Ações...` (ícone com "...") ou acione o comando `Extensões: Instalar do VSIX...` no painel de comandos (`CTRL+SHIFT+P`) e selecione o arquivo `.vsix`.
 
 Acesse [releases](https://github.com/brodao2/tds-dito/releases) para baixar a última versão liberada.
 
 > Caso o acesso seja negado, solicite liberação.
 > Sua solicitação será analisada, podendo ser liberado ou negada sem maiores explicações.
 
-Você pode instalar também usando a opção ``--install-extension`` através da linha de comando e informando o caminho do arquivo ``.vsix``.
+Você pode instalar também usando a opção `--install-extension` através da linha de comando e informando o caminho do arquivo `.vsix`.
 
-> ``code --install-extension tds-dito-0.0.1.vsix``
+> `code --install-extension tds-dito-0.0.1.vsix`
 
 Ao finalizar a instalação, lhe será apresentado um bate-bato (_chat_). É através dele que você e  **Dito, seu parceiro na programação AdvPL/TLPP**, iram interagir.
 
@@ -95,7 +95,7 @@ Ao finalizar a instalação, lhe será apresentado um bate-bato (_chat_). É atr
 
 ### Revertendo uma atualização
 
-Se for necessário reverter uma atualização, selecione o comando ``Instalar Outra Versão...`` após acionar o botão ``Gerenciar`` e selecione a outra versão que deseja instalar.
+Se for necessário reverter uma atualização, selecione o comando `Instalar Outra Versão...` após acionar o botão `Gerenciar` e selecione a outra versão que deseja instalar.
 
 ### Desinstalando a extensão
 
@@ -112,16 +112,16 @@ A extensão já vem configurada pronto para uso, não requerendo nenhuma configu
 Você pode utilizar  as funcionalidades através de comandos, que podem ser acionados de diversas formas. 
 
 - Acionando um atalho;
-- Acionando o painel de comandos (``ctrl+shit+p`` ou ``F1``), comece a digitar o comando para filtrar e acione-o quando localizado;
+- Acionando o painel de comandos (`ctrl+shit+p` ou `F1`), comece a digitar o comando para filtrar e acione-o quando localizado;
 - Acionando ligações no bate-papo;
 - Digitando o comando pelo _prompt_ do bate-bato;
 - Acionando o menu de contexto do bate-papo ou fonte em edição. 
 
 Neste documento, quando citado "Acionar o comando ...", entenda que você pode aciona-lo pelo atalho a ele associado, pelo painel de comandos ou digitando-o no _prompt_ do bate-papo. Se for digitar, digite apenas a palavra informada entre chaves do final do comando ou acione o atalho entre parenteses. Lembrando que os atalhos aqui citados, são os atribuídos por padrão.
 
-Por exemplo: "... identifique-se acionando ``TDS-Dito: Login (ctrl+d ctrl+l) [login]``", você pode acionar o painel de comandos e localizar o comando ou digitar ``login`` no _prompt_ ou acionar o atalho ``ctrl+d ctrl+l `` ou acionar a ligação no bate-papo, se existir ou, ainda, pelo menu de contexto do bate-papo ou fonte em edição.
+Por exemplo: "... identifique-se acionando `TDS-Dito: Login (Ctrl+D Ctrl+L) [login]`", você pode acionar o painel de comandos e localizar o comando ou digitar `login` no _prompt_ ou acionar o atalho `Ctrl+D Ctrl+L ` ou acionar a ligação no bate-papo, se existir ou, ainda, pelo menu de contexto do bate-papo ou fonte em edição.
 
-Quando o **TDS-Dito**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando ``TDS-Dito: Login (ctrl+d ctrl+l) [login]``. 
+Quando o **TDS-Dito**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando `TDS-Dito: Login (Ctrl+D Ctrl+L) [login]`. 
 
 Caso não saiba o que fazer ou aparenta não estar funcionando, veja o que o **TDS-Dito** está lhe dizendo no bate-papo.
 
@@ -135,7 +135,7 @@ A extensão fornece sugestões de código analisando seu código AdvPL/TLPP do f
 
 ### Explicação de código
 
-A extensão pode lhe fornecer explicações sobre o código ao acionar o comando ``TDS-Dito: Explain (ctrl+d ctrl+e) [explain]``. 
+A extensão pode lhe fornecer explicações sobre o código ao acionar o comando `TDS-Dito: Explain (Ctrl+D Ctrl+E) [explain]`. 
  Se não ficar satisfeito, acione novamente o comando, que lhe será apresentado uma nova explicação.
 
 #### Linha corrente
@@ -152,28 +152,28 @@ Posicione o cursor no cabeçalho da implementação da função ou método e aci
 
 ### Tipificação de variáveis
 
-Em códigos TLPP, a extensão pode analisar uma função ou método e lhe fornecer a tipificação de variáveis com base no seu uso. Com o cursor posicionado em qualquer lugar dentro da função ou método, acionar o comando ``TDS-Dito: typify (ctrl+d ctrl+t) [typify]``. 
+Em códigos TLPP, a extensão pode analisar uma função ou método e lhe fornecer a tipificação de variáveis com base no seu uso. Com o cursor posicionado em qualquer lugar dentro da função ou método, acionar o comando `TDS-Dito: typify (Ctrl+D Ctrl+T) [typify]`. 
 
 ## Erros comuns
 
 ### Bloqueio por _firewall_ e outros sistemas de proteção  
 
-O ``TDS-Dito``, depende de acesso a URL´s de serviços externos que, eventualmente, precisam ser liberados por sistemas de proteção (_firewalls_, anti-virus e outros).
+O **TDS-Dito**, depende de acesso a URL´s de serviços externos que, eventualmente, precisam ser liberados por sistemas de proteção (_firewalls_, anti-virus e outros).
 
 #### Sintoma
 
-Apresenta, na visão ``TDS-Dito`` da aba ``Output``, mensagem semelhante:
+Apresenta, na visão `TDS-Dito` da aba `Output`, mensagem semelhante:
 
-```console
+`console
 Cause: Error: unable to get local issuer certificate
 Stack: TypeError: fetch failed
  at fetch (w:\ws_tds_vscode\tds-dito\node_modules\undici\index.js:103:13)
  at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
  at async CarolApi.checkHealth (w:\ws_tds_vscode\tds-dito\out\api\carolApi.js:30:20)
-```
+`
 
 #### Correção
 
-Entre em contato com o suporte de segurança de sua empresa/organização para que ele libere o acesso a URL ``https://advpl.ds.dta.totvs.ai`` ou outro _endpoint_ indicado.
+Entre em contato com o suporte de segurança de sua empresa/organização para que ele libere o acesso a URL `https://advpl.ds.dta.totvs.ai` ou outro _endpoint_ indicado.
 
 Dependendo de configurações de seu sistema operacional/ambiente de trabalho, você mesmo pode liberar o acesso, desde que tenha os conhecimentos de como fazê-las.
