@@ -156,16 +156,17 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             const parts: string[] = this._token.split(" ");
 
             if (parts[0].length == 0) {
-                parts[0] = "@<uninformed>"
+                parts[0] = "@<uninformed>";
             } else {
                 parts[0] = parts[0].substring(1);
             }
+            parts[1] = parts[1] || "";
 
             setDitoUser({
                 id: `ID:${this._token}`,
-                email: "",
+                email: `${this._token}`,
                 name: capitalize(parts[0]),
-                fullname: capitalize(`${parts[0]} ${parts[1]}`) || capitalize(parts[0]),
+                fullname: `${capitalize(parts[0])} ${capitalize(parts[1])}`,
                 displayName: capitalize(parts[0]),
                 avatarUrl: "",
                 expiration: new Date(2024, 0, 1, 0, 0, 0, 0),
@@ -173,11 +174,11 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             });
         } else {
             setDitoUser({
-                id: `$ID:{this._token}`,
-                email: "",
-                name: capitalize(this._token),
-                fullname: capitalize(this._token),
-                displayName: capitalize(this._token),
+                id: `ID:${this._token}`,
+                email: `${this._token}`,
+                name: this._token,
+                fullname: this._token,
+                displayName: this._token,
                 avatarUrl: "",
                 expiration: new Date(2024, 0, 1, 0, 0, 0, 0),
                 expiresAt: new Date(2024, 11, 31, 23, 59, 59, 999),
@@ -253,11 +254,11 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         logger.info("Code explain...");
         logger.profile("explainCode");
 
-        const body: {} = {
+        const body: any = {
             "code": code,
         };
 
-        let response: {} | Error = await this.jsonRequest("POST", `${this._apiRequest}/explain`, JSON.stringify(body));
+        let response: any | Error = await this.jsonRequest("POST", `${this._apiRequest}/explain`, JSON.stringify(body));
 
         if (typeof (response) === "object" && response instanceof Error) {
             return "";
@@ -267,10 +268,11 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         }
 
         //  logger.debug(`Code explain end with ${response.length} size`);
+        const explanation: string = response.explanation.trim().replace(/<\|[^\|].*\|>/i, "").trim()
         logger.debug(response);
         logger.profile("explainCode");
 
-        return JSON.stringify(JSON.stringify(response, undefined, 2));
+        return explanation;
     }
 
     async typify(code: string): Promise<string> {

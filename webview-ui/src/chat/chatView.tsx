@@ -39,9 +39,98 @@ function HandleCommand(message: TMessageModel, action: TMessageActionModel) {
   );
 }
 
-function HandleText(part: string) {
+const PARAGRAPH_RE = /\n\n/i
+const PHRASE_RE = /\n/i
 
-  return <span>{part}</span>
+const tagsInlineMap: Record<string, RegExp> = {
+  "code": /\`(.*)\`/gi,
+  "strong": /\*\*(.*)\*\*/gi,
+  "italic": /_(.*)_/gi
+};
+
+const tagsBlockMap: Record<string, RegExp> = {
+  "code": /[\`\`\`|~~~]\w*(.*)[\`\`\`|~~~]/gis
+};
+
+function mdInlineToHtml(text: string) {
+  let children: any[] = [];
+
+  Object.keys(tagsInlineMap).forEach((tag: string) => {
+    const matches = [...text.matchAll(tagsInlineMap[tag])];
+
+    matches.forEach((match: any) => {
+      children.push(<>{text.substring(0, match.index)}</>);
+      if (tag == "code") {
+        children.push(<code>{match[1]}</code>);
+      } else if (tag == "strong") {
+        children.push(<strong>{match[1]}</strong>);
+      }
+      children.push(<>{text.substring((match.index || 0) + match[1].length + 4)}</>);
+    })
+
+  });
+
+  return children.length > 0 ? children : text;
+}
+
+function mdBlockToHtml(text: string) {
+  let children: any[] = [];
+
+  Object.keys(tagsBlockMap).forEach((tag: string) => {
+    const matches = [...text.matchAll(tagsInlineMap[tag])];
+
+    matches.forEach((match: any) => {
+      children.push(text.substring(0, match.index));
+      if (tag == "code") {
+        children.push(<code>{match[1]}</code>);
+      }
+      children.push(text.substring((match.index || 0) + match[1].length + 4));
+    })
+
+  });
+
+  return children;
+}
+
+function HandleText(part: string) {
+  let children: any[] = [];  //mdBlockToHtml(part);
+
+  if (children.length > 0) {
+    let childrenAll: any[] = [];
+
+    children.forEach((child: any) => {
+      if (typeof child == "string") {
+        childrenAll.push(HandleText(child));
+      } else {
+        childrenAll.push(child);
+      }
+    })
+
+    children = [...childrenAll];
+  } else {
+    const paragraphs: string[] = part.split(PARAGRAPH_RE);
+
+    if (paragraphs.length > 1) {
+      paragraphs.forEach((paragraph: string) => {
+        const phrases: string[] = paragraph.split(PHRASE_RE);
+        let children2: any[] = [];
+
+        phrases.forEach((phrase: string, index: number) => {
+          if (index == (phrase.length - 1)) {
+            children2.push(<>{mdInlineToHtml(phrase)}</>);
+          } else {
+            children2.push(<>{mdInlineToHtml(phrase)}<br /></>);
+          }
+        });
+
+        children.push(<p>{...children2}</p>);
+      });
+    } else {
+      children.push(<p>{mdInlineToHtml(part)}</p>);
+    }
+  }
+
+  return children
 }
 
 function ShowMessage(message: TMessageModel) {
@@ -160,52 +249,52 @@ export default function ChatView() {
 
   /*
               <VSCodeDataGrid id="includeGrid" grid-template-columns="30px">
-                {model && model.includePaths.map((row: TIncludeData, index: number) => (
-                  <VSCodeDataGridRow key={index}>
-                    {row.path !== "" &&
-                      <>
-                        <VSCodeDataGridCell grid-column="1">
-                          <VSCodeButton appearance="icon"
-                            onClick={() => removeIncludePath(index)} >
-                            <span className="codicon codicon-close"></span>
-                          </VSCodeButton>
-                        </VSCodeDataGridCell>
-                        <VSCodeDataGridCell grid-column="2">
-                          <TdsSimpleTextField
-                            name={`includePaths.${index}.path`}
-                            readOnly={true}
-                          />
-                        </VSCodeDataGridCell>
-                      </>
-                    }
-                    {((row.path == "") && (index !== indexFirstPathFree)) &&
-                      <>
-                        <VSCodeDataGridCell grid-column="1">
-                          &nbsp;
-                        </VSCodeDataGridCell>
-                        <VSCodeDataGridCell grid-column="2">
-                          &nbsp;
-                        </VSCodeDataGridCell>
-                      </>
-                    }
-                    {(index === indexFirstPathFree) &&
-                      <>
-                        <VSCodeDataGridCell grid-column="1">
-                          &nbsp;
-                        </VSCodeDataGridCell>
-                        <VSCodeDataGridCell grid-column="2">
-                          <TdsSelectionFolderField
-                            name={`btnSelectFolder.${index}`}
-                            info={"Selecione uma pasta que contenha arquivos de definição"}
-                            title="Select folder with define files"
-                          />
-                        </VSCodeDataGridCell>
-                      </>
-                    }
-                  </VSCodeDataGridRow>
-                ))}
-              </VSCodeDataGrid>
-  */
+              {model && model.includePaths.map((row: TIncludeData, index: number) => (
+                <VSCodeDataGridRow key={index}>
+                  {row.path !== "" &&
+                    <>
+                      <VSCodeDataGridCell grid-column="1">
+                        <VSCodeButton appearance="icon"
+                          onClick={() => removeIncludePath(index)} >
+                          <span className="codicon codicon-close"></span>
+                        </VSCodeButton>
+                      </VSCodeDataGridCell>
+                      <VSCodeDataGridCell grid-column="2">
+                        <TdsSimpleTextField
+                          name={`includePaths.${index}.path`}
+                          readOnly={true}
+                        />
+                      </VSCodeDataGridCell>
+                    </>
+                  }
+                  {((row.path == "") && (index !== indexFirstPathFree)) &&
+                    <>
+                      <VSCodeDataGridCell grid-column="1">
+                        &nbsp;
+                      </VSCodeDataGridCell>
+                      <VSCodeDataGridCell grid-column="2">
+                        &nbsp;
+                      </VSCodeDataGridCell>
+                    </>
+                  }
+                  {(index === indexFirstPathFree) &&
+                    <>
+                      <VSCodeDataGridCell grid-column="1">
+                        &nbsp;
+                      </VSCodeDataGridCell>
+                      <VSCodeDataGridCell grid-column="2">
+                        <TdsSelectionFolderField
+                          name={`btnSelectFolder.${index}`}
+                          info={"Selecione uma pasta que contenha arquivos de definição"}
+                          title="Select folder with define files"
+                        />
+                      </VSCodeDataGridCell>
+                    </>
+                  }
+                </VSCodeDataGridRow>
+              ))}
+            </VSCodeDataGrid>
+            */
 
   // model.loggedUser
   return (

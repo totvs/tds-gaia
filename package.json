@@ -354,15 +354,15 @@
     ],
     "keybindings": [
       {
-        "key": "ctrl+d ctrl+l",
+        "key": "Ctrl+D Ctrl+L",
         "command": "tds-dito.login"
       },
       {
-        "key": "ctrl+d ctrl+b",
+        "key": "Ctrl+D ctrl+b",
         "command": "tds-dito.logout"
       },
       {
-        "key": "ctrl+d ctrl+t",
+        "key": "Ctrl+D Ctrl+T",
         "command": "tds-dito.typify"
       },
       {
@@ -370,15 +370,15 @@
         "command": "editor.action.inlineSuggest.trigger"
       },
       {
-        "key": "ctrl+d ctrl+e",
+        "key": "Ctrl+D Ctrl+E",
         "command": "tds-dito.explain"
       },
       {
-        "key": "ctrl+d ctrl+g",
+        "key": "Ctrl+D ctrl+g",
         "command": "tds-dito.generate-code"
       },
       {
-        "key": "ctrl+d ctrl+m",
+        "key": "Ctrl+D ctrl+m",
         "command": "tds-dito.open-manual"
       }
     ]

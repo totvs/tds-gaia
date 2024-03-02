@@ -11,7 +11,7 @@ section.tds-header {
 	flex-direction: row;
 	align-items: flex-end;
 	/* width: 100%; */
-	margin-bottom: var(--type-ramp-minus2-line-height);
+	margin-bottom: var(--tds-hor-spacing);
 }
 
 section.tds-header h1 {

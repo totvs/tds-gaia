@@ -28,7 +28,7 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
     typify(code: string): Promise<string> {
         throw new Error("Method not implemented.");
     }
-    explainCode(code: string): Promise<string> {
+    explainCode(code: any): Promise<string> {
         throw new Error("Method not implemented.");
     }
 

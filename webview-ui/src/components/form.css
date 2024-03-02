@@ -20,12 +20,12 @@
 	order: 0;
 	flex-direction: row;
 	align-items: flex-end;
-	margin-top: var(--type-ramp-minus2-line-height);
+	margin-top: var(--tds-hor-spacing);
 }
 
 .tds-form p {
 	margin: 0;
-	margin-bottom: var(--type-ramp-minus2-line-height);
+	margin-bottom: var(--tds-hor-spacing);
 }
 
 .tds-form-footer .tds-message {
@@ -100,7 +100,7 @@ revisar
 .tds-field-container+.tds-field-container,
 .tds-field-container+.tds-row-container,
 .tds-row-container+.tds-row-container {
-	margin-top: calc(var(--type-ramp-minus2-line-height) / 2);
+	margin-top: calc(var(--tds-hor-spacing) / 2);
 }
 
 .tds-row-container .tds-field-container+.tds-field-container {
@@ -109,7 +109,7 @@ revisar
 }
 
 .tds-field-container label {
-	line-height: 250%;
+	line-height: cal(--line-height * 250%);
 }
 
 .tds-scroll {
@@ -122,16 +122,10 @@ span.tds-required::after {
 	color: var(--vscode-editorError-foreground);
 }
 
-
-vscode-data-grid-row {
-	/* margin: 0px 1rem 1rem 0px;
-	padding: 0px; */
-}
-
 vscode-data-grid-cell {
 	margin: 0px;
 	padding: 0px;
-	padding-left: calc(var(--design-unit) * 3px);
+	padding-left: var(--tds-ver-spacing);
 }
 
 vscode-data-grid-row:hover {
@@ -171,7 +165,7 @@ vscode-data-grid-row:hover {
 .tds-dropdown-container label {
 	display: block;
 	cursor: pointer;
-	margin-bottom: calc(var(--type-ramp-minus2-line-height) / 2);
+	margin-bottom: calc(var(--tds-hor-spacing) / 2);
 }
 
 .tds-grid-container {

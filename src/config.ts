@@ -44,17 +44,6 @@ export type TDitoConfig = {
   top_k: number;
 }
 
-const EMPTY_USER: LoggedUser = {
-  id: "",
-  email: "<not logged>",
-  name: "<not logged>",
-  fullname: "<not logged>",
-  displayName: "<not logged>",
-  avatarUrl: "",
-  expiration: undefined,
-  expiresAt: undefined,
-}
-
 export type TDitoCustomConfig = {
   currentUser?: LoggedUser
   ready?: boolean;
