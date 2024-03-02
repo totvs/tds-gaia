@@ -540,6 +540,99 @@ Comentários:
 A explicação faz sentido, porém prolixa. O uso de ligações em objetos, métodos, etc, quando citados, seria bem vindo.
 E o último parágrafo para que foi cortado por limite de tamanho. Se for o caso, Um indicador do tipo "More...", é interessante para recuperar mais informações, através de uma API apropriada ou parâmetros adicionais a API ``explain``.
 
+### Declarações de variáveis
+
+Foi solicitado a explicação para o código:
+
+```code
+Local oDlg, oFont, oSay
+```
+
+Retorno (por ser longo, faço comentário no meio):
+
+> The code is explained as follows:
+>
+> Local oDlg := Nil // Declare uma variável local do tipo objeto chamada "oDlg"
+> Local oFont := Nil // Declare uma variável local do tipo objeto chamada "oFont"
+> Local oSay := Nil // Declare uma variável local do tipo objeto chamada "oSay"
+>
+
+Perfeito até aqui. Mas porquê veio em português?
+Daqui para frente, me parece que o IA presumiu um contexto, sem informar isso.
+
+> // Cria um objeto da classe TDialog (janela) com nome "Teste Dialog" e tamanho 320x240 pixels, sendo centralizada
+> DEFINE DIALOG oDlg TITLE "Teste Dialog" FROM 180,180 TO 550,700 PIXEL
+>
+> // Cria um objeto da classe TFont (fonte) com fonte Arial, tamanho 16 e não em negrito
+> DEFINE FONT oFont NAME "Arial" SIZE 16 BOLD
+>
+> // Cria um objeto da classe TSay (texto) com mensagem "Exemplo de dialog" e tamanho 200x200 pixels, centralizado na janela > principal
+> DEFINE SAY oSay PROMPT "Exemplo de dialog" OF oDlg FONT oFont COLOR CLRITE PIXEL ALIGN 1,1
+>
+> ACTIVATE DIALOG oDlg CENTERED
+>
+> Return.T.
+>
+
+Código correto, mas poderia indicar que se trata de um exemplo de uso. Em portugues!
+
+> The code can be translated to English as follows:
+>
+> Declare a variable of type object named "oDlg"
+> Declare a variable of type object named "oFont"
+> Declare a variable of type object named "oSay"
+>
+
+Ao traduzir para o inglês, deixou de informação que trata-se de declaração "local".
+
+> Create an instance of class TDialog (dialog window) with name "Test Dialog", size 320 x 240 pixels and centered on screen
+> Define a font named "Arial" with size 16 and without boldness
+> Create a text object named "Example dialog" with message "Example dialog", size 200 x 200 pixels and centered on main window
+> Activate the dialog window
+>
+> Return.T.
+>
+
+Traduziu o código gerado anteriormente para o inglês, mas deixo um "return".
+
+> The translation of this code is done by translating each line into English, which results in the following output:
+>
+> Declare a variable of type object named "oDlg"
+> Declare a variable of type object named "oFont"
+> Declare a variable of type object named "oSay"
+>
+> Create an instance of class TDialog (dialog window) with name "Test Dialog", size 320 x 240 pixels and centered on screen
+> Define a font named "Arial" with size 16 and without boldness
+> Create a text object named "Example dialog" with message "Example dialog", size 200 x 200 pixels and centered on main window
+> Activate the dialog window
+>
+> Return.T.
+>
+> The result of this translation is shown below:
+>
+> Declare a variable of type object named "oDlg"
+> Declare a variable of type object named "oFont"
+> Declare a variable of type object named "oSay"
+>
+> Create an instance of class TDialog (dialog window) with name "Test Dialog", size 320 x 240 pixels and centered on screen
+> Define a font named "Arial" with size 16 and without boldness
+> Create a text object named "Example dialog" with message "Example dialog", size 200 x 200 pixels and centered on main window
+> Activate the dialog window
+>
+> Return.T.
+>
+
+Bloco acima em duplicidade.
+
+> The resulting code is compiled using the command-line interface (CLI), which produces the following output:
+>
+> [000]
+> 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+>
+
+Bloco acima, sem sentido.
+
+
 ### Outros comandos e classes visuais
 
 Efetuado testes semelhantes ao do ``@...say`` com outras classes visuais, obtendo resultados semelhantes.
