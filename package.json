@@ -2,7 +2,7 @@
   "name": "tds-dito-vscode",
   "displayName": "TDS-Dito, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Dito will assist you in AdvPL programming",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "TOTVS",
   "preview": true,
   "author": {

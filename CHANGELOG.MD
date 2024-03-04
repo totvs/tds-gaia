@@ -1,0 +1,26 @@
+# TDS-Dito, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
+
+## TDS-Dito 0.0.3
+
+### Melhorias
+
+- Melhoria na formatação das respostas das APIs ``explain`` e ``typify`` apresentadas no bate-papo.
+
+- Adicionado menu de contexto ao bate-papo.
+- Adicionado na configuração as chaves:
+  . tds-dito.clearBeforeExplain: false
+    Limpa as mensagens existentes no bate-papo, antes de apresentar a explicação.
+  . tds-dito.clearBeforeTypify: false
+    Limpa as mensagens existentes no bate-papo, antes de apresentar a explicação.
+
+## TDS-Dito 0.0.2
+
+Liberação inicial.
+
+> **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
+>
+> Por ser um projeto **experimental**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
+>
+> No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
+
+Favor ler [GUIA RÁPIDO](https://github.com/brodao2/tds-dito/blob/main/README.md#guia-ultra-r%C3%A1pido).
