@@ -49,8 +49,16 @@
 		},
 		{
 			"label": "u_dbgString2"
+		},
+		{
+			"args": [],
+			"label": "tsay"
+		},
+		{
+			"args": [],
+			"label": "u_tsay"
 		}
 	],
-	"lastProgramExecuted": "u_dbgString2",
+	"lastProgramExecuted": "u_tsay",
 	"lastProgramArguments": []
 }
