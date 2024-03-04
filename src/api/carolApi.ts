@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoUser } from "../config";
 import { fetch, Response } from "undici";
 import { capitalize } from "../util";
-import { CompletionResponse, IaAbstractApi, IaApiInterface } from "./interfaceApi";
+import { CompletionResponse, IaAbstractApi, IaApiInterface, TypifyResponse } from "./interfaceApi";
 import { logger } from "../logger";
 
 export class CarolApi extends IaAbstractApi implements IaApiInterface {
@@ -275,7 +275,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         return explanation;
     }
 
-    async typify(code: string): Promise<string> {
+    async typify(code: string): Promise<TypifyResponse> {
         logger.info("Code typify...");
         logger.profile("typify");
 
@@ -283,19 +283,19 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             "code": code,
         };
 
-        let response: {} | Error = await this.jsonRequest("POST", `${this._apiRequest}/typefy`, JSON.stringify(body));
+        let json: any = await this.jsonRequest("POST", `${this._apiRequest}/typefy`, body);
 
-        if (typeof (response) === "object" && response instanceof Error) {
-            return "";
-        } else if (!response) {// } || response.length === 0) {
-            return "";
+        if (!json || json.length === 0) {
+            void vscode.window.showInformationMessage("No code found in the stack");
+            logger.profile("typify");
+            return { types: [] };
         }
 
         //  logger.debug(`Code explain end with ${response.length} size`);
-        logger.debug(response);
+        logger.debug(json);
         logger.profile("typify");
 
-        return JSON.stringify(JSON.stringify(response, undefined, 2));
+        return json;
     }
 
     stop(): Promise<boolean> {

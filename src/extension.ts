@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
 import { TDitoConfig, getDitoConfiguration, getDitoLogLevel, isDitoLogged, isDitoShowBanner, setDitoReady, setDitoUser } from './config';
 import { inlineCompletionItemProvider } from './completionItemProvider';
-import { CompletionResponse, IaApiInterface } from './api/interfaceApi';
+import { CompletionResponse, IaApiInterface, TypifyResponse } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
 import { PREFIX_DITO, logger } from './logger';
 import { ChatViewProvider } from './panels/chatViewProvider';
@@ -152,6 +152,10 @@ export function activate(context: vscode.ExtensionContext) {
 		let codeToTypify: string = "";
 
 		if (editor !== undefined) {
+			if (getDitoConfiguration().clearBeforeExplain) {
+				chatApi.dito("clear");
+			}
+
 			const selection: vscode.Selection = editor.selection;
 			const function_re: RegExp = /(function|method(...)class)/i
 			const curPos: vscode.Position = selection.start;
@@ -200,16 +204,27 @@ export function activate(context: vscode.ExtensionContext) {
 				codeToTypify = editor.document.getText(rangeForTypify);
 			}
 
-			if (codeToTypify.length > 0) {
-				iaApi.typify(codeToTypify).then((value: string) => {
-					if (value.length == 0) {
-						chatApi.ditoInfo("Desculpe. Não consegui tipificar essa função.");
-					} else {
-						chatApi.dito(value);
+			try {
+				const response: TypifyResponse = await iaApi.typify(codeToTypify);
+				let text: string[] = [];
+
+				if (response !== undefined && response.types.length) {
+					for (const varType of response.types) {
+						text.push(`- **${varType.var}** as **${varType.type}** ${chatApi.commandText("update")}`);
 					}
-				});
-			} else {
-				chatApi.dito("Empty code to typify");
+
+					chatApi.dito(text);
+				}
+			} catch (e) {
+				const err_msg = (e as Error);
+
+				if (err_msg.message.includes("is currently loading")) {
+					vscode.window.showWarningMessage(err_msg.message);
+				} else if (err_msg.message !== "Canceled") {
+					vscode.window.showErrorMessage(err_msg.message);
+				}
+
+				console.error(e);
 			}
 		} else {
 			chatApi.dito("Editor undefined");

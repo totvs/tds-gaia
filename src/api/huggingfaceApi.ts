@@ -6,7 +6,7 @@ import { AuthInfo, Credentials, WhoAmI, WhoAmIOrg, WhoAmIUser, whoAmI } from "@h
 import { TDitoConfig, getDitoConfiguration, getDitoUser, isDitoShowBanner, setDitoUser } from "../config";
 import { fetch } from "undici";
 import { capitalize } from "../util";
-import { CompletionResponse, IaAbstractApi, IaApiInterface } from "./interfaceApi";
+import { CompletionResponse, IaAbstractApi, IaApiInterface, TypifyResponse } from "./interfaceApi";
 import { logger } from "../logger";
 
 // TOKEN_BRODAO  = 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
@@ -25,7 +25,7 @@ export class HuggingFaceApi extends IaAbstractApi implements IaApiInterface {
     constructor() {
         super();
     }
-    typify(code: string): Promise<string> {
+    typify(code: string): Promise<TypifyResponse> {
         throw new Error("Method not implemented.");
     }
     explainCode(code: any): Promise<string> {

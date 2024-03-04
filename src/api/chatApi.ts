@@ -14,7 +14,8 @@ const MANUAL_RE = /^manual$/i;
 const HEALTH_RE = /^health$/i;
 const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
-const typify_RE = /^typify\s(source)?$/i;
+const TYPIFY_RE = /^typify\s(source)?$/i;
+const UPDATE_RE = /^update\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
 const HINT_2_RE = /^(hint_2)$/i;
@@ -91,9 +92,15 @@ const commandsMap: Record<string, TCommand> = {
     },
     "typify": {
         command: "typify",
-        regex: typify_RE,
+        regex: TYPIFY_RE,
         alias: ["ty", "t"],
         commandId: "tds-dito.typify",
+    },
+    "update": {
+        caption: "Update",
+        command: "update",
+        regex: UPDATE_RE,
+        //commandId: "tds-dito.typify",
     }
 };
 

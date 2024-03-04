@@ -88,7 +88,9 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
             break;
           case CommonCommandFromWebViewEnum.Save:
-            chatApi.user(data.model.newMessage, true);
+            if (data.model.newMessage.trim() !== "") {
+              chatApi.user(data.model.newMessage, true);
+            }
 
             break;
           case CommonCommandFromWebViewEnum.Execute:
