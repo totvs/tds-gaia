@@ -358,7 +358,7 @@
         "command": "tds-dito.login"
       },
       {
-        "key": "Ctrl+D ctrl+b",
+        "key": "Ctrl+D Ctrl+B",
         "command": "tds-dito.logout"
       },
       {
@@ -374,11 +374,11 @@
         "command": "tds-dito.explain"
       },
       {
-        "key": "Ctrl+D ctrl+g",
+        "key": "Ctrl+D Ctrl+G",
         "command": "tds-dito.generate-code"
       },
       {
-        "key": "Ctrl+D ctrl+m",
+        "key": "Ctrl+D Ctrl+M",
         "command": "tds-dito.open-manual"
       }
     ]

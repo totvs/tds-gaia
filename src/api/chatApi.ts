@@ -277,7 +277,7 @@ export class ChatApi {
         const command: TCommand | undefined = ChatApi.getCommand(_command);
 
         if (command) {
-            return `[{command:${command.command}}${args ? args.join(" ") : ""}${command.key ? " `" + command.key + "`" : ""}]`;
+            return `[${command.caption}](command:${command.command}${args.length > 0 ? `&${args.join(";")}` : ""})${command.key ? " `" + command.key + "`" : ""}`;
         }
 
         return _command;
@@ -317,7 +317,7 @@ function doHelp(chat: ChatApi, message: string): boolean {
                 chat.dito("- Por uma ligação apresentada nesse bate-papo");
                 chat.dito("- Digitando o comando no _prompt_ abaixo");
                 chat.dito("- Menu de contexto do bate-papo ou fonte em edição.");
-                chat.dito(`Se você possui familiaridade com o **VS-Code**, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, leio o ${chat.commandText("manual")} (será aberto no seu navegador padrão).`);
+                chat.dito(`Se você possui familiaridade com o **VS-Code**, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, a ${chat.commandText("manual")} (será aberto no seu navegador padrão).`);
                 chat.dito(`Para saber os comandos, digite ${chat.commandText("help")}.`);
             } else if (matches[2].trim() == "hint_2") {
                 const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md#guia-ultra-r%C3%A1pido";
@@ -327,7 +327,7 @@ function doHelp(chat: ChatApi, message: string): boolean {
             }
         } else {
             chat.dito(`Os comandos disponíveis, no momento, são: ${chat.commandList()}.`);
-            chat.dito(`Se você possui familiaridade com o **VS-Code**, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, leio o ${chat.commandText("manual")} (será aberto no seu navegador padrão).`);
+            chat.dito(`Se você possui familiaridade com o **VS-Code**, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, leia o ${chat.commandText("manual")} (será aberto no seu navegador padrão).`);
         }
 
         result = true;

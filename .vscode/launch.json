@@ -8,7 +8,6 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--inspect",
 				"--log TOTVS.tds-dito:debug",
 				"${workspaceFolder}/advpl_sources"
 			],
