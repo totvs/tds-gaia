@@ -92,6 +92,11 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(detailHealth);
 
+	const clear = vscode.commands.registerCommand('tds-dito.clear', async () => {
+		chatApi.user("clear", true);
+	});
+	context.subscriptions.push(clear);
+
 	const openManual = vscode.commands.registerCommand('tds-dito.open-manual', async () => {
 		const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md";
 		vscode.env.openExternal(vscode.Uri.parse(url));
@@ -121,12 +126,15 @@ export function activate(context: vscode.ExtensionContext) {
 				const curLineStart = new vscode.Position(curPos.line, 0);
 				const nextLineStart = new vscode.Position(curPos.line + 1, 0);
 				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
-				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
+				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine).trim();
 
 				codeToExplain = contentWithFirstCharOfNextLine.trim();
 			}
 
 			if (codeToExplain.length > 0) {
+				if (getDitoConfiguration().clearBeforeExplain) {
+					chatApi.dito("clear");
+				}
 				iaApi.explainCode(codeToExplain).then((value: string) => {
 					chatApi.dito(value);
 				});

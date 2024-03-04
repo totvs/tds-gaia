@@ -20,6 +20,7 @@ export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
 //deve ser espelho do definido no package.json
 //outras configurações, de preferência não persistentes, devem ser efetuadas em TDitoCustomConfig
 export type TDitoConfig = {
+  clearBeforeExplain: boolean;
   showBanner: boolean;
   logLevel: "off" | "error" | "warn" | "info" | "http" | "verbose" | "debug";
   endPoint: string;

@@ -47,14 +47,14 @@ type InlineTagName = "code" | "bold" | "italic" | "link";
 type BlockTagName = "code";
 
 //mapeamento parcial (somente as utilizadas) das marcações MD
-const mdTags: Record<InlineTagName, string> = {
-  "code": "\\`([^\\`]+)\`",
-  "bold": "\\*\\*([^\\*\\*]+)\\*\\*",
-  "italic": "_([^_])+_",
-  "link": "\\[([^\\].]+)\\]\\(([^\\).]+)\\)"
+const mdTags: Record<InlineTagName, RegExp> = {
+  "code": /\`([^\\`]+)\`/g,
+  "bold": /\*\*([^\*\*]+)\*\*/g,
+  "italic": /_([^_])+_/g,
+  "link": /\[([^\].]+)\]\(([^\).]+)\)/g
 }
 
-const allTags_re = new RegExp(`(${mdTags.code})|(${mdTags.bold})|$({mdTags.italic})|(${mdTags.link})`, "ig");
+const allTags_re = new RegExp(`(${mdTags.code.source})|(${mdTags.bold.source})|(${mdTags.italic.source})|(${mdTags.link.source})`, "ig");
 
 const tagsBlockMap: Record<BlockTagName, RegExp> = {
   "code": /[\`\`\`|~~~]\w*(.*)[\`\`\`|~~~]/gis
@@ -127,26 +127,36 @@ function mdToHtml(text: string): any[] {
 
 function txtToHtml(text: string): any[] {
   const children: any[] = [];
-  const paragraphs: string[] = text.split(PARAGRAPH_RE);
+  const blocks: string[] = [text]; //text.split(tagsBlockMap["code"]);
 
-  paragraphs.forEach((paragraph: string) => {
-    const phrases: string[] = paragraph.split(PHRASE_RE);
+  for (let index = 0; index < blocks.length; index++) {
+    const block: string = blocks[index];
 
-    phrases.forEach((phrase: string, index: number) => {
-      phrase = phrase.trim();
-      if (phrase.length > 0) {
-        //if (index == (phrases.length - 1)) {
-        if (phrases.length == 1) {
-          children.push(<p>{mdToHtml(text)}</p>);
-        } else if (index > 0) {
-          children.push(mdToHtml(text));
-          children.push(<br />);
-        } else {
-          children.push(mdToHtml(text));
-        }
-      }
-    });
-  });
+    // if (block.match(tagsBlockMap["code"])) {
+    //   children.push(<code>{block}</code>);
+    // } else {
+      const paragraphs: string[] = text.split(PARAGRAPH_RE);
+
+      paragraphs.forEach((paragraph: string) => {
+        const phrases: string[] = paragraph.split(PHRASE_RE);
+
+        phrases.forEach((phrase: string, index: number) => {
+          phrase = phrase.trim();
+          if (phrase.length > 0) {
+            //if (index == (phrases.length - 1)) {
+            if (phrases.length == 1) {
+              children.push(<p>{mdToHtml(phrase)}</p>);
+            } else if (index > 0) {
+              children.push(mdToHtml(phrase));
+              children.push(<br />);
+            } else {
+              children.push(mdToHtml(phrase));
+            }
+          }
+        });
+      });
+    //}
+  };
 
   return children;
 }

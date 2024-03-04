@@ -49,8 +49,8 @@ section.tds-chat div.tds-message-row+div.tds-message-row {
 
 section.tds-chat div.tds-message-row+div.tds-message-row {
 	margin-bottom: 0.5em;
-	border-bottom: dotted;
-	border-bottom-width: thin;
+	/* border-bottom: dotted;
+	border-bottom-width: thin; */
 }
 
 section.tds-chat div.tds-message-row div.tds-message-author {

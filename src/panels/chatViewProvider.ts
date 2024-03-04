@@ -41,6 +41,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       while (queueMessage.size() > 0) {
         const message: TMessageModel = queueMessage.dequeue() as TMessageModel;
 
+        if (message.message == "clear") {
+          this.chatModel.messages = [];
+          this.sendUpdateModel(this.chatModel, undefined);
+        }
+
         this.chatModel.messages.push(message);
       }
 
@@ -61,70 +66,6 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView", { title: "Dito: Chat" });
     webviewView.webview.onDidReceiveMessage(this._getWebviewMessageListener(webviewView.webview));
   }
-
-  // private _getHtmlForWebview(webview: vscode.Webview) {
-
-  //   const getUri = (pathList: string[]): vscode.Uri => {
-  //     return webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, ...pathList));
-  //   }
-
-  //   const getNonce = (): string => {
-  //     let text = '';
-  //     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  //     for (let i = 0; i < 32; i++) {
-  //       text += possible.charAt(Math.floor(Math.random() * possible.length));
-  //     }
-  //     return text;
-  //   }
-
-  //   const BASE_FOLDER: string[] = [
-  //     "webview-ui",
-  //     "build",
-  //   ];
-
-  //   // The CSS file from the React build output
-  //   const stylesUri: vscode.Uri[] = [];
-
-  //   // const cssFiles: string[] = options.cssExtraFiles || [];
-
-  //   // The JS file from the React build output
-  //   const scriptsUri: vscode.Uri[] = [];
-  //   scriptsUri.push(getUri([
-  //     ...BASE_FOLDER,
-  //     `chatView.js`,
-  //   ]))
-
-  //   const nonce = getNonce();
-
-  //   return /*html*/ `
-  //     <!DOCTYPE html>
-  //     <html lang="en">
-  //       <head>
-  //         <meta charset="utf-8">
-  //         <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-  //         <meta name="theme-color" content="#000000">
-  //         <meta http-equiv="Content-Security-Policy"
-  //             content="default-src 'none';
-  //                     img-src https: 'unsafe-inline' ${webview.cspSource};
-  //                     font-src ${webview.cspSource};
-  //                     style-src 'unsafe-inline' ${webview.cspSource};
-  //                     script-src 'nonce-${nonce}';"
-  //         >
-  //         ${stylesUri.map((uri: vscode.Uri) => {
-  //     return `<link rel="stylesheet" type="text/css" href="${stylesUri}">\n`;
-  //   })}
-  //         <title>${"Dito: Chat"}</title>
-  //       </head>
-  //       <body>
-  //         <noscript>You need to enable JavaScript to run this app.</noscript>
-  //         <div id="root"></div>
-  //         ${scriptsUri.map((uri: vscode.Uri) => {
-  //     return `<script nonce="${nonce}" src="${uri}"></script>\n`;
-  //   })}
-  //       </body>
-  //     </html>
-  //   `;
-  // }
 
   /**
    * Return  an event listener to listen for messages passed from the webview context and
@@ -152,13 +93,6 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             break;
           case CommonCommandFromWebViewEnum.Execute:
             chatApi.user(data.command, false);
-
-            if (data.command == "clear") {
-              this.chatModel.messages = [];
-              this.sendUpdateModel(this.chatModel, undefined);
-            }
-
-            //TODO: limpar comando da mensagem original (messageId)? 
             break;
         }
       }

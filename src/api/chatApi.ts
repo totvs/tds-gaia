@@ -172,16 +172,31 @@ export class ChatApi {
         }
     }
 
-    async dito(message: string): Promise<void> {
+    async dito(message: string | string[]): Promise<void> {
 
-        this.sendMessage({
-            inProcess: true,
-            messageId: this.messageId++,
-            timeStamp: new Date(),
-            author: "Dito",
-            message: message,
-            actions: this.extractActions(message)
-        });
+        if (typeof message == "string") {
+            this.sendMessage({
+                inProcess: true,
+                messageId: this.messageId++,
+                timeStamp: new Date(),
+                author: "Dito",
+                message: message,
+                actions: this.extractActions(message)
+            });
+        } else {
+            let workMessage: string = "";
+            message.forEach((m: string) => {
+                workMessage += `\n${m}`;
+            });
+            this.sendMessage({
+                inProcess: true,
+                messageId: this.messageId++,
+                timeStamp: new Date(),
+                author: "Dito",
+                message: workMessage,
+                actions: this.extractActions(workMessage)
+            });
+        }
     }
 
     async ditoInfo(message: string): Promise<void> {
@@ -311,14 +326,16 @@ function doHelp(chat: ChatApi, message: string): boolean {
     if (matches = message.match(commandsMap["help"].regex)) {
         if (matches[2]) {
             if (matches[2].trim() == "hint_1") {
-                chat.dito("Para interagir comigo, você usará comandos que podem ser acionados por um desses modos:");
-                chat.dito("- Um atalho");
-                chat.dito("- Pelo painel de comandos(`Ctrl+Shit-P` ou `F1`), filtrando por \"TDS-Dito\"");
-                chat.dito("- Por uma ligação apresentada nesse bate-papo");
-                chat.dito("- Digitando o comando no _prompt_ abaixo");
-                chat.dito("- Menu de contexto do bate-papo ou fonte em edição.");
-                chat.dito(`Se você possui familiaridade com o **VS-Code**, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, a ${chat.commandText("manual")} (será aberto no seu navegador padrão).`);
-                chat.dito(`Para saber os comandos, digite ${chat.commandText("help")}.`);
+                chat.dito([
+                    "Para interagir comigo, você usará comandos que podem ser acionados por um desses modos:",
+                    "- Um atalho;",
+                    "- Pelo painel de comandos(`Ctrl+Shit-P` ou `F1`), filtrando por \"TDS-Dito\";",
+                    "- Por uma ligação apresentada nesse bate-papo;",
+                    "- Digitando o comando no prompt abaixo;",
+                    "- Menu de contexto do bate-papo ou fonte em edição.",
+                    `Se você possui familiaridade com o **VS-Code**, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, a ${chat.commandText("manual")} (será aberto no seu navegador padrão).`,
+                    `Para saber os comandos, digite ${chat.commandText("help")}.`
+                ]);
             } else if (matches[2].trim() == "hint_2") {
                 const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md#guia-ultra-r%C3%A1pido";
                 vscode.env.openExternal(vscode.Uri.parse(url));
@@ -349,6 +366,6 @@ function doLogout(chat: ChatApi): boolean {
 }
 
 function doClear(chat: ChatApi): any {
-    chat.dito("Function not implemented. Sorry.");
+    //chat.dito("@clear");
 }
 
