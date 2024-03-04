@@ -1,4 +1,4 @@
-# Relato de testes com IA (22/02/24)
+# Relato de testes com IA (22/02/24 a 01/03/24)
 
 ## Resumo
 
