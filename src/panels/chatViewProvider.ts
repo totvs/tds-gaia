@@ -94,7 +94,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
             break;
           case CommonCommandFromWebViewEnum.Execute:
-            chatApi.user(data.command, false);
+            chatApi.user(data.command, true);
             break;
         }
       }
@@ -113,9 +113,9 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {
-    //model.loggedUser = getDitoUser()!.displayName || "<Not logged>";
-    //model.newMessage = "";
     let messagesToSend: TMessageModel[] = [];
+    //model.loggedUser = getDitoUser()!.displayName || "<Not logged>";
+    model.newMessage = "";
 
     if (this.chatModel.messages.length > 0) {
       let oldAuthor: string | undefined;

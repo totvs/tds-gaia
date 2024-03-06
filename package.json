@@ -348,6 +348,7 @@
     "watch:views": "cd webview-ui && npm run watch",
     "lint": "eslint src --ext ts",
     "--PUBLISH--": "",
+    "vscode:package": "vsce package",
     "vscode:prepublish": "npm run compile",
     "--TEST--": "",
     "pretest": "npm run compile && npm run lint",

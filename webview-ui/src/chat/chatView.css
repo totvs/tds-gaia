@@ -18,8 +18,11 @@ section.tds-chat section.tds-header {
 	/* align-items: flex-end; */
 }
 
-section.tds-chat section.tds-content {
+.tds-form .tds-form-content {
 	display: flex;
+}
+
+section.tds-chat section.tds-content {
 	flex-direction: column;
 	flex-grow: 1;
 	flex-shrink: 1;
@@ -49,8 +52,6 @@ section.tds-chat div.tds-message-row+div.tds-message-row {
 
 section.tds-chat div.tds-message-row+div.tds-message-row {
 	margin-bottom: 0.5em;
-	/* border-bottom: dotted;
-	border-bottom-width: thin; */
 }
 
 section.tds-chat div.tds-message-row div.tds-message-author {

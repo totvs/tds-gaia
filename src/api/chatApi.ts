@@ -82,7 +82,7 @@ const commandsMap: Record<string, TCommand> = {
         command: "clear",
         regex: CLEAR_RE,
         alias: ["c"],
-        process: (chat: ChatApi) => doClear(chat)
+        //process: (chat: ChatApi) => doClear(chat)
     },
     "explain": {
         command: "explain",
@@ -124,10 +124,6 @@ export function completeCommandsMap(extension: vscode.Extension<any>) {
 }
 
 export class ChatApi {
-    // static getCommandsMap(): Record<string, TCommand> {
-    //     return commandsMap;
-    // }
-
     static getCommand(_command: string): TCommand | undefined {
         const commandId: string = _command.toLowerCase();
         let command: TCommand | undefined = commandsMap[commandId];
@@ -263,7 +259,7 @@ export class ChatApi {
                 inProcess: false,
                 messageId: this.messageId++,
                 timeStamp: new Date(),
-                author: getDitoUser()?.displayName || "Unknown",
+                author: getDitoUser()?.displayName || "<Not Logged",
                 message: message == undefined ? "???" : message,
             });
 
@@ -372,7 +368,7 @@ function doLogout(chat: ChatApi): boolean {
     return true;
 }
 
-function doClear(chat: ChatApi): any {
-    //chat.dito("@clear");
-}
+// function doClear(chat: ChatApi): any {
+//     chat.user("clear", true);
+// }
 

@@ -1,10 +1,11 @@
 import { ButtonAppearance } from "@vscode/webview-ui-toolkit";
 import "./form.css";
 import { ChangeHandler, FieldValues, FormState, RegisterOptions, UseFormReturn, UseFormSetError, UseFormSetValue, useFormContext } from "react-hook-form";
-import { VSCodeButton, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
+import { VSCodeButton, VSCodeLink, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
 import { sendClose, sendReset } from "../utilities/common-command-webview";
 import { Children } from 'react';
 import React from "react";
+import { sendExecute } from "../chat/sendCommand";
 
 export function getDefaultActionsForm(): IFormAction[] {
 	return [
@@ -24,7 +25,7 @@ export function getDefaultActionsForm(): IFormAction[] {
 			caption: "Close",
 			hint: "Fecha a página, sem salvar as informações",
 			appearance: "secondary",
-			action: () => {
+			onClick: () => {
 				sendClose();
 			},
 		},
@@ -64,11 +65,11 @@ export interface IFormAction {
 	id: number;
 	caption: string;
 	hint?: string;
-	action?: any;
+	onClick?: any;
 	enabled?: boolean | ((isDirty: boolean, isValid: boolean) => boolean);
 	visible?: boolean | ((isDirty: boolean, isValid: boolean) => boolean);
 	isProcessRing?: boolean
-	type?: "submit" | "reset" | "button";
+	type?: "submit" | "reset" | "button" | "link";
 	appearance?: ButtonAppearance;
 }
 
@@ -212,8 +213,8 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 							propsField["appearance"] = action.appearance;
 						}
 
-						if (action.action) {
-							propsField["onClick"] = action.action;
+						if (action.onClick) {
+							propsField["onClick"] = action.onClick;
 						}
 
 						if (action.visible !== undefined) {
@@ -228,11 +229,13 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 							visible = isVisible ? "" : "tds-hidden";
 						}
 
-						return (<VSCodeButton
-							className={`tds-button-button ${visible}`}
-							{...propsField} >
-							{action.caption}
-						</VSCodeButton>)
+						return (action.type == "link" ?
+							<VSCodeLink onClick={() => action.onClick()}>{action.caption}</VSCodeLink>
+							: <VSCodeButton
+								className={`tds-button-button ${visible}`}
+								{...propsField} >
+								{action.caption}
+							</VSCodeButton>)
 					})}
 				</div>
 			</section>

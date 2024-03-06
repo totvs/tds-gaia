@@ -18,6 +18,23 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.l10n.t('Congratulations, your extension "tds-dito" is now active!')
 	);
 
+	// Get the TS extension
+	const tsExtension = vscode.extensions.getExtension('TOTVS.tds-vscode');
+
+	if (!tsExtension) {
+		return;
+	}
+
+	// Get the API from the TS extension
+	//if (!tsExtension.exports || !tsExtension.exports.getAPI) {
+	//	return;
+	//}
+
+	// const api = tsExtension.exports.getAPI(0);
+	// if (!api) {
+	// 	return;
+	// }
+
 	completeCommandsMap(context.extension);
 
 	ctx = context;
@@ -83,6 +100,11 @@ export function activate(context: vscode.ExtensionContext) {
 				const message: string = `Desculpe, estou com dificuldades técnicas. ${chatApi.commandText("health")}`;
 				chatApi.dito(message);
 				vscode.window.showErrorMessage(`${PREFIX_DITO} ${message}`);
+
+				if (error.message.includes("502: Bad Gateway")) {
+					const parts: string = error.message.split("\n");
+					chatApi.dito(parts[1]);
+				}
 			} else {
 				vscode.commands.executeCommand("tds-dito.login", [true]).then(() => {
 					chatApi.checkUser();

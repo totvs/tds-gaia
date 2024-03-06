@@ -64,7 +64,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
                         }
                     }
                 } else {
-                    result.message += `\n Detail: ${bodyResp}`;
+                    result.cause += `${result.cause}\n Detail: ${bodyResp}`;
 
                 }
                 Error.captureStackTrace(result);
