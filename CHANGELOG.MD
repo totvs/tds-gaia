@@ -11,7 +11,7 @@
   . tds-dito.clearBeforeExplain: false
     Limpa as mensagens existentes no bate-papo, antes de apresentar a explicação.
   . tds-dito.clearBeforeTypify: false
-    Limpa as mensagens existentes no bate-papo, antes de apresentar a explicação.
+    Limpa as mensagens existentes no bate-papo, antes de apresentar a tipificação.
 
 ## TDS-Dito 0.0.2
 

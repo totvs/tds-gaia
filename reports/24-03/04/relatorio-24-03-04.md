@@ -416,3 +416,74 @@ return.T.
 Comentário:
 
 O código retornado está correto, mas porquê exemplo _rest_?
+
+## API "typefy"
+
+### Variáveis
+
+Solicitado a tipificação de variáveis no bloco:
+
+```
+User Function TSay()
+ Local oDlg, oFont, oSay
+ local lista := {{1,2,3},{4,5,6,7}}
+// local map := { "a": { "n1": "v1" }}
+
+ DEFINE DIALOG oDlg TITLE "Exemplo TSay" FROM 180,180 TO 550,700 PIXEL
+...
+```
+
+![Tipificação](./images/typefy.png)
+
+Comentários:
+
+- Sugestões corretas
+- Foi processo a linha comentado. Faz sentido ou não?
+- Quem vai fazer a modificação do fonte para agregar a tipificação?
+  A extensão ou o IA.
+- É possível o IA retorna a posição (linha/coluna ou _offset_) onde encontra-se a definição da variável?
+
+### Parâmetros
+
+Solicitado a tipificação de variáveis no bloco:
+
+```
+User Function TSay(param)
+ Local oDlg, oFont, oSay
+ local lista := {{1,2,3},{4,5,6,7}}
+// local map := { "a": { "n1": "v1" }}
+
+ DEFINE DIALOG oDlg TITLE "Exemplo TSay" FROM 180,180 TO 550,700 PIXEL
+
+ if param == 3
+  conout("TSay")
+  conout(lista)
+  conout(map)
+ endif
+ ...
+```
+
+Comentários:
+
+- As variáveis foram tipificadas corretamente
+- O parâmetro não foi tipificado apesar de utilizado na função
+
+### Escopos diversos
+
+Solicitado a tipificação de variáveis no bloco:
+
+```
+User Function TSay(param)
+ Local oDlg, oFont, oSay
+ static varStatic := .t.
+ public varPublic := date()
+ private varPrivate := "varPrivate"
+
+ xxxx := "teste tipificação"
+...
+```
+
+Comentários:
+
+- Tipificações corretas nas variáveis declaradas
+- A `xxxx` foi ignorada, o que esta correto
