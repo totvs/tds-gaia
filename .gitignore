@@ -22,3 +22,4 @@ advpl_sources/.vscode/.advpl/_binary_class.prw
 advpl_sources/.vscode/.advpl/_binary_functions.prw
 *.log
 *.vsix
+build
