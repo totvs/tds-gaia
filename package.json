@@ -2,7 +2,7 @@
   "name": "tds-dito-vscode",
   "displayName": "TDS-Dito, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Dito will assist you in AdvPL programming",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "TOTVS",
   "preview": true,
   "author": {
@@ -106,6 +106,10 @@
           "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
         },
         {
+          "command": "tds-dito.clear",
+          "when": "webviewId == 'tds-dito-view'"
+        },
+        {
           "command": "tds-dito.typify",
           "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
         }
@@ -159,6 +163,12 @@
         "command": "tds-dito.explain",
         "title": "Explain source or function/method Code",
         "shortTitle": "Explain",
+        "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.clear",
+        "title": "Clear messages in chat",
+        "shortTitle": "Clear",
         "category": "TDS-Dito"
       },
       {
@@ -229,6 +239,16 @@
             "default": true,
             "description": "Displays banner when starting"
           },
+          "tds-dito.clearBeforeExplain": {
+            "type": "boolean",
+            "default": false,
+            "description": "Clear messages before explain"
+          },
+          "tds-dito.clearBeforeTypify": {
+            "type": "boolean",
+            "default": false,
+            "description": "Clear messages before typify"
+          },
           "tds-dito.logLevel": {
             "type": "string",
             "enum": [
@@ -278,91 +298,21 @@
             "default": "",
             "description": "When last user logged",
             "deprecationMessage": "For internal use. Don´t edit please."
-          },
-          "tds-dito.tokensToClear": {
-            "scope": "application",
-            "type": "array",
-            "default": [],
-            "description": "tokensToClear",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
-          },
-          "tds-dito.maxNewTokens": {
-            "scope": "application",
-            "type": "number",
-            "default": 128,
-            "description": "maxNewTokens",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
-          },
-          "tds-dito.temperature": {
-            "scope": "application",
-            "type": "number",
-            "default": 0.2,
-            "description": "temperature",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
-          },
-          "tds-dito.top_p": {
-            "scope": "application",
-            "type": "number",
-            "default": 0.95,
-            "description": "top_p",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
-          },
-          "tds-dito.top_k": {
-            "scope": "application",
-            "type": "number",
-            "default": 50,
-            "description": "top_p",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
-          },
-          "tds-dito.stop_sequence": {
-            "scope": "application",
-            "type": "array",
-            "default": [],
-            "description": "stop_sequence",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
-          },
-          "tds-dito.fillInTheMiddle": {
-            "scope": "application",
-            "type": "number",
-            "default": 1,
-            "description": "fillInTheMiddle",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
-          },
-          "tds-dito.contextWindow": {
-            "scope": "application",
-            "type": "number",
-            "default": 0,
-            "description": "contextWindow",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
-          },
-          "tds-dito.tlsSkipVerifyInsecure": {
-            "scope": "application",
-            "type": "boolean",
-            "default": false,
-            "description": "tlsSkipVerifyInsecure",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
-          },
-          "tds-dito.tokenizer": {
-            "scope": "application",
-            "type": "object",
-            "default": {},
-            "description": "tokenizer",
-            "deprecationMessage": "Used by HF API. Extension version 0.0.1"
           }
         }
       }
     ],
     "keybindings": [
       {
-        "key": "ctrl+d ctrl+l",
+        "key": "Ctrl+D Ctrl+L",
         "command": "tds-dito.login"
       },
       {
-        "key": "ctrl+d ctrl+b",
+        "key": "Ctrl+D Ctrl+B",
         "command": "tds-dito.logout"
       },
       {
-        "key": "ctrl+d ctrl+t",
+        "key": "Ctrl+D Ctrl+T",
         "command": "tds-dito.typify"
       },
       {
@@ -370,15 +320,19 @@
         "command": "editor.action.inlineSuggest.trigger"
       },
       {
-        "key": "ctrl+d ctrl+e",
+        "key": "Ctrl+D Ctrl+C",
+        "command": "tds-dito.clear"
+      },
+      {
+        "key": "Ctrl+D Ctrl+E",
         "command": "tds-dito.explain"
       },
       {
-        "key": "ctrl+d ctrl+g",
+        "key": "Ctrl+D Ctrl+G",
         "command": "tds-dito.generate-code"
       },
       {
-        "key": "ctrl+d ctrl+m",
+        "key": "Ctrl+D Ctrl+M",
         "command": "tds-dito.open-manual"
       }
     ]
@@ -394,6 +348,7 @@
     "watch:views": "cd webview-ui && npm run watch",
     "lint": "eslint src --ext ts",
     "--PUBLISH--": "",
+    "vscode:package": "vsce package",
     "vscode:prepublish": "npm run compile",
     "--TEST--": "",
     "pretest": "npm run compile && npm run lint",

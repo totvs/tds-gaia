@@ -11,6 +11,16 @@ export interface CompletionResponse {
     completions: Completion[],
 }
 
+interface Type {
+    var: string;
+    type: string;
+}
+
+export interface TypifyResponse {
+    request_id?: String,
+    types: Type[],
+}
+
 export interface IaApiInterface {
     start(token: string): Promise<boolean>;
     stop(): Promise<boolean>;
@@ -22,7 +32,7 @@ export interface IaApiInterface {
     generateCode(text: string): Promise<string[]>;
     getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse>
     explainCode(code: string): Promise<string>;
-    typify(code: string): Promise<string>;
+    typify(code: string): Promise<TypifyResponse>;
 }
 
 export class IaAbstractApi {

@@ -2,6 +2,8 @@
 
 User Function TSay()
 	Local oDlg, oFont, oSay
+	local lista := {{1,2,3},{4,5,6,7}}
+//	local map := { "a": { "n1": "v1" }}
 
 	DEFINE DIALOG oDlg TITLE "Exemplo TSay" FROM 180,180 TO 550,700 PIXEL
 

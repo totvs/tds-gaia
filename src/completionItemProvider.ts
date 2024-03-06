@@ -79,8 +79,7 @@ export function inlineCompletionItemProvider(context: vscode.ExtensionContext): 
 
                 console.error(e);
             }
-        },
-
+        }
     };
 
     return provider;

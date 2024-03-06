@@ -63,7 +63,9 @@ const userHome: string = process.env.USERPROFILE || process.env.HOME || process.
 const logDir: string = userHome + '/.tds-dito/logs';
 fse.ensureDirSync(logDir);
 const now: Date = new Date();
-const logSuffix: string = `${now.getFullYear()}-${(now.getMonth() + 1) < 10 ? "0" : ""}${now.getMonth() + 1}-${now.getDate()}`;
+const logSuffix: string = `${now.getFullYear()}-${(now.getMonth() + 1) < 10 ? "0" : ""}${now.getMonth() + 1}-${now.getDate()}` +
+    `-${now.toTimeString().substring(0, 5).replace(":", "_")}`;
+;
 const logFilename: string = `${logDir}/tds-dito-${logSuffix}.log`;
 
 if (fse.existsSync(logFilename)) {
@@ -78,7 +80,7 @@ const formatCause = (cause: any, prefix: string = "\t"): string => {
     if (cause.stack) {
         text += `${prefix}Stack: ${cause.stack.replace(/\t/g, prefix + "\t")}\n`;
     }
-    
+
     Object.keys(cause).forEach((key: string) => {
         if (key == "cause") {
             text += formatCause(cause.cause, prefix + "\t");

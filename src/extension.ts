@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
 import { TDitoConfig, getDitoConfiguration, getDitoLogLevel, isDitoLogged, isDitoShowBanner, setDitoReady, setDitoUser } from './config';
 import { inlineCompletionItemProvider } from './completionItemProvider';
-import { CompletionResponse, IaApiInterface } from './api/interfaceApi';
+import { CompletionResponse, IaApiInterface, TypifyResponse } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
 import { PREFIX_DITO, logger } from './logger';
 import { ChatViewProvider } from './panels/chatViewProvider';
@@ -17,6 +17,23 @@ export function activate(context: vscode.ExtensionContext) {
 	logger.info(
 		vscode.l10n.t('Congratulations, your extension "tds-dito" is now active!')
 	);
+
+	// Get the TS extension
+	const tsExtension = vscode.extensions.getExtension('TOTVS.tds-vscode');
+
+	if (!tsExtension) {
+		return;
+	}
+
+	// Get the API from the TS extension
+	//if (!tsExtension.exports || !tsExtension.exports.getAPI) {
+	//	return;
+	//}
+
+	// const api = tsExtension.exports.getAPI(0);
+	// if (!api) {
+	// 	return;
+	// }
 
 	completeCommandsMap(context.extension);
 
@@ -83,6 +100,11 @@ export function activate(context: vscode.ExtensionContext) {
 				const message: string = `Desculpe, estou com dificuldades técnicas. ${chatApi.commandText("health")}`;
 				chatApi.dito(message);
 				vscode.window.showErrorMessage(`${PREFIX_DITO} ${message}`);
+
+				if (error.message.includes("502: Bad Gateway")) {
+					const parts: string = error.message.split("\n");
+					chatApi.dito(parts[1]);
+				}
 			} else {
 				vscode.commands.executeCommand("tds-dito.login", [true]).then(() => {
 					chatApi.checkUser();
@@ -91,6 +113,11 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	});
 	context.subscriptions.push(detailHealth);
+
+	const clear = vscode.commands.registerCommand('tds-dito.clear', async () => {
+		chatApi.user("clear", true);
+	});
+	context.subscriptions.push(clear);
 
 	const openManual = vscode.commands.registerCommand('tds-dito.open-manual', async () => {
 		const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md";
@@ -121,12 +148,15 @@ export function activate(context: vscode.ExtensionContext) {
 				const curLineStart = new vscode.Position(curPos.line, 0);
 				const nextLineStart = new vscode.Position(curPos.line + 1, 0);
 				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
-				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
+				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine).trim();
 
 				codeToExplain = contentWithFirstCharOfNextLine.trim();
 			}
 
 			if (codeToExplain.length > 0) {
+				if (getDitoConfiguration().clearBeforeExplain) {
+					chatApi.dito("clear");
+				}
 				iaApi.explainCode(codeToExplain).then((value: string) => {
 					chatApi.dito(value);
 				});
@@ -144,6 +174,10 @@ export function activate(context: vscode.ExtensionContext) {
 		let codeToTypify: string = "";
 
 		if (editor !== undefined) {
+			if (getDitoConfiguration().clearBeforeExplain) {
+				chatApi.dito("clear");
+			}
+
 			const selection: vscode.Selection = editor.selection;
 			const function_re: RegExp = /(function|method(...)class)/i
 			const curPos: vscode.Position = selection.start;
@@ -192,16 +226,27 @@ export function activate(context: vscode.ExtensionContext) {
 				codeToTypify = editor.document.getText(rangeForTypify);
 			}
 
-			if (codeToTypify.length > 0) {
-				iaApi.typify(codeToTypify).then((value: string) => {
-					if (value.length == 0) {
-						chatApi.ditoInfo("Desculpe. Não consegui tipificar essa função.");
-					} else {
-						chatApi.dito(value);
+			try {
+				const response: TypifyResponse = await iaApi.typify(codeToTypify);
+				let text: string[] = [];
+
+				if (response !== undefined && response.types.length) {
+					for (const varType of response.types) {
+						text.push(`- **${varType.var}** as **${varType.type}** ${chatApi.commandText("update")}`);
 					}
-				});
-			} else {
-				chatApi.dito("Empty code to typify");
+
+					chatApi.dito(text);
+				}
+			} catch (e) {
+				const err_msg = (e as Error);
+
+				if (err_msg.message.includes("is currently loading")) {
+					vscode.window.showWarningMessage(err_msg.message);
+				} else if (err_msg.message !== "Canceled") {
+					vscode.window.showErrorMessage(err_msg.message);
+				}
+
+				console.error(e);
 			}
 		} else {
 			chatApi.dito("Editor undefined");

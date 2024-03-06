@@ -27,6 +27,9 @@ export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
 		registerField.onChange = props.onChange;
 	}
 
+	// value={value}
+	// onInput={e => fieldState.setValue(e.target.value)} />
+
 	return (
 		<section
 			className={`tds-field-container tds-text-field ${props.className ? props.className : ''}`}

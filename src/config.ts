@@ -20,6 +20,8 @@ export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
 //deve ser espelho do definido no package.json
 //outras configurações, de preferência não persistentes, devem ser efetuadas em TDitoCustomConfig
 export type TDitoConfig = {
+  clearBeforeExplain: boolean;
+  clearBeforeTypify: boolean;
   showBanner: boolean;
   logLevel: "off" | "error" | "warn" | "info" | "http" | "verbose" | "debug";
   endPoint: string;
@@ -42,17 +44,6 @@ export type TDitoConfig = {
   temperature: number;
   top_p: number;
   top_k: number;
-}
-
-const EMPTY_USER: LoggedUser = {
-  id: "",
-  email: "<not logged>",
-  name: "<not logged>",
-  fullname: "<not logged>",
-  displayName: "<not logged>",
-  avatarUrl: "",
-  expiration: undefined,
-  expiresAt: undefined,
 }
 
 export type TDitoCustomConfig = {

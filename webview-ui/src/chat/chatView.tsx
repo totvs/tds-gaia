@@ -3,7 +3,7 @@ import React from "react";
 import { Control, FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { CommonCommandFromPanelEnum, ReceiveMessage, sendSave } from "../utilities/common-command-webview";
 import { VSCodeButton, VSCodeLink, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
-import { TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
+import { IFormAction, TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
 import { sendExecute } from "./sendCommand";
 
 enum ReceiveCommandEnum {
@@ -33,15 +33,121 @@ type TFields = {
 }
 
 function HandleCommand(message: TMessageModel, action: TMessageActionModel) {
-  return (<VSCodeLink onClick={() => sendExecute(message.messageId, action.command)}>
+  return (<VSCodeLink onClick={() => {
+    (document.getElementsByName("newMessage")[0] as any).control.value = action.command;
+    sendExecute(message.messageId, action.command);
+  }}>
     {action.caption}
   </VSCodeLink>
   );
 }
 
-function HandleText(part: string) {
+const PARAGRAPH_RE = /\n\n/i
+const PHRASE_RE = /\n/i
 
-  return <span>{part}</span>
+type InlineTagName = "code" | "bold" | "italic" | "link";
+type BlockTagName = "code";
+
+//mapeamento parcial (somente as utilizadas) das marcações MD
+const mdTags: Record<InlineTagName, RegExp> = {
+  "code": /\`([^\\`]+)\`/g,
+  "bold": /\*\*([^\*\*]+)\*\*/g,
+  "italic": /_([^_])+_/g,
+  "link": /\[([^\].]+)\]\(([^\).]+)\)/g
+}
+
+const allTags_re = new RegExp(`(${mdTags.code.source})|(${mdTags.bold.source})|(${mdTags.italic.source})|(${mdTags.link.source})`, "ig");
+
+const tagsBlockMap: Record<BlockTagName, RegExp> = {
+  "code": /[\`\`\`|~~~]\w*(.*)[\`\`\`|~~~]/gis
+};
+
+let spanSeq: number = 0;
+
+function mdToHtml(text: string): any[] {
+  let children: any[] = [];
+  let parts: string[] | null = text.split(allTags_re);
+
+  for (let index = 0; index < parts.length; index++) {
+    const part: string = parts[index];
+
+    if (part) {
+      if (part.match(mdTags.bold)) {
+        index++;
+        children.push(<b key={spanSeq++}>{parts[index]}</b>);
+      } else if (part.match(mdTags.code)) {
+        index++;
+        children.push(<code key={spanSeq++}>{parts[index]}</code>);
+      } else if (part.match(mdTags.italic)) {
+        index++;
+        children.push(<i key={spanSeq++}>{parts[index]}</i>);
+      } else if (part.match(mdTags.link)) {
+        index++;
+        const caption: string = parts[index];
+        index++;
+        const link: string = parts[index];
+        const pos: number = link.indexOf(":");
+        if (pos > -1) {
+          children.push(<VSCodeLink key={spanSeq++} onClick={() => {
+            (document.getElementsByName("newMessage")[0] as any).control.value = caption;
+            sendExecute(0, link.substring(pos + 1));
+          }}>{caption}</VSCodeLink>);
+        } else {
+          children.push(<span key={spanSeq++}>{part}</span>);
+        }
+
+      } else {
+        children.push(<span key={spanSeq++}>{part}</span>);
+      }
+
+    }
+  }
+
+  if (children.length == 0) {
+    children.push(<span>{text}</span>);
+  }
+
+  return children;
+}
+
+function txtToHtml(text: string): any[] {
+  const children: any[] = [];
+  const blocks: string[] = [text]; //text.split(tagsBlockMap["code"]);
+
+  for (let index = 0; index < blocks.length; index++) {
+    const block: string = blocks[index];
+
+    // if (block.match(tagsBlockMap["code"])) {
+    //   children.push(<code>{block}</code>);
+    // } else {
+    const paragraphs: string[] = text.split(PARAGRAPH_RE);
+
+    paragraphs.forEach((paragraph: string) => {
+      const phrases: string[] = paragraph.split(PHRASE_RE);
+
+      phrases.forEach((phrase: string, index: number) => {
+        phrase = phrase.trim();
+        if (phrase.length > 0) {
+          //if (index == (phrases.length - 1)) {
+          if (phrases.length == 1) {
+            children.push(<p key={spanSeq++}>{mdToHtml(phrase)}</p>);
+          } else if (index > 0) {
+            children.push(mdToHtml(phrase));
+            children.push(<br key={spanSeq++} />);
+          } else {
+            children.push(<>{mdToHtml(phrase)}</>);
+          }
+        }
+      });
+    });
+  };
+
+  return children;
+}
+
+function HandleText(part: string): any[] {
+
+  return txtToHtml(part);
 }
 
 function ShowMessage(message: TMessageModel) {
@@ -50,19 +156,19 @@ function ShowMessage(message: TMessageModel) {
   if (message.actions?.length) {
     let text: string = message.message;
 
-    message.actions?.forEach((action) => {
-      const pos_s: number = text.indexOf("{command:");
-      const pos_e: number = text.indexOf("}", pos_s);
+    // message.actions?.forEach((action) => {
+    //   const pos_s: number = text.indexOf("{command:");
+    //   const pos_e: number = text.indexOf("}", pos_s);
 
-      if (pos_s > -1 && pos_e > -1) {
-        children.push(HandleText(text.substring(0, pos_s)));
-        children.push(HandleCommand(message, action));
-      } else {
-        children.push(HandleText(text));
-      }
+    //   if (pos_s > -1 && pos_e > -1) {
+    //     children.push(HandleText(text.substring(0, pos_s)));
+    //     children.push(HandleCommand(message, action));
+    //   } else {
+    //     children.push(HandleText(text));
+    //   }
 
-      text = text.substring(pos_e + 1);
-    });
+    //   text = text.substring(pos_e + 1);
+    // });
 
     if (text.length > 0) {
       children.push(HandleText(text));
@@ -72,7 +178,7 @@ function ShowMessage(message: TMessageModel) {
   }
 
   return (
-    <div className="tds-message">
+    <div className="tds-message" key={spanSeq++}>
       {...children}
     </div>
   )
@@ -85,9 +191,9 @@ function MessageRow(row: TMessageModel, index: number, control: Control<TFields,
 
   if (row.author.length > 0) {
     children.push(
-      <div className="tds-message-author">
+      <div className="tds-message-author" key={spanSeq++}>
         {row.inProcess && false && <VSCodeProgressRing />}
-        <span id="author">{author}</span><span id="timeStamp">{timeStamp}</span>
+        <span key={spanSeq++} id="author">{author}</span><span id="timeStamp">{timeStamp}</span>
       </div>
     )
   }
@@ -157,57 +263,17 @@ export default function ChatView() {
   }, []);
 
   const model: TFields = methods.getValues();
+  const actions: IFormAction[] = [];
+  actions.push({
+    id: 0,
+    caption: "Clear",
+    type: "link",
+    onClick: () => {
+      (document.getElementsByName("newMessage")[0] as any).control.value = "clear";
+      sendExecute(-1, "clear");
+    }
+  });
 
-  /*
-              <VSCodeDataGrid id="includeGrid" grid-template-columns="30px">
-                {model && model.includePaths.map((row: TIncludeData, index: number) => (
-                  <VSCodeDataGridRow key={index}>
-                    {row.path !== "" &&
-                      <>
-                        <VSCodeDataGridCell grid-column="1">
-                          <VSCodeButton appearance="icon"
-                            onClick={() => removeIncludePath(index)} >
-                            <span className="codicon codicon-close"></span>
-                          </VSCodeButton>
-                        </VSCodeDataGridCell>
-                        <VSCodeDataGridCell grid-column="2">
-                          <TdsSimpleTextField
-                            name={`includePaths.${index}.path`}
-                            readOnly={true}
-                          />
-                        </VSCodeDataGridCell>
-                      </>
-                    }
-                    {((row.path == "") && (index !== indexFirstPathFree)) &&
-                      <>
-                        <VSCodeDataGridCell grid-column="1">
-                          &nbsp;
-                        </VSCodeDataGridCell>
-                        <VSCodeDataGridCell grid-column="2">
-                          &nbsp;
-                        </VSCodeDataGridCell>
-                      </>
-                    }
-                    {(index === indexFirstPathFree) &&
-                      <>
-                        <VSCodeDataGridCell grid-column="1">
-                          &nbsp;
-                        </VSCodeDataGridCell>
-                        <VSCodeDataGridCell grid-column="2">
-                          <TdsSelectionFolderField
-                            name={`btnSelectFolder.${index}`}
-                            info={"Selecione uma pasta que contenha arquivos de definição"}
-                            title="Select folder with define files"
-                          />
-                        </VSCodeDataGridCell>
-                      </>
-                    }
-                  </VSCodeDataGridRow>
-                ))}
-              </VSCodeDataGrid>
-  */
-
-  // model.loggedUser
   return (
     <main>
       <section className="tds-chat">
@@ -220,10 +286,12 @@ export default function ChatView() {
               id="chatForm"
               onSubmit={onSubmit}
               methods={methods}
-              actions={[]}
+              actions={actions}
             >
+
               <section className="tds-row-container" >
-                <TdsTextField name="newMessage" label={""} />
+                <TdsTextField name="newMessage" label={model.loggedUser} />
+
                 <VSCodeButton
                   name="btnSend"
                   type="submit"

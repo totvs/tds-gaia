@@ -18,8 +18,11 @@ section.tds-chat section.tds-header {
 	/* align-items: flex-end; */
 }
 
-section.tds-chat section.tds-content {
+.tds-form .tds-form-content {
 	display: flex;
+}
+
+section.tds-chat section.tds-content {
 	flex-direction: column;
 	flex-grow: 1;
 	flex-shrink: 1;
@@ -44,7 +47,11 @@ section.tds-chat div.tds-message-row {
 }
 
 section.tds-chat div.tds-message-row+div.tds-message-row {
-	margin-bottom: calc(var(--type-ramp-minus2-line-height) / 2);
+	margin-top: 0.5em;
+}
+
+section.tds-chat div.tds-message-row+div.tds-message-row {
+	margin-bottom: 0.5em;
 }
 
 section.tds-chat div.tds-message-row div.tds-message-author {
@@ -64,6 +71,21 @@ section.tds-chat div.tds-message-row div.tds-message-author #timeStamp {
 	font-style: italic;
 }
 
-section.tds-chat div.tds-message-row div.tds-message {
+div.tds-message {
 	margin: 0;
+}
+
+div.tds-message+div.tds-message {
+	margin-top: 0.5em;
+}
+
+div.tds-message p {
+	margin-block-start: 0;
+	margin-block-end: 0;
+	line-height: calc(var(--tds-line-height) * 130%);
+}
+
+div.tds-message p+p {
+	margin-block-start: var(--tds-ver-spacing);
+	margin-block-end: 0;
 }

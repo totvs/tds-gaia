@@ -8,7 +8,7 @@
 	/* width: 100%; */
 	flex-direction: row;
 	align-items: flex-end;
-	margin-top: calc(var(--type-ramp-minus2-line-height)/2);
+	margin-top: calc(var(--tds-hor-spacing)/2);
 }
 
 .tds-footer .tds-footer-content {

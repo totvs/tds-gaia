@@ -1,3 +1,9 @@
+:root {
+	--tds-hor-spacing: var(--type-ramp-minus2-line-height);
+	--tds-ver-spacing: calc(var(--design-unit) * 3px);
+	--tds-line-height: var(--type-ramp-base-line-height);
+}
+
 main {
 	display: flex;
 	flex-direction: column;
