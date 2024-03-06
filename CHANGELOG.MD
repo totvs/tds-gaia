@@ -1,5 +1,12 @@
 # TDS-Dito, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
 
+## TDS-Dito 0.0.4
+
+### Melhorias
+
+- Melhoria na interface visual do bate-papo.
+- Tratamento de erros de requisição com o serviço de IA.
+
 ## TDS-Dito 0.0.3
 
 ### Melhorias

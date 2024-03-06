@@ -290,7 +290,7 @@ export default function ChatView() {
             >
 
               <section className="tds-row-container" >
-                <TdsTextField name="newMessage" label={model.loggedUser} />
+                <TdsTextField name="newMessage" label={""} />
 
                 <VSCodeButton
                   name="btnSend"
