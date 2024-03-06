@@ -244,7 +244,7 @@ export class ChatApi {
                 }
                 this.dito(`Para começar, preciso conhecer você. Favor identificar-se com o comando ${this.commandText('login')}.`);
             } else {
-                this.dito(`Olá, ${getDitoUser()?.displayName}. Estou pronto para ajudá-lo no que for possível!`);
+                this.dito(`Olá, **${getDitoUser()?.displayName}**. Estou pronto para ajudá-lo no que for possível!`);
             }
         } else {
             vscode.commands.executeCommand("tds-dito.health");

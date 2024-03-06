@@ -44,6 +44,9 @@ section.tds-chat div.tds-message-row {
 	display: flex;
 	flex-direction: column;
 	margin: 0;
+	border: 1px solid var(--vscode-editor-foreground);
+	border-radius: 3px;
+	padding: 3px;
 }
 
 section.tds-chat div.tds-message-row+div.tds-message-row {
