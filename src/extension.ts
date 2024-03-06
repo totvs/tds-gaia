@@ -56,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
 			});
 		}
 
-		if (args) {
+		if (args.length > 0) {
 			if (args[0]) { //indica que login foi acionado automaticamente
 				return;
 			}
@@ -89,10 +89,18 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(logout);
 
-	const detailHealth = vscode.commands.registerCommand('tds-dito.health', async () => {
+	const detailHealth = vscode.commands.registerCommand('tds-dito.health', async (...args) => {
+		let detail: boolean = true;
+
 		chatApi.dito("Verificando disponibilidade do serviço.");
 
-		iaApi.checkHealth(true).then((error: any) => {
+		if (args.length > 0) {
+			if (!args[0]) { //solicitando verificação sem  detalhes
+				detail = false;
+			}
+		}
+
+		iaApi.checkHealth(detail).then((error: any) => {
 			updateContextKey("readyForUse", error === undefined);
 			setDitoReady(error === undefined);
 
@@ -104,6 +112,10 @@ export function activate(context: vscode.ExtensionContext) {
 				if (error.message.includes("502: Bad Gateway")) {
 					const parts: string = error.message.split("\n");
 					chatApi.dito(parts[1]);
+				}
+
+				if (detail) {
+					chatApi.ditoInfo(JSON.stringify(error, undefined, 2));
 				}
 			} else {
 				vscode.commands.executeCommand("tds-dito.login", [true]).then(() => {
@@ -280,7 +292,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.registerWebviewViewProvider(ChatViewProvider.viewType, chat));
 
 	//aciona a verificação do serviço no ar e posterior login
-	vscode.commands.executeCommand("tds-dito.health");
+	vscode.commands.executeCommand("tds-dito.health", false);
 }
 
 export function deactivate() {

@@ -259,7 +259,7 @@ export class ChatApi {
                 inProcess: false,
                 messageId: this.messageId++,
                 timeStamp: new Date(),
-                author: getDitoUser()?.displayName || "<Not Logged",
+                author: getDitoUser()?.displayName || "<Not Logged>",
                 message: message == undefined ? "???" : message,
             });
 
