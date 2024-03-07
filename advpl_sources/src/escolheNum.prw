@@ -1,19 +1,16 @@
 #include "protheus.ch"
 
-#define ABC "xxxxxxx"
-
 user function escolheNum(replay, replayPath, numbers)
-	local n, cResp := "xxxxx", cMsg := ""
+	local n, cResp := "", cMsg := ""
 	local aOpcoes := {}
 	private cOpcao
 	private ondeEstou := "escolheNum"
 	public aPublic := {}
 
-	conout(ABC)
-	conout()
-
-	if replay == "true"
+	if replay == "true" .or. replay == "TRUE"
 		replay = .t.
+		numbers += "*"
+		
 		TDSReplay(.T. , {"*"}, {}, {"*"} , replayPath, 0 , .t. , "")
 	endif
 //
