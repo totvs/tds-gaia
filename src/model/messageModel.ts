@@ -1,4 +1,5 @@
 import { TAbstractModel } from "./abstractMode";
+import { Response } from 'undici';
 
 export type TMessageActionModel = {
     caption: string;
@@ -6,8 +7,9 @@ export type TMessageActionModel = {
 }
 
 export type TMessageModel = TAbstractModel & {
+    id: string;
+    answering: string;
     inProcess: boolean;
-    messageId: number;
     timeStamp: Date;
     author: string;
     message: string;

@@ -154,6 +154,7 @@ export const logger: winston.Logger = winston.createLogger({
 //
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
+        level: 'info',
         format: winston.format.combine(
             winston.format.colorize(),
             winston.format.splat(),
@@ -161,12 +162,8 @@ if (process.env.NODE_ENV !== 'production') {
             winston.format.label({ label: LABEL_DITO }),
             //winston.format.simple()
             winston.format.prettyPrint(),
-
         )
     }));
 }
 
 outputChannel.appendLine(`TDS-Dito logger initialized at ${new Date().toDateString()} and file writes in ${logDir}`);
-outputChannel.onDidChangeLogLevel((newLogLevel: vscode.LogLevel) => {
-    //    console.log(newLogLevel)
-})

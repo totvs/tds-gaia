@@ -2,12 +2,13 @@
 import * as vscode from 'vscode';
 import { CommonCommandFromWebViewEnum, CommonCommandToWebViewEnum, ReceiveMessage } from './utilities/common-command-panel';
 import { TChatModel } from '../model/chatModel';
-import { getWebviewContent } from './utilities/webview-utils';
+import { getExtraPanelConfigurations, getWebviewContent } from './utilities/webview-utils';
 import { TMessageModel } from '../model/messageModel';
 import { TFieldErrors } from '../model/abstractMode';
 import { chatApi } from '../extension';
 import { TQueueMessages } from '../api/chatApi';
 import { getDitoUser } from '../config';
+import { logger } from '../logger';
 
 enum ChatCommandEnum {
 
@@ -38,12 +39,13 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   ) {
 
     chatApi.onMessage((queueMessage: TQueueMessages) => {
+      logger.info(`ChatViewProvider.onMessage=> ${queueMessage.size()}`);
+
       while (queueMessage.size() > 0) {
         const message: TMessageModel = queueMessage.dequeue() as TMessageModel;
 
         if (message.message == "clear") {
           this.chatModel.messages = [];
-          this.sendUpdateModel(this.chatModel, undefined);
         }
 
         this.chatModel.messages.push(message);
@@ -54,11 +56,12 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this._view = webviewView;
 
-    webviewView.webview.options = {
-      // Allow scripts in the webview
-      enableScripts: true,
-      localResourceRoots: [this._extensionUri]
-    };
+    webviewView.webview.options = getExtraPanelConfigurations(this._extensionUri);
+    // {
+    //   // Allow scripts in the webview
+    //   enableScripts: true,
+    //   localResourceRoots: [this._extensionUri]
+    // };
 
     const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-dito-vscode');
     const extensionUri: vscode.Uri = ext!.extensionUri;
@@ -114,26 +117,33 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
   protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {
     let messagesToSend: TMessageModel[] = [];
+
     //model.loggedUser = getDitoUser()!.displayName || "<Not logged>";
     model.newMessage = "";
 
     if (this.chatModel.messages.length > 0) {
       let oldAuthor: string | undefined;
       let oldTimestamp: string | undefined;
-      const countMessages: number = this.chatModel.messages.length;
+
+      this.chatModel.messages.forEach((message: TMessageModel) => {
+        if (message.answering.length > 0) {
+          this.chatModel.messages.filter((answered: TMessageModel) => answered.id == message.answering)
+            .forEach((answered: TMessageModel) => {
+              answered.inProcess = false;
+            });
+        }
+      });
 
       this.chatModel.messages.forEach((message: TMessageModel) => {
         let formattedMessage: TMessageModel = { ...message };
 
-        if ((oldAuthor != formattedMessage.author) || (oldTimestamp != formattedMessage.timeStamp.toTimeString().substring(0, 5))) {
+        if ((oldAuthor != formattedMessage.author)
+          || (oldTimestamp != formattedMessage.timeStamp.toTimeString().substring(0, 5))
+          || (message.inProcess)) {
           oldAuthor = formattedMessage.author;
           oldTimestamp = formattedMessage.timeStamp.toTimeString().substring(0, 5);
         } else {
           formattedMessage.author = "";
-        }
-
-        if ((countMessages > 1) && formattedMessage.inProcess) {
-          message.inProcess = false;
         }
 
         messagesToSend.push(formattedMessage);
@@ -146,10 +156,6 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         model: { ...model, messages: messagesToSend },
         errors: errors
       }
-    });
-
-    this.chatModel.messages.forEach((message: TMessageModel, index: number) => {
-      message.inProcess = false;
     });
   }
 

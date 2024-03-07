@@ -59,6 +59,7 @@ type TDSFormProps<DataModel extends FieldValues> = {
 	methods: UseFormReturn<DataModel>;
 	actions?: IFormAction[];
 	children: any
+	isProcessRing?: boolean
 };
 
 export interface IFormAction {
@@ -154,9 +155,9 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 	let actions: IFormAction[] = props.actions ? props.actions : getDefaultActionsForm();
 
 	if (isSubmitting && (actions.length > 0)) {
-		isProcessRing = true;
+		isProcessRing = props.isProcessRing !== undefined ? props.isProcessRing : true;
 	} else if (!isValid) {
-		isProcessRing = false;
+		isProcessRing = props.isProcessRing !== undefined ? props.isProcessRing : false;
 	}
 
 	actions.forEach((action: IFormAction) => {

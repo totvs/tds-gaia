@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 					vscode.window.showErrorMessage(`${PREFIX_DITO} Login failure`);
 				}
 
-				chatApi.checkUser();
+				chatApi.checkUser("");
 			}
 		}
 	});
@@ -91,37 +91,38 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const detailHealth = vscode.commands.registerCommand('tds-dito.health', async (...args) => {
 		let detail: boolean = true;
+		const messageId = chatApi.dito("Verificando disponibilidade do serviço.");
 
-		chatApi.dito("Verificando disponibilidade do serviço.");
-
-		if (args.length > 0) {
-			if (!args[0]) { //solicitando verificação sem  detalhes
-				detail = false;
-			}
-		}
-
-		iaApi.checkHealth(detail).then((error: any) => {
-			updateContextKey("readyForUse", error === undefined);
-			setDitoReady(error === undefined);
-
-			if (error !== undefined) {
-				const message: string = `Desculpe, estou com dificuldades técnicas. ${chatApi.commandText("health")}`;
-				chatApi.dito(message);
-				vscode.window.showErrorMessage(`${PREFIX_DITO} ${message}`);
-
-				if (error.message.includes("502: Bad Gateway")) {
-					const parts: string = error.message.split("\n");
-					chatApi.dito(parts[1]);
+		return new Promise((resolve, reject) => {
+			if (args.length > 0) {
+				if (!args[0]) { //solicitando verificação sem  detalhes
+					detail = false;
 				}
-
-				if (detail) {
-					chatApi.ditoInfo(JSON.stringify(error, undefined, 2));
-				}
-			} else {
-				vscode.commands.executeCommand("tds-dito.login", [true]).then(() => {
-					chatApi.checkUser();
-				});
 			}
+
+			iaApi.checkHealth(detail).then((error: any) => {
+				updateContextKey("readyForUse", error === undefined);
+				setDitoReady(error === undefined);
+
+				if (error !== undefined) {
+					const message: string = `Desculpe, estou com dificuldades técnicas. ${chatApi.commandText("health")}`;
+					chatApi.dito(message, messageId);
+					vscode.window.showErrorMessage(`${PREFIX_DITO} ${message}`);
+
+					if (error.message.includes("502: Bad Gateway")) {
+						const parts: string = error.message.split("\n");
+						chatApi.ditoInfo(parts[1], messageId);
+					}
+
+					if (detail) {
+						chatApi.ditoInfo(JSON.stringify(error, undefined, 2), messageId);
+					}
+				} else {
+					vscode.commands.executeCommand("tds-dito.login", true).then(() => {
+						chatApi.checkUser(messageId);
+					});
+				}
+			})
 		});
 	});
 	context.subscriptions.push(detailHealth);
@@ -132,15 +133,20 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(clear);
 
 	const openManual = vscode.commands.registerCommand('tds-dito.open-manual', async () => {
+		const messageId: string = chatApi.dito("Abrindo manual do **TDS-Dito**.");
 		const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md";
-		vscode.env.openExternal(vscode.Uri.parse(url));
+
+		return vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
+			chatApi.dito("Manual do Dito aberto.", messageId);
+		}, (reason) => {
+			chatApi.dito("Não foi possível abrir manual do **TDS-Dito**.", messageId);
+			logger.error(reason);
+		});
 	});
 	context.subscriptions.push(openManual);
 
 	const generateCode = vscode.commands.registerTextEditorCommand('tds-dito.generate-code', () => {
 		const text: string = "Gerar código para varrer um array";
-		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.selection.active.lineText);
-		// hf.HuggingFaceApi.generateCode(vscode.window.activeTextEditor!.document.getText());
 		iaApi.generateCode(text);
 	});
 	context.subscriptions.push(generateCode);
@@ -151,10 +157,16 @@ export function activate(context: vscode.ExtensionContext) {
 
 		if (editor !== undefined) {
 			const selection: vscode.Selection = editor.selection;
+			let whatExplain: string = "";
 
 			if (selection && !selection.isEmpty) {
-				const selectionRange = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
+				const selectionRange: vscode.Range = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
 				codeToExplain = editor.document.getText(selectionRange);
+				if (selectionRange.isSingleLine) {
+					whatExplain = `linha ${selectionRange.start.line + 1}`;
+				} else {
+					whatExplain = `bloco ${selectionRange.start.line + 1}:${selectionRange.start.character + 1} : ${selectionRange.end.line + 1}:${selectionRange.end.character + 1}`;
+				}
 			} else {
 				const curPos: vscode.Position = selection.start;
 				const curLineStart = new vscode.Position(curPos.line, 0);
@@ -162,21 +174,34 @@ export function activate(context: vscode.ExtensionContext) {
 				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
 				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine).trim();
 
+				whatExplain = `linha ${curLineStart.line + 1}`;
+
 				codeToExplain = contentWithFirstCharOfNextLine.trim();
 			}
 
 			if (codeToExplain.length > 0) {
-				if (getDitoConfiguration().clearBeforeExplain) {
-					chatApi.dito("clear");
+				const workspaceFolder: vscode.WorkspaceFolder | undefined = vscode.workspace.getWorkspaceFolder(editor.document.uri);
+				let filename: string = editor.document.fileName;
+
+				if (workspaceFolder !== undefined) {
+					filename = filename.replace(workspaceFolder.uri.fsPath, "...");
 				}
-				iaApi.explainCode(codeToExplain).then((value: string) => {
-					chatApi.dito(value);
+
+				const messageId: string = chatApi.dito(
+					`Preparando explicação para o código em: \`\`${filename}, ${whatExplain}\`\`.`
+				);
+
+				return iaApi.explainCode(codeToExplain).then((value: string) => {
+					if (getDitoConfiguration().clearBeforeExplain) {
+						chatApi.dito("clear");
+					}
+					chatApi.dito(value, messageId);
 				});
 			} else {
-				chatApi.dito("Empty code to explain");
+				chatApi.dito("Não consegui identificar um código para explica-lo.");
 			}
 		} else {
-			chatApi.dito("Editor undefined");
+			chatApi.dito("Editor corrente não é valido para essa operação.");
 		}
 	});
 	context.subscriptions.push(explainCode);
@@ -191,10 +216,10 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			const selection: vscode.Selection = editor.selection;
-			const function_re: RegExp = /(function|method(...)class)/i
+			const function_re: RegExp = /(function|method(...)class)\s*(\w+)/i
 			const curPos: vscode.Position = selection.start;
+			let whatExplain: string = "";
 			let curLine = curPos.line;
-
 			let startFunction: vscode.Position | undefined = undefined;
 			let endFunction: vscode.Position | undefined = undefined;
 
@@ -221,9 +246,13 @@ export function activate(context: vscode.ExtensionContext) {
 				const nextLineStart = new vscode.Position(lineStart.line + 1, 0);
 				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
 				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
+				const matches = contentWithFirstCharOfNextLine.match(function_re);
 
-				if (contentWithFirstCharOfNextLine.match(function_re)) {
+				if (matches) {
 					endFunction = new vscode.Position(curLine, 0);
+					if (matches[3]) {
+						whatExplain = matches[3];
+					}
 				}
 
 				curLine++;
@@ -236,35 +265,42 @@ export function activate(context: vscode.ExtensionContext) {
 
 				const rangeForTypify = new vscode.Range(startFunction, endFunction);
 				codeToTypify = editor.document.getText(rangeForTypify);
-			}
 
-			try {
-				const response: TypifyResponse = await iaApi.typify(codeToTypify);
-				let text: string[] = [];
+				if (codeToTypify.length > 0) {
+					const workspaceFolder: vscode.WorkspaceFolder | undefined = vscode.workspace.getWorkspaceFolder(editor.document.uri);
+					let filename: string = editor.document.fileName;
+					whatExplain += `, bloco ${startFunction!.line + 1} : ${endFunction!.line + 1}`;
 
-				if (response !== undefined && response.types.length) {
-					for (const varType of response.types) {
-						text.push(`- **${varType.var}** as **${varType.type}** ${chatApi.commandText("update")}`);
+					if (workspaceFolder !== undefined) {
+						filename = filename.replace(workspaceFolder.uri.fsPath, "...");
 					}
 
-					chatApi.dito(text);
-				}
-			} catch (e) {
-				const err_msg = (e as Error);
+					const messageId: string = chatApi.dito(
+						`Analisando para tipificar o código em: \`\`${filename}, ${whatExplain}\`\`.`
+					);
 
-				if (err_msg.message.includes("is currently loading")) {
-					vscode.window.showWarningMessage(err_msg.message);
-				} else if (err_msg.message !== "Canceled") {
-					vscode.window.showErrorMessage(err_msg.message);
-				}
+					return iaApi.typify(codeToTypify).then((response: TypifyResponse) => {
+						let text: string[] = [];
 
-				console.error(e);
+						if (response !== undefined && response.types.length) {
+							for (const varType of response.types) {
+								text.push(`- **${varType.var}** as **${varType.type}** ${chatApi.commandText("update")}`);
+							}
+
+							chatApi.dito(text, messageId);
+						}
+					});
+				}
+			} else {
+				chatApi.dito([
+					"Não consegui identificar uma função/método para tipificar.",
+					"Experimente posicionar o cursor em outra linha da implementação."
+				]);
 			}
 		} else {
-			chatApi.dito("Editor undefined");
+			chatApi.dito("Editor corrente não é valido para essa operação.");
 		}
 	});
-
 	context.subscriptions.push(typify);
 
 	const provider: vscode.InlineCompletionItemProvider = inlineCompletionItemProvider(context);

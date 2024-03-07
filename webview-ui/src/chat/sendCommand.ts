@@ -1,7 +1,7 @@
 import { CommonCommandToPanelEnum, SendMessage } from "../utilities/common-command-webview";
 import { vscode } from "../utilities/vscodeWrapper";
 
-export function sendExecute(messageId: number, command: string) {
+export function sendExecute(messageId: string, command: string) {
 	vscode.postMessage({
 		command: CommonCommandToPanelEnum.Execute,
 		data: {

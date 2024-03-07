@@ -17,8 +17,9 @@ type TMessageActionModel = {
 }
 
 type TMessageModel = {
-  inProcess: boolean
-  messageId: number;
+  id: string;
+  answering: string;
+  inProcess: boolean;
   timeStamp: Date;
   author: string;
   message: string;
@@ -35,7 +36,7 @@ type TFields = {
 function HandleCommand(message: TMessageModel, action: TMessageActionModel) {
   return (<VSCodeLink onClick={() => {
     (document.getElementsByName("newMessage")[0] as any).control.value = action.command;
-    sendExecute(message.messageId, action.command);
+    sendExecute(message.id, action.command);
   }}>
     {action.caption}
   </VSCodeLink>
@@ -45,7 +46,7 @@ function HandleCommand(message: TMessageModel, action: TMessageActionModel) {
 const PARAGRAPH_RE = /\n\n/i
 const PHRASE_RE = /\n/i
 
-type InlineTagName = "code" | "bold" | "italic" | "link";
+type InlineTagName = "code" | "bold" | "italic" | "link" | "blockquote";
 type BlockTagName = "code";
 
 //mapeamento parcial (somente as utilizadas) das marcações MD
@@ -53,10 +54,11 @@ const mdTags: Record<InlineTagName, RegExp> = {
   "code": /\`([^\\`]+)\`/g,
   "bold": /\*\*([^\*\*]+)\*\*/g,
   "italic": /_([^_])+_/g,
-  "link": /\[([^\].]+)\]\(([^\).]+)\)/g
+  "link": /\[([^\].]+)\]\(([^\).]+)\)/g,
+  "blockquote": /^>/gs,
 }
 
-const allTags_re = new RegExp(`(${mdTags.code.source})|(${mdTags.bold.source})|(${mdTags.italic.source})|(${mdTags.link.source})`, "ig");
+const allTags_re = new RegExp(`(${mdTags.code.source})|(${mdTags.bold.source})|(${mdTags.italic.source})|(${mdTags.link.source})|(${mdTags.blockquote.source})`, "ig");
 
 const tagsBlockMap: Record<BlockTagName, RegExp> = {
   "code": /[\`\`\`|~~~]\w*(.*)[\`\`\`|~~~]/gis
@@ -90,12 +92,14 @@ function mdToHtml(text: string): any[] {
         if (pos > -1) {
           children.push(<VSCodeLink key={spanSeq++} onClick={() => {
             (document.getElementsByName("newMessage")[0] as any).control.value = caption;
-            sendExecute(0, link.substring(pos + 1));
+            sendExecute("", link.substring(pos + 1));
           }}>{caption}</VSCodeLink>);
         } else {
           children.push(<span key={spanSeq++}>{part}</span>);
         }
-
+      } else if (part.match(mdTags.blockquote)) {
+        index++;
+        children.push(<blockquote key={spanSeq++}>{parts[index]}</blockquote>);
       } else {
         children.push(<span key={spanSeq++}>{part}</span>);
       }
@@ -192,8 +196,9 @@ function MessageRow(row: TMessageModel, index: number, control: Control<TFields,
   if (row.author.length > 0) {
     children.push(
       <div className="tds-message-author" key={spanSeq++}>
-        {row.inProcess && false && <VSCodeProgressRing />}
-        <span key={spanSeq++} id="author">{author}</span><span id="timeStamp">{timeStamp}</span>
+        <span key={spanSeq++} id="author">{author}</span>
+        {row.inProcess && <span id="inProcess" key={spanSeq++}>Processing..</span>}
+        <span id="timeStamp">{timeStamp}</span>
       </div>
     )
   }
@@ -201,7 +206,7 @@ function MessageRow(row: TMessageModel, index: number, control: Control<TFields,
   children.push(ShowMessage(row));
 
   return (
-    <div key={row.messageId.toString()} className="tds-message-row">
+    <div key={row.id.toString()} className="tds-message-row">
       {...children}
     </div>
   )
@@ -270,7 +275,7 @@ export default function ChatView() {
     type: "link",
     onClick: () => {
       (document.getElementsByName("newMessage")[0] as any).control.value = "clear";
-      sendExecute(-1, "clear");
+      sendExecute("", "clear");
     }
   });
 
@@ -287,6 +292,7 @@ export default function ChatView() {
               onSubmit={onSubmit}
               methods={methods}
               actions={actions}
+              isProcessRing={false}
             >
 
               <section className="tds-row-container" >

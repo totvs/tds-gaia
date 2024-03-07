@@ -4,6 +4,7 @@ import { getDitoUser, isDitoFirstUse, isDitoLogged, isDitoReady } from "../confi
 import { Queue } from "../queue";
 import { TMessageActionModel, TMessageModel } from "../model/messageModel";
 import { exit } from "process";
+import { logger } from "../logger";
 
 export type TQueueMessages = Queue<TMessageModel>;
 
@@ -168,6 +169,10 @@ export class ChatApi {
     }
 
     protected sendMessage(message: TMessageModel): void {
+        if (!message.actions || message.actions.length == 0) {
+            message.actions = this.extractActions(message.message)
+        }
+
         this.queueMessages.enqueue(message);
 
         if (!this.messageGroup) {
@@ -175,43 +180,32 @@ export class ChatApi {
         }
     }
 
-    async dito(message: string | string[]): Promise<void> {
+    dito(message: string | string[], answeringId: string = ""): string {
+        let workMessage: string = typeof message == "string"
+            ? message
+            : message.join("\n");
 
-        if (typeof message == "string") {
-            this.sendMessage({
-                inProcess: true,
-                messageId: this.messageId++,
-                timeStamp: new Date(),
-                author: "Dito",
-                message: message,
-                actions: this.extractActions(message)
-            });
-        } else {
-            let workMessage: string = "";
-            message.forEach((m: string) => {
-                workMessage += `\n${m}`;
-            });
-            this.sendMessage({
-                inProcess: true,
-                messageId: this.messageId++,
-                timeStamp: new Date(),
-                author: "Dito",
-                message: workMessage,
-                actions: this.extractActions(workMessage)
-            });
-        }
-    }
-
-    async ditoInfo(message: string): Promise<void> {
+        //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
+        const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
 
         this.sendMessage({
-            inProcess: true,
-            messageId: this.messageId++,
+            id: id,
+            answering: answeringId,
+            inProcess: answeringId.length == 0,
             timeStamp: new Date(),
-            author: "Dito (info)",
-            message: message,
-            actions: this.extractActions(message)
+            author: "Dito",
+            message: workMessage
         });
+
+        return id;
+    }
+
+    ditoInfo(message: string | string[], answeringId: string): void {
+        let workMessage: string | string[] = typeof message == "string"
+            ? message
+            : message.map((line: string) => `> ${line}`);
+
+        this.dito(workMessage, answeringId);
     }
 
     private extractActions(message: string): TMessageActionModel[] {
@@ -236,15 +230,15 @@ export class ChatApi {
         return actions;
     }
 
-    checkUser() {
+    checkUser(answeringId: string) {
         if (isDitoReady()) {
             if (!isDitoLogged()) {
                 if (isDitoFirstUse()) {
-                    this.dito(`Parece que é a primeira vez que nos encontramos. Quer saber como interagir comigo? ${this.commandText("hint_1")}`);
+                    this.dito(`Parece que é a primeira vez que nos encontramos. Quer saber como interagir comigo? ${this.commandText("hint_1")}`, answeringId);
                 }
-                this.dito(`Para começar, preciso conhecer você. Favor identificar-se com o comando ${this.commandText('login')}.`);
+                this.dito(`Para começar, preciso conhecer você. Favor identificar-se com o comando ${this.commandText('login')}.`, answeringId);
             } else {
-                this.dito(`Olá, **${getDitoUser()?.displayName}**. Estou pronto para ajudá-lo no que for possível!`);
+                this.dito(`Olá, **${getDitoUser()?.displayName}**. Estou pronto para ajudá-lo no que for possível!`, answeringId);
             }
         } else {
             vscode.commands.executeCommand("tds-dito.health");
@@ -253,11 +247,15 @@ export class ChatApi {
 
     user(message: string, echo: boolean): void {
         if (echo) {
+            //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
+            const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
+
             this.beginMessageGroup();
 
             this.sendMessage({
+                id: id,
+                answering: "",
                 inProcess: false,
-                messageId: this.messageId++,
                 timeStamp: new Date(),
                 author: getDitoUser()?.displayName || "<Not Logged>",
                 message: message == undefined ? "???" : message,
@@ -340,8 +338,15 @@ function doHelp(chat: ChatApi, message: string): boolean {
                     `Para saber os comandos, digite ${chat.commandText("help")}.`
                 ]);
             } else if (matches[2].trim() == "hint_2") {
+                const messageId: string = chat.dito("Abrindo manual rápido do **TDS-Dito**.");
                 const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md#guia-ultra-r%C3%A1pido";
-                vscode.env.openExternal(vscode.Uri.parse(url));
+
+                vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
+                    chat.dito("Manual do Dito aberto.", messageId);
+                }, (reason) => {
+                    chat.dito("Não foi possível abrir manual rápido do **TDS-Dito**.", messageId);
+                    logger.error(reason);
+                });
             } else {
                 chat.dito(`AJUDA DO COMANDO ${matches[2]}.`);
             }
@@ -357,13 +362,11 @@ function doHelp(chat: ChatApi, message: string): boolean {
 }
 
 function doLogout(chat: ChatApi): boolean {
-    chat.beginMessageGroup();
-
-    chat.dito(`${getDitoUser()?.displayName}, até logo!`);
-    chat.dito("Obrigado por usar o Dito!");
-    chat.dito("Saindo...");
-
-    chat.endMessageGroup();
+    chat.dito([
+        `**${getDitoUser()?.displayName}**, até logo!`,
+        "Obrigado por trabalhar comigo!",
+        "Saindo..."
+    ]);
 
     return true;
 }

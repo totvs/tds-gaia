@@ -74,12 +74,20 @@
           "type": "webview",
           "id": "tds-dito-view",
           "name": "Dito: Chat",
-          "visibility": "collapsed",
-          "icon": "icons/tds-dito-24x24.png"
+          "visibility": "visible",
+          "icon": "icons/tds-dito.svg",
+          "contextualTitle": "Dito: Chat"
         }
       ]
     },
     "menus": {
+      "view/title": [
+        {
+          "command": "tds-dito.clear",
+          "when": "webviewId == 'tds-dito-view'",
+          "group": "navigation"
+        }
+      ],
       "webview/context": [
         {
           "command": "tds-dito.login",
