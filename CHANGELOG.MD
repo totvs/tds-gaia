@@ -1,5 +1,11 @@
 # TDS-Dito, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
 
+## TDS-Dito 0.0.NEXT
+
+### Melhorias
+
+- Indicação visual de processamento de mensagens enviadas para o serviço de IA.
+
 ## TDS-Dito 0.0.4
 
 ### Melhorias
