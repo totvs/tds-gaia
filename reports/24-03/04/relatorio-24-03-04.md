@@ -11,8 +11,6 @@
 - Presumindo respostas em formato MD, o correto para bloco é 3 apóstrofes( \`\`\`) ou til (~~~~) e não """.
 - Comentários que faço, partem da premissa que desejo uma resposta resumida (menos prolixa).
 
-## API ``explain``
-
 ### Uma linha
 
 Foi solicitado a explicação para o código:
@@ -190,7 +188,7 @@ Duplicidade de informação.
 
 Pela primeira vez, exibiu opções. De onde vieram? Vai fazer algo comum? Como tratar?
 
-```
+```code
 \"\"\"
 
  // Define variáveis de controle da tela
@@ -397,7 +395,7 @@ popipe
 
 Até onde sei, não é significa nada e o retorno foi exemplo de _rest_:
 
-```
+```code
 # include "tlpp-core.th"
 # include "tlpp-rest.th"
 
@@ -423,7 +421,7 @@ O código retornado está correto, mas porquê exemplo _rest_?
 
 Solicitado a tipificação de variáveis no bloco:
 
-```
+```code
 User Function TSay()
  Local oDlg, oFont, oSay
  local lista := {{1,2,3},{4,5,6,7}}
@@ -447,7 +445,7 @@ Comentários:
 
 Solicitado a tipificação de variáveis no bloco:
 
-```
+```code
 User Function TSay(param)
  Local oDlg, oFont, oSay
  local lista := {{1,2,3},{4,5,6,7}}
@@ -472,7 +470,7 @@ Comentários:
 
 Solicitado a tipificação de variáveis no bloco:
 
-```
+```code
 User Function TSay(param)
  Local oDlg, oFont, oSay
  static varStatic := .t.
