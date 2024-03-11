@@ -1,6 +1,6 @@
 # TDS-Dito, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
 
-## TDS-Dito 0.0.NEXT
+## TDS-Dito 0.0.5
 
 ### Melhorias
 
