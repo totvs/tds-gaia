@@ -133,7 +133,6 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
           case CommonCommandFromWebViewEnum.Ready:
             if (data.model == undefined) {
               this.sendUpdateModel(this.chatModel, undefined);
-              this.sendConfiguration()
             }
 
             break;
@@ -193,10 +192,6 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         }
       }
     );
-
-  }
-
-  protected _sendConfiguration(): void {
 
   }
 

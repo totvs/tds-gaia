@@ -18,7 +18,7 @@ import "./chatView.css";
 import React from "react";
 import { Control, FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { CommonCommandFromPanelEnum, ReceiveMessage, sendSave } from "../utilities/common-command-webview";
-import { VSCodeButton, VSCodeLink, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
+import { VSCodeButton, VSCodeLink } from "@vscode/webview-ui-toolkit/react";
 import { IFormAction, TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
 import { sendExecute, sendLinkMouseOver } from "./sendCommand";
 

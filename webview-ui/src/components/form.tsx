@@ -289,5 +289,5 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 // export { TdsSelectionFileField } from "./fields/selectionResourceField";
 // export { TdsSelectionFolderField } from "./fields/selectionResourceField";
 // export { TdsSimpleCheckBoxField } from "./fields/simpleCheckBoxField";
-// export { TdsTextField } from "./fields/textField";
+export { TdsTextField } from "./fields/textField";
 // export { TdsSimpleTextField } from "./fields/simpleTextField";
