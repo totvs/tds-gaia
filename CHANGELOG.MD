@@ -1,5 +1,21 @@
 # TDS-Dito, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
 
+## TDS-Dito 0.0.5
+
+### Melhorias
+
+- Indicação visual de processamento de mensagens enviadas para o serviço de IA.
+- Comando `Ctrl+D Ctrl+W`` para explicar a palavra corrente.
+- Melhoria na interface visual do bate-papo.
+- Adicionado ligação com evento `MouseOver`. Passar o _mouse_ sobre uma ligação de posição.
+
+## TDS-Dito 0.0.4
+
+### Melhorias
+
+- Melhoria na interface visual do bate-papo.
+- Tratamento de erros de requisição com o serviço de IA.
+
 ## TDS-Dito 0.0.3
 
 ### Melhorias

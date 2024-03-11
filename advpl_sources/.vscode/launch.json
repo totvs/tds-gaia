@@ -2,6 +2,21 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"type": "totvs_tdsreplay_debug",
+			"request": "launch",
+			"name": "TDS Replay",
+			"cwb": "",
+			"tdsReplayFile": "W:\\ws_tds_vscode\\tds-dito\\advpl_sources\\replaylocal.trplay",
+			"password": "",
+			"includeSources": "*",
+			"excludeSources": "",
+			"ignoreSourcesNotFound": false,
+			"selectedSources": [
+				"AP5TRANSLATE.PRW",
+				"TSSCONFIG.PRW"
+			]
+		},
+		{
 			"type": "totvs_language_debug",
 			"request": "launch",
 			"name": "TOTVS Language Debug",
@@ -18,47 +33,18 @@
 	],
 	"lastPrograms": [
 		{
-			"label": "u_dbgString"
-		},
-		{
-			"label": "u_TSTGRID"
-		},
-		{
-			"label": "u_dlgLogin"
-		},
-		{
-			"label": "u_consulta"
-		},
-		{
-			"label": "u_cadastro"
-		},
-		{
-			"label": "u_dwcadastro"
-		},
-		{
-			"label": "u_fwcadastro"
-		},
-		{
-			"label": "u_fwca01"
-		},
-		{
-			"label": "u_fwcad01"
-		},
-		{
-			"label": "u_fwcad02"
-		},
-		{
-			"label": "u_dbgString2"
-		},
-		{
-			"args": [],
-			"label": "tsay"
-		},
-		{
-			"args": [],
-			"label": "u_tsay"
+			"args": [
+				"true",
+				"W:\\ws_tds_vscode\\tds-dito\\advpl_sources\\replay.trplay",
+				"1234"
+			],
+			"label": "u_escolheNum"
 		}
 	],
-	"lastProgramExecuted": "u_tsay",
-	"lastProgramArguments": []
+	"lastProgramExecuted": "u_escolheNum",
+	"lastProgramArguments": [
+		"true",
+		"W:\\ws_tds_vscode\\tds-dito\\advpl_sources\\replay.trplay",
+		"1234"
+	]
 }

@@ -1,12 +1,37 @@
-import * as vscode from "vscode";
+/*
+Copyright 2024 TOTVS S.A
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import * as vscode from "vscode";
+import * as path from "path";
 import { getDitoUser, isDitoFirstUse, isDitoLogged, isDitoReady } from "../config";
 import { Queue } from "../queue";
 import { TMessageActionModel, TMessageModel } from "../model/messageModel";
 import { exit } from "process";
+import { logger } from "../logger";
 
+/**
+ * Defines the queue message type for chat messages.
+ * Includes the message content, sender, and metadata like timestamp.
+*/
 export type TQueueMessages = Queue<TMessageModel>;
 
+/**
+ * Regular expressions to match chat commands.
+ * 
+ */
 const HELP_RE = /^(help)(\s+(\w+))?$/i;
 const LOGOUT_RE = /^logout$/i;
 const LOGIN_RE = /^login$/i;
@@ -14,6 +39,7 @@ const MANUAL_RE = /^manual$/i;
 const HEALTH_RE = /^health$/i;
 const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
+const EXPLAIN_WORD_RE = /^explain\sword\s(source)?$/i;
 const TYPIFY_RE = /^typify\s(source)?$/i;
 const UPDATE_RE = /^update\s(source)?$/i;
 
@@ -22,6 +48,11 @@ const HINT_2_RE = /^(hint_2)$/i;
 
 const COMMAND_IN_MESSAGE = /\{command:([^\}]\w+)(\s+\b.*)?\}/i;
 
+/**
+ * Defines the shape of command objects used for chat command handling.
+ * Includes the command name, regex to match it, an optional ID, 
+ * optional caption and aliases, and an optional handler function.
+*/
 type TCommand = {
     command: string;
     regex: RegExp;
@@ -32,6 +63,10 @@ type TCommand = {
     process?: (chat: ChatApi, ...args: any[]) => boolean;
 }
 
+/**
+ * Defines a map of chat command objects used for handling chat commands.
+ * The keys are the primary command names.
+ */
 const commandsMap: Record<string, TCommand> = {
     "help": {
         caption: "Help",
@@ -90,6 +125,12 @@ const commandsMap: Record<string, TCommand> = {
         alias: ["ex", "e"],
         commandId: "tds-dito.explain",
     },
+    "explain-world": {
+        command: "explain-word",
+        regex: EXPLAIN_WORD_RE,
+        alias: ["ew"],
+        commandId: "tds-dito.explain-word",
+    },
     "typify": {
         command: "typify",
         regex: TYPIFY_RE,
@@ -104,6 +145,12 @@ const commandsMap: Record<string, TCommand> = {
     }
 };
 
+/**
+ * Completes the commands map by adding details like captions, keybindings etc. 
+ * from the extension's package.json.
+ * 
+ * @param extension - The VS Code extension object.
+ */
 export function completeCommandsMap(extension: vscode.Extension<any>) {
     const commands: any = extension.packageJSON.contributes.commands;
     const keybindings: any = extension.packageJSON.contributes.keybindings;
@@ -123,6 +170,12 @@ export function completeCommandsMap(extension: vscode.Extension<any>) {
     });
 }
 
+/**
+ * Provides methods for interacting with the chat API. 
+ * Allows sending messages, responding to user input, executing commands, etc.
+ * Maintains internal state like user login status, message history.
+ * Dispatches events for new messages.
+ */
 export class ChatApi {
     static getCommand(_command: string): TCommand | undefined {
         const commandId: string = _command.toLowerCase();
@@ -168,6 +221,10 @@ export class ChatApi {
     }
 
     protected sendMessage(message: TMessageModel): void {
+        if (!message.actions || message.actions.length == 0) {
+            message.actions = this.extractActions(message.message)
+        }
+
         this.queueMessages.enqueue(message);
 
         if (!this.messageGroup) {
@@ -175,43 +232,46 @@ export class ChatApi {
         }
     }
 
-    async dito(message: string | string[]): Promise<void> {
+    dito(message: string | string[], answeringId: string | undefined = undefined): string {
+        let workMessage: string = typeof message == "string"
+            ? message
+            : message.join("\n");
 
-        if (typeof message == "string") {
-            this.sendMessage({
-                inProcess: true,
-                messageId: this.messageId++,
-                timeStamp: new Date(),
-                author: "Dito",
-                message: message,
-                actions: this.extractActions(message)
-            });
-        } else {
-            let workMessage: string = "";
-            message.forEach((m: string) => {
-                workMessage += `\n${m}`;
-            });
-            this.sendMessage({
-                inProcess: true,
-                messageId: this.messageId++,
-                timeStamp: new Date(),
-                author: "Dito",
-                message: workMessage,
-                actions: this.extractActions(workMessage)
-            });
-        }
-    }
-
-    async ditoInfo(message: string): Promise<void> {
+        //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
+        const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
 
         this.sendMessage({
-            inProcess: true,
-            messageId: this.messageId++,
+            id: id,
+            answering: answeringId || "",
+            inProcess: (answeringId === undefined),
             timeStamp: new Date(),
-            author: "Dito (info)",
-            message: message,
-            actions: this.extractActions(message)
+            author: "Dito",
+            message: workMessage
         });
+
+        return id;
+    }
+
+    ditoInfo(message: string | string[]): void {
+        let workMessage: string | string[] = typeof message == "string"
+            ? message
+            : message.map((line: string) => `> ${line}`);
+
+        this.dito(workMessage, "");
+    }
+
+    ditoWarning(message: string | string[]): void {
+        let workMessage: string | string[] = typeof message == "string"
+            ? `[WARN] ${message}`
+            : message.map((line: string, index: number) => {
+                if (index == 0) {
+                    return `[WARN] ${line}`;
+                }
+
+                return line;
+            });
+
+        this.dito(workMessage, "");
     }
 
     private extractActions(message: string): TMessageActionModel[] {
@@ -225,7 +285,7 @@ export class ChatApi {
 
             if (command) {
                 actions.push({
-                    caption: command.caption || `<No caption>${command.command}`,
+                    caption: command.caption || `< No caption > ${command.command} `,
                     command: commandId
                 });
             }
@@ -236,15 +296,18 @@ export class ChatApi {
         return actions;
     }
 
-    checkUser() {
+    checkUser(answeringId: string) {
         if (isDitoReady()) {
             if (!isDitoLogged()) {
                 if (isDitoFirstUse()) {
-                    this.dito(`Parece que é a primeira vez que nos encontramos. Quer saber como interagir comigo? ${this.commandText("hint_1")}`);
+                    this.dito(`Parece que é a primeira vez que nos encontramos. Quer saber como interagir comigo? ${this.commandText("hint_1")} `, answeringId);
                 }
-                this.dito(`Para começar, preciso conhecer você. Favor identificar-se com o comando ${this.commandText('login')}.`);
+                this.dito(`Para começar, preciso conhecer você.Favor identifique-se  com o comando ${this.commandText('login')}.`, answeringId);
             } else {
-                this.dito(`Olá, ${getDitoUser()?.displayName}. Estou pronto para ajudá-lo no que for possível!`);
+                this.dito(
+                    `Olá, ** ${getDitoUser()?.displayName}**.\n\n` +
+                    `Estou pronto para ajudá-lo no que for possível!`
+                    , answeringId);
             }
         } else {
             vscode.commands.executeCommand("tds-dito.health");
@@ -253,11 +316,15 @@ export class ChatApi {
 
     user(message: string, echo: boolean): void {
         if (echo) {
+            //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
+            const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
+
             this.beginMessageGroup();
 
             this.sendMessage({
+                id: id,
+                answering: "",
                 inProcess: false,
-                messageId: this.messageId++,
                 timeStamp: new Date(),
                 author: getDitoUser()?.displayName || "<Not Logged>",
                 message: message == undefined ? "???" : message,
@@ -283,6 +350,7 @@ export class ChatApi {
         } else if (isDitoLogged()) {
             commands.push(`${this.commandText("logout")}`);
             commands.push(`${this.commandText("explain")}`);
+            commands.push(`${this.commandText("explain-word")}`);
             commands.push(`${this.commandText("typify")}`);
         } else {
             commands.push(`${this.commandText("login")}`);
@@ -295,10 +363,34 @@ export class ChatApi {
         const command: TCommand | undefined = ChatApi.getCommand(_command);
 
         if (command) {
-            return `[${command.caption}](command:${command.command}${args.length > 0 ? `&${args.join(";")}` : ""})${command.key ? " `" + command.key + "`" : ""}`;
+            return `[${command.caption}](command:${command.command}${args.length > 0 ? `&${args.join(";")}` : ""})${command.key ? " `" + command.key + "`" : ""} `;
         }
 
         return _command;
+    }
+
+    linkToSource(source: vscode.Uri, range: vscode.Range | number): string {
+        const workspaceFolder: vscode.WorkspaceFolder | undefined = vscode.workspace.getWorkspaceFolder(source);
+
+        if (workspaceFolder !== undefined) {
+            let filename: string = path.basename(source.fsPath)
+                .replace(workspaceFolder.uri.fsPath, "@")
+                .replace(/\\/g, "/");
+
+            let position: string = "";
+
+            if ((range instanceof vscode.Range)) {
+                const workRange: vscode.Range = (range as vscode.Range);
+                position = `${workRange.start.line + 1}:${workRange.start.character + 1}`;
+                position += `-${workRange.end.line + 1}:${workRange.end.character + 1}`;
+            } else {
+                position = `${(range as number) + 1}`;
+            }
+
+            return `[${filename}(${position})](link:${source.fsPath}&${position})`;
+        }
+
+        return `Workspace of \`${source.fsPath}\` not found.`;
     }
 
     private processMessage(message: string) {
@@ -314,14 +406,19 @@ export class ChatApi {
             if (processResult && command.commandId) {
                 vscode.commands.executeCommand(command.commandId);
             } else {
-                //this.dito(`Funcionalidade não implementada. Por favor, entre em contato com o desenvolvedor.`);
+                //this.dito(`Funcionalidade não implementada.Por favor, entre em contato com o desenvolvedor.`);
             }
         } else {
-            this.dito(`Não entendi. Você pode digitar ${this.commandText("help")} para ver os comandos disponíveis.`);
+            this.dito(`Não entendi.Você pode digitar ${this.commandText("help")} para ver os comandos disponíveis.`, "");
         }
     }
 }
 
+/**
+ * Processes a help command entered by the user. 
+ * Checks if a specific command was requested and provides help for it, 
+ * otherwise prints the list of available commands.
+*/
 function doHelp(chat: ChatApi, message: string): boolean {
     let matches = undefined;
     let result: boolean = false;
@@ -332,22 +429,31 @@ function doHelp(chat: ChatApi, message: string): boolean {
                 chat.dito([
                     "Para interagir comigo, você usará comandos que podem ser acionados por um desses modos:",
                     "- Um atalho;",
-                    "- Pelo painel de comandos(`Ctrl+Shit-P` ou `F1`), filtrando por \"TDS-Dito\";",
+                    "- Pelo painel de comandos(`Ctrl + Shit - P` ou `F1`), filtrando por \"TDS-Dito\";",
                     "- Por uma ligação apresentada nesse bate-papo;",
                     "- Digitando o comando no prompt abaixo;",
                     "- Menu de contexto do bate-papo ou fonte em edição.",
-                    `Se você possui familiaridade com o **VS-Code**, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, a ${chat.commandText("manual")} (será aberto no seu navegador padrão).`,
+                    `Se você possui familiaridade com o ** VS - Code **, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, a ${chat.commandText("manual")} (será aberto no seu navegador padrão).`,
                     `Para saber os comandos, digite ${chat.commandText("help")}.`
                 ]);
             } else if (matches[2].trim() == "hint_2") {
+                const messageId: string = chat.dito("Abrindo manual rápido do **TDS-Dito**.");
                 const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md#guia-ultra-r%C3%A1pido";
-                vscode.env.openExternal(vscode.Uri.parse(url));
+
+                vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
+                    chat.dito("Manual do Dito aberto.", messageId);
+                }, (reason) => {
+                    chat.dito("Não foi possível abrir manual rápido do **TDS-Dito**.", messageId);
+                    logger.error(reason);
+                });
             } else {
                 chat.dito(`AJUDA DO COMANDO ${matches[2]}.`);
             }
         } else {
-            chat.dito(`Os comandos disponíveis, no momento, são: ${chat.commandList()}.`);
-            chat.dito(`Se você possui familiaridade com o **VS-Code**, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, leia o ${chat.commandText("manual")} (será aberto no seu navegador padrão).`);
+            chat.dito([
+                `Os comandos disponíveis, no momento, são: ${chat.commandList()}.`,
+                `Se você possui familiaridade com o ** VS - Code **, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, leia o ${chat.commandText("manual")} (será aberto no seu navegador padrão).`
+            ], "");
         }
 
         result = true;
@@ -356,19 +462,24 @@ function doHelp(chat: ChatApi, message: string): boolean {
     return result;
 }
 
+/**
+ * Logs the user out by printing a logout message.
+ * 
+ * @returns Always returns true after printing the logout message.
+ */
 function doLogout(chat: ChatApi): boolean {
-    chat.beginMessageGroup();
-
-    chat.dito(`${getDitoUser()?.displayName}, até logo!`);
-    chat.dito("Obrigado por usar o Dito!");
-    chat.dito("Saindo...");
-
-    chat.endMessageGroup();
+    chat.dito([
+        `** ${getDitoUser()?.displayName}**, até logo!`,
+        "Obrigado por trabalhar comigo!",
+        "Saindo..."
+    ]);
 
     return true;
 }
 
+/**
+ * Clears the chat history.
+ */
 // function doClear(chat: ChatApi): any {
 //     chat.user("clear", true);
 // }
-

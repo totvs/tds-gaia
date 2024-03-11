@@ -1,10 +1,26 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import "./chatView.css";
 import React from "react";
 import { Control, FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { CommonCommandFromPanelEnum, ReceiveMessage, sendSave } from "../utilities/common-command-webview";
-import { VSCodeButton, VSCodeLink, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
+import { VSCodeButton, VSCodeLink } from "@vscode/webview-ui-toolkit/react";
 import { IFormAction, TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
-import { sendExecute } from "./sendCommand";
+import { sendExecute, sendLinkMouseOver } from "./sendCommand";
 
 enum ReceiveCommandEnum {
 }
@@ -17,8 +33,9 @@ type TMessageActionModel = {
 }
 
 type TMessageModel = {
-  inProcess: boolean
-  messageId: number;
+  id: string;
+  answering: string;
+  inProcess: boolean;
   timeStamp: Date;
   author: string;
   message: string;
@@ -32,31 +49,24 @@ type TFields = {
   messages: TMessageModel[];
 }
 
-function HandleCommand(message: TMessageModel, action: TMessageActionModel) {
-  return (<VSCodeLink onClick={() => {
-    (document.getElementsByName("newMessage")[0] as any).control.value = action.command;
-    sendExecute(message.messageId, action.command);
-  }}>
-    {action.caption}
-  </VSCodeLink>
-  );
-}
-
 const PARAGRAPH_RE = /\n\n/i
 const PHRASE_RE = /\n/i
+const LINK_COMMAND_RE = /\[([^\]]+)\]\(command:([^\)]+)\)/i
+const LINK_SOURCE_RE = /\[([^\]]+)\]\(link:([^\)]+)\)/i
 
-type InlineTagName = "code" | "bold" | "italic" | "link";
+type InlineTagName = "code" | "bold" | "italic" | "link" | "blockquote";
 type BlockTagName = "code";
 
 //mapeamento parcial (somente as utilizadas) das marcações MD
 const mdTags: Record<InlineTagName, RegExp> = {
-  "code": /\`([^\\`]+)\`/g,
+  "code": /\`([^\`]+)\`/g,
   "bold": /\*\*([^\*\*]+)\*\*/g,
   "italic": /_([^_])+_/g,
-  "link": /\[([^\].]+)\]\(([^\).]+)\)/g
+  "link": /\[([^\]]+)\]\(([^\)]+)\)/g,
+  "blockquote": /^>/gs,
 }
 
-const allTags_re = new RegExp(`(${mdTags.code.source})|(${mdTags.bold.source})|(${mdTags.italic.source})|(${mdTags.link.source})`, "ig");
+const allTags_re = new RegExp(`(${mdTags.code.source})|(${mdTags.bold.source})|(${mdTags.italic.source})|(${mdTags.link.source})|(${mdTags.blockquote.source})`, "ig");
 
 const tagsBlockMap: Record<BlockTagName, RegExp> = {
   "code": /[\`\`\`|~~~]\w*(.*)[\`\`\`|~~~]/gis
@@ -72,34 +82,54 @@ function mdToHtml(text: string): any[] {
     const part: string = parts[index];
 
     if (part) {
-      if (part.match(mdTags.bold)) {
-        index++;
-        children.push(<b key={spanSeq++}>{parts[index]}</b>);
-      } else if (part.match(mdTags.code)) {
+      //A ordem de teste deve ser:  Code, Link e demais tags (cuidado ao alterar)
+      if (part.match(mdTags.code)) {
         index++;
         children.push(<code key={spanSeq++}>{parts[index]}</code>);
-      } else if (part.match(mdTags.italic)) {
-        index++;
-        children.push(<i key={spanSeq++}>{parts[index]}</i>);
       } else if (part.match(mdTags.link)) {
         index++;
         const caption: string = parts[index];
         index++;
-        const link: string = parts[index];
-        const pos: number = link.indexOf(":");
-        if (pos > -1) {
-          children.push(<VSCodeLink key={spanSeq++} onClick={() => {
-            (document.getElementsByName("newMessage")[0] as any).control.value = caption;
-            sendExecute(0, link.substring(pos + 1));
-          }}>{caption}</VSCodeLink>);
+        const link: string = part;
+        let matchesLink: any;  //RegExpMatchArray | null;
+        if (matchesLink = link.match(LINK_COMMAND_RE)) {
+          children.push(
+            <VSCodeLink key={spanSeq++}
+              onClick={() => {
+                (document.getElementsByName("newMessage")[0] as any).control.value = caption;
+                sendExecute(matchesLink!.input);
+              }
+              }>{matchesLink[1]}
+            </VSCodeLink>);
+        } else if (matchesLink = link.match(LINK_SOURCE_RE)) {
+          children.push(
+            <span key={spanSeq++}
+              onMouseOver={(e) => {
+                sendLinkMouseOver(matchesLink!.input);
+              }}>
+              <VSCodeLink key={spanSeq++}
+                onClick={() => {
+                  (document.getElementsByName("newMessage")[0] as any).control.value = caption;
+                  sendExecute(matchesLink!.input);
+                }
+                }>{matchesLink[1]}
+              </VSCodeLink>
+            </span>);
         } else {
           children.push(<span key={spanSeq++}>{part}</span>);
         }
-
+      } else if (part.match(mdTags.bold)) {
+        index++;
+        children.push(<b key={spanSeq++}>{parts[index]}</b>);
+      } else if (part.match(mdTags.italic)) {
+        index++;
+        children.push(<i key={spanSeq++}>{parts[index]}</i>);
+      } else if (part.match(mdTags.blockquote)) {
+        index++;
+        children.push(<blockquote key={spanSeq++}>{parts[index]}</blockquote>);
       } else {
         children.push(<span key={spanSeq++}>{part}</span>);
       }
-
     }
   }
 
@@ -110,7 +140,7 @@ function mdToHtml(text: string): any[] {
   return children;
 }
 
-function txtToHtml(text: string): any[] {
+function mdTextToHtml(text: string): any[] {
   const children: any[] = [];
   const blocks: string[] = [text]; //text.split(tagsBlockMap["code"]);
 
@@ -145,37 +175,8 @@ function txtToHtml(text: string): any[] {
   return children;
 }
 
-function HandleText(part: string): any[] {
-
-  return txtToHtml(part);
-}
-
 function ShowMessage(message: TMessageModel) {
-  let children: any[] = [];
-
-  if (message.actions?.length) {
-    let text: string = message.message;
-
-    // message.actions?.forEach((action) => {
-    //   const pos_s: number = text.indexOf("{command:");
-    //   const pos_e: number = text.indexOf("}", pos_s);
-
-    //   if (pos_s > -1 && pos_e > -1) {
-    //     children.push(HandleText(text.substring(0, pos_s)));
-    //     children.push(HandleCommand(message, action));
-    //   } else {
-    //     children.push(HandleText(text));
-    //   }
-
-    //   text = text.substring(pos_e + 1);
-    // });
-
-    if (text.length > 0) {
-      children.push(HandleText(text));
-    }
-  } else {
-    children.push(HandleText(message.message));
-  }
+  let children: any[] = mdTextToHtml(message.message);
 
   return (
     <div className="tds-message" key={spanSeq++}>
@@ -192,8 +193,9 @@ function MessageRow(row: TMessageModel, index: number, control: Control<TFields,
   if (row.author.length > 0) {
     children.push(
       <div className="tds-message-author" key={spanSeq++}>
-        {row.inProcess && false && <VSCodeProgressRing />}
-        <span key={spanSeq++} id="author">{author}</span><span id="timeStamp">{timeStamp}</span>
+        <span key={spanSeq++} id="author">{author}</span>
+        {row.inProcess && <span id="inProcess" key={spanSeq++}>Processing..</span>}
+        <span id="timeStamp">{timeStamp}</span>
       </div>
     )
   }
@@ -201,12 +203,19 @@ function MessageRow(row: TMessageModel, index: number, control: Control<TFields,
   children.push(ShowMessage(row));
 
   return (
-    <div key={row.messageId.toString()} className="tds-message-row">
+    <div key={row.id.toString()} className="tds-message-row">
       {...children}
     </div>
   )
 }
 
+/**
+ * ChatView renders the chat interface. 
+ * 
+ * It uses React hooks to manage form state and field arrays. 
+ * Handles receiving updates from the panel via postMessage.
+ * Renders messages, form, and buttons.
+ */
 export default function ChatView() {
   const methods = useForm<TFields>({
     defaultValues: {
@@ -243,11 +252,6 @@ export default function ChatView() {
           setErrorModel(methods.setError, errors);
 
           break;
-        // case CommonCommandFromPanelEnum.Configuration,
-        //   const model: TFields = command.data.commandsMap;
-        //     commandsMap: ChatApi.getCommandsMap()
-        //}
-        //});
 
         default:
           console.error("Unknown command received: " + command.command);
@@ -270,7 +274,7 @@ export default function ChatView() {
     type: "link",
     onClick: () => {
       (document.getElementsByName("newMessage")[0] as any).control.value = "clear";
-      sendExecute(-1, "clear");
+      sendExecute("clear");
     }
   });
 
@@ -287,10 +291,11 @@ export default function ChatView() {
               onSubmit={onSubmit}
               methods={methods}
               actions={actions}
+              isProcessRing={false}
             >
 
               <section className="tds-row-container" >
-                <TdsTextField name="newMessage" label={model.loggedUser} />
+                <TdsTextField name="newMessage" label={""} />
 
                 <VSCodeButton
                   name="btnSend"

@@ -1,12 +1,34 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import { ButtonAppearance } from "@vscode/webview-ui-toolkit";
 import "./form.css";
 import { ChangeHandler, FieldValues, FormState, RegisterOptions, UseFormReturn, UseFormSetError, UseFormSetValue, useFormContext } from "react-hook-form";
 import { VSCodeButton, VSCodeLink, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
 import { sendClose, sendReset } from "../utilities/common-command-webview";
-import { Children } from 'react';
 import React from "react";
-import { sendExecute } from "../chat/sendCommand";
 
+/**
+ * Returns the default set of actions for the form.
+ * 
+ * The default actions include:
+ * - Save: Submits the form and closes the page. Enabled when form is dirty and valid.
+ * - Close: Closes the page without saving. 
+ * - Clear: Resets the form fields. Initially hidden.
+ */
 export function getDefaultActionsForm(): IFormAction[] {
 	return [
 		{
@@ -59,8 +81,13 @@ type TDSFormProps<DataModel extends FieldValues> = {
 	methods: UseFormReturn<DataModel>;
 	actions?: IFormAction[];
 	children: any
+	isProcessRing?: boolean
 };
 
+/**
+ * Interface for form action buttons. 
+ * Defines the shape of action button configs used in TDS forms.
+*/
 export interface IFormAction {
 	id: number;
 	caption: string;
@@ -73,6 +100,10 @@ export interface IFormAction {
 	appearance?: ButtonAppearance;
 }
 
+/**
+ * Interface for form field components.
+ * Defines the props shape for form fields.
+ */
 export type TdsFieldProps = {
 	name: string;
 	label: string;
@@ -146,6 +177,14 @@ export function setErrorModel<DataModel extends FieldValues>(setError: UseFormSe
  */
 let isProcessRing: boolean = false;
 
+/**
+ * Renders a form component with state management and actions.
+ * 
+ * Accepts a generic DataModel for the form values and errors.
+ * Provides form state values and common form handling methods.
+ * Renders form content, messages, and action buttons.
+ * Handles submit and reset events.
+ */
 export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataModel>): JSX.Element {
 	const {
 		formState: { errors, isDirty, isValid, isSubmitting },
@@ -154,9 +193,9 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 	let actions: IFormAction[] = props.actions ? props.actions : getDefaultActionsForm();
 
 	if (isSubmitting && (actions.length > 0)) {
-		isProcessRing = true;
+		isProcessRing = props.isProcessRing !== undefined ? props.isProcessRing : true;
 	} else if (!isValid) {
-		isProcessRing = false;
+		isProcessRing = props.isProcessRing !== undefined ? props.isProcessRing : false;
 	}
 
 	actions.forEach((action: IFormAction) => {
@@ -243,12 +282,12 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 	);
 }
 
-export { TdsCheckBoxField } from "./fields/checkBoxField";
-export { TdsLabelField } from "./fields/labelField";
-export { TdsNumericField } from "./fields/numericField";
-export { TdsSelectionField } from "./fields/selectionField";
-export { TdsSelectionFileField } from "./fields/selectionResourceField";
-export { TdsSelectionFolderField } from "./fields/selectionResourceField";
-export { TdsSimpleCheckBoxField } from "./fields/simpleCheckBoxField";
+// export { TdsCheckBoxField } from "./fields/checkBoxField";
+// export { TdsLabelField } from "./fields/labelField";
+// export { TdsNumericField } from "./fields/numericField";
+// export { TdsSelectionField } from "./fields/selectionField";
+// export { TdsSelectionFileField } from "./fields/selectionResourceField";
+// export { TdsSelectionFolderField } from "./fields/selectionResourceField";
+// export { TdsSimpleCheckBoxField } from "./fields/simpleCheckBoxField";
 export { TdsTextField } from "./fields/textField";
-export { TdsSimpleTextField } from "./fields/simpleTextField";
+// export { TdsSimpleTextField } from "./fields/simpleTextField";

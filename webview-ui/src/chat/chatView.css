@@ -1,6 +1,18 @@
-[name="serverType"] {
-	width: 20rem;
-}
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 section.tds-chat {
 	display: flex;
@@ -44,6 +56,9 @@ section.tds-chat div.tds-message-row {
 	display: flex;
 	flex-direction: column;
 	margin: 0;
+	border: 1px solid var(--vscode-editor-foreground);
+	border-radius: 3px;
+	padding: 3px;
 }
 
 section.tds-chat div.tds-message-row+div.tds-message-row {
@@ -58,13 +73,16 @@ section.tds-chat div.tds-message-row div.tds-message-author {
 	display: flex;
 }
 
-section.tds-chat div.tds-message-row div.tds-message-author vscode-progress-ring {
-	height: 1.2rem;
-}
-
 section.tds-chat div.tds-message-row div.tds-message-author #author {
 	font-weight: bold;
 	flex-grow: 1;
+}
+
+section.tds-chat div.tds-message-row div.tds-message-author #inProcess {
+	font-style: italic;
+	font-size: 80%;
+	flex-grow: 3;
+	align-self: baseline ;
 }
 
 section.tds-chat div.tds-message-row div.tds-message-author #timeStamp {

@@ -1,3 +1,19 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from 'vscode';
 import * as fse from 'fs-extra';
 import winston = require('winston');
@@ -8,6 +24,10 @@ const outputChannel: vscode.LogOutputChannel = vscode.window.createOutputChannel
 export const PREFIX_DITO = "[TDS-Dito]: ";
 const LABEL_DITO = "tds-dito";
 
+/**
+ * Custom Winston transport that logs messages to the extension's output channel. 
+ * Handles log levels and formats messages appropriately.
+ */
 class OutputChannelTransport extends Transport {
     constructor(opts: any) {
         super(opts);
@@ -113,6 +133,12 @@ const myFormat = winston.format.printf((info: winston.Logform.TransformableInfo)
     return text;
 });
 
+/**
+ * Creates a Winston logger instance with the provided configuration.
+ * 
+ * Configures the log level, format, default metadata, and transport streams.
+ * The logger will log to the console and to a dated log file.
+ */
 export const logger: winston.Logger = winston.createLogger({
     level: getDitoLogLevel(),
     format: winston.format.combine(
@@ -154,6 +180,7 @@ export const logger: winston.Logger = winston.createLogger({
 //
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
+        level: 'info',
         format: winston.format.combine(
             winston.format.colorize(),
             winston.format.splat(),
@@ -161,12 +188,8 @@ if (process.env.NODE_ENV !== 'production') {
             winston.format.label({ label: LABEL_DITO }),
             //winston.format.simple()
             winston.format.prettyPrint(),
-
         )
     }));
 }
 
 outputChannel.appendLine(`TDS-Dito logger initialized at ${new Date().toDateString()} and file writes in ${logDir}`);
-outputChannel.onDidChangeLogLevel((newLogLevel: vscode.LogLevel) => {
-    //    console.log(newLogLevel)
-})

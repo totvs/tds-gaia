@@ -2,7 +2,7 @@
   "name": "tds-dito-vscode",
   "displayName": "TDS-Dito, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Dito will assist you in AdvPL programming",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "publisher": "TOTVS",
   "preview": true,
   "author": {
@@ -74,12 +74,20 @@
           "type": "webview",
           "id": "tds-dito-view",
           "name": "Dito: Chat",
-          "visibility": "collapsed",
-          "icon": "icons/tds-dito-24x24.png"
+          "visibility": "visible",
+          "icon": "icons/tds-dito.svg",
+          "contextualTitle": "Dito: Chat"
         }
       ]
     },
     "menus": {
+      "view/title": [
+        {
+          "command": "tds-dito.clear",
+          "when": "webviewId == 'tds-dito-view'",
+          "group": "navigation"
+        }
+      ],
       "webview/context": [
         {
           "command": "tds-dito.login",
@@ -103,6 +111,10 @@
         },
         {
           "command": "tds-dito.explain",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        },
+        {
+          "command": "tds-dito.explain-word",
           "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
         },
         {
@@ -163,6 +175,11 @@
         "command": "tds-dito.explain",
         "title": "Explain source or function/method Code",
         "shortTitle": "Explain",
+        "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.explain-word",
+        "title": "Explain word",
         "category": "TDS-Dito"
       },
       {
@@ -326,6 +343,10 @@
       {
         "key": "Ctrl+D Ctrl+E",
         "command": "tds-dito.explain"
+      },
+      {
+        "key": "Ctrl+D Ctrl+W",
+        "command": "tds-dito.explain-word"
       },
       {
         "key": "Ctrl+D Ctrl+G",

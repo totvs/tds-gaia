@@ -1,19 +1,16 @@
 #include "protheus.ch"
 
-#define ABC "xxxxxxx"
-
 user function escolheNum(replay, replayPath, numbers)
-	local n, cResp := "xxxxx", cMsg := ""
+	local n, cResp := "", cMsg := ""
 	local aOpcoes := {}
 	private cOpcao
 	private ondeEstou := "escolheNum"
 	public aPublic := {}
 
-	conout(ABC)
-	conout()
-
-	if replay == "true"
+	if replay == "true" .or. replay == "TRUE"
 		replay = .t.
+		numbers += "*"
+
 		TDSReplay(.T. , {"*"}, {}, {"*"} , replayPath, 0 , .t. , "")
 	endif
 //
@@ -107,3 +104,15 @@ static function tela(aaOpcoes)
 //oDlg:Activate()
 
 Return cOpcao
+
+
+static Function TAF012()
+	Local oBrowse := Nil
+
+	Private cCadastro := STR0001 //"Cadastro de Eventos R-4030"
+	oBrowse := FWMBrowse():New()
+	oBrowse:SetAlias("C8E")
+	oBrowse:SetDescription(STR0002) //"Eventos R-4030"
+	
+	oBrowse:Activate()
+Return Ni

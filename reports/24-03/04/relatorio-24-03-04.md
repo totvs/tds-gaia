@@ -11,8 +11,6 @@
 - Presumindo respostas em formato MD, o correto para bloco é 3 apóstrofes( \`\`\`) ou til (~~~~) e não """.
 - Comentários que faço, partem da premissa que desejo uma resposta resumida (menos prolixa).
 
-## API ``explain``
-
 ### Uma linha
 
 Foi solicitado a explicação para o código:
@@ -190,7 +188,7 @@ Duplicidade de informação.
 
 Pela primeira vez, exibiu opções. De onde vieram? Vai fazer algo comum? Como tratar?
 
-```
+```code
 \"\"\"
 
  // Define variáveis de controle da tela
@@ -397,7 +395,7 @@ popipe
 
 Até onde sei, não é significa nada e o retorno foi exemplo de _rest_:
 
-```
+```code
 # include "tlpp-core.th"
 # include "tlpp-rest.th"
 
@@ -423,7 +421,7 @@ O código retornado está correto, mas porquê exemplo _rest_?
 
 Solicitado a tipificação de variáveis no bloco:
 
-```
+```code
 User Function TSay()
  Local oDlg, oFont, oSay
  local lista := {{1,2,3},{4,5,6,7}}
@@ -447,7 +445,7 @@ Comentários:
 
 Solicitado a tipificação de variáveis no bloco:
 
-```
+```code
 User Function TSay(param)
  Local oDlg, oFont, oSay
  local lista := {{1,2,3},{4,5,6,7}}
@@ -472,7 +470,7 @@ Comentários:
 
 Solicitado a tipificação de variáveis no bloco:
 
-```
+```code
 User Function TSay(param)
  Local oDlg, oFont, oSay
  static varStatic := .t.
@@ -487,3 +485,33 @@ Comentários:
 
 - Tipificações corretas nas variáveis declaradas
 - A `xxxx` foi ignorada, o que esta correto
+
+## API "explain"
+
+### Código não AdvPL
+
+Solicitado a explicação do bloco não AdvPL:
+
+```code
+2024-03-06 11:18:11.556 [info] TDS-Dito logger initialized at Wed Mar 06 2024 and file writes in C:\\Users\\acandido/.tds-dito/> logs
+```
+
+Resposta:
+
+> The date and time on your system was set to Wed Mar 06 2024 11:18:11.556.
+> The log files will be created under C:\\Users\\acandido/.tds-dito/logs.
+>
+> The following code was provided for explanation:
+>
+> 2024-03-06 11:18:11.556 [info] TDS-Dito logger initialized at Wed Mar 06 2024 and file writes in C:\\Users\\acandido/.tds-dito/> logs
+>
+> It seems like you're trying to use an advanced programming language (ADVPL). I'm sorry but this program can't handle it yet. > Please try another language or write me if you want support for it.
+>
+> If you think there's something wrong with my code, please let me know by opening an issue on GitHub.
+>
+> Have a nice day!
+
+Comentários:
+
+- Explicação de acordo com o bloco enviado e até mesmo inesperado.
+- Em situações semelhantes a ``...issue on GitHub.``, que remetem a uma ligação, se puder vir com marcação, posso tratar e colocar a ligação correta. Por exemplo: ``..[issue on GitHub.](<qualquer coisa ou mesmo vazio)``.

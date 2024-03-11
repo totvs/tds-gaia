@@ -1,26 +1,68 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import { logger } from "../logger";
 
 let execBeginTime: Date;
 
+/**
+ * Interface for completion response from autocomplete API.
+ */
 interface Completion {
     generated_text: string;
 }
 
+/**
+ * Interface for completion response from autocomplete API.
+ * Contains request ID and array of Completion objects.
+ */
 export interface CompletionResponse {
     request_id?: String,
     completions: Completion[],
 }
 
+/**
+ * Interface defining the shape of type information.
+ * Contains a type name and variable name.
+ */
 interface Type {
     var: string;
     type: string;
 }
 
+/**
+ * Interface defining the shape of typify response. 
+ * Contains request ID and array of Type objects.
+ */
 export interface TypifyResponse {
     request_id?: String,
     types: Type[],
 }
 
+/**
+ * Interface defining the API for the AI assistant.
+ * 
+ * Contains methods for:
+ * - Starting and stopping the assistant
+ * - Checking assistant health
+ * - User login/logout
+ * - Code generation and completion
+ * - Explaining code
+ * - Inferring types
+ */
 export interface IaApiInterface {
     start(token: string): Promise<boolean>;
     stop(): Promise<boolean>;
@@ -35,6 +77,13 @@ export interface IaApiInterface {
     typify(code: string): Promise<TypifyResponse>;
 }
 
+/**
+ * Contains methods for logging requests, responses, and errors.
+ * 
+ * The logRequest method logs the request details. 
+ * The logResponse method logs the response details.
+ * The logError method logs error details.
+ */
 export class IaAbstractApi {
 
     constructor() {
