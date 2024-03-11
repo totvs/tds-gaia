@@ -114,6 +114,10 @@
           "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
         },
         {
+          "command": "tds-dito.explain-word",
+          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+        },
+        {
           "command": "tds-dito.clear",
           "when": "webviewId == 'tds-dito-view'"
         },
@@ -171,6 +175,11 @@
         "command": "tds-dito.explain",
         "title": "Explain source or function/method Code",
         "shortTitle": "Explain",
+        "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.explain-word",
+        "title": "Explain word",
         "category": "TDS-Dito"
       },
       {
@@ -334,6 +343,10 @@
       {
         "key": "Ctrl+D Ctrl+E",
         "command": "tds-dito.explain"
+      },
+      {
+        "key": "Ctrl+D Ctrl+W",
+        "command": "tds-dito.explain-word"
       },
       {
         "key": "Ctrl+D Ctrl+G",

@@ -25,7 +25,8 @@ export enum CommonCommandToPanelEnum {
 	Ready = "READY",
 	Reset = "RESET",
 	Validate = "VALIDATE",
-	UpdateModel  = "UPDATE_MODEL",
+	UpdateModel = "UPDATE_MODEL",
+	LinkMouseOver = "LINK_MOUSE_OVER"
 }
 
 export type CommonCommandToPanel = CommonCommandToPanelEnum;

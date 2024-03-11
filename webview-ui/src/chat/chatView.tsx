@@ -4,7 +4,7 @@ import { Control, FormProvider, SubmitHandler, useFieldArray, useForm } from "re
 import { CommonCommandFromPanelEnum, ReceiveMessage, sendSave } from "../utilities/common-command-webview";
 import { VSCodeButton, VSCodeLink, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
 import { IFormAction, TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
-import { sendExecute } from "./sendCommand";
+import { sendExecute, sendLinkMouseOver } from "./sendCommand";
 
 enum ReceiveCommandEnum {
 }
@@ -33,28 +33,20 @@ type TFields = {
   messages: TMessageModel[];
 }
 
-function HandleCommand(message: TMessageModel, action: TMessageActionModel) {
-  return (<VSCodeLink onClick={() => {
-    (document.getElementsByName("newMessage")[0] as any).control.value = action.command;
-    sendExecute(message.id, action.command);
-  }}>
-    {action.caption}
-  </VSCodeLink>
-  );
-}
-
 const PARAGRAPH_RE = /\n\n/i
 const PHRASE_RE = /\n/i
+const LINK_COMMAND_RE = /\[([^\]]+)\]\(command:([^\)]+)\)/i
+const LINK_SOURCE_RE = /\[([^\]]+)\]\(link:([^\)]+)\)/i
 
 type InlineTagName = "code" | "bold" | "italic" | "link" | "blockquote";
 type BlockTagName = "code";
 
 //mapeamento parcial (somente as utilizadas) das marcações MD
 const mdTags: Record<InlineTagName, RegExp> = {
-  "code": /\`([^\\`]+)\`/g,
+  "code": /\`([^\`]+)\`/g,
   "bold": /\*\*([^\*\*]+)\*\*/g,
   "italic": /_([^_])+_/g,
-  "link": /\[([^\].]+)\]\(([^\).]+)\)/g,
+  "link": /\[([^\]]+)\]\(([^\)]+)\)/g,
   "blockquote": /^>/gs,
 }
 
@@ -74,36 +66,54 @@ function mdToHtml(text: string): any[] {
     const part: string = parts[index];
 
     if (part) {
-      if (part.match(mdTags.bold)) {
-        index++;
-        children.push(<b key={spanSeq++}>{parts[index]}</b>);
-      } else if (part.match(mdTags.code)) {
+      //A ordem de teste deve ser:  Code, Link e demais tags (cuidado ao alterar)
+      if (part.match(mdTags.code)) {
         index++;
         children.push(<code key={spanSeq++}>{parts[index]}</code>);
-      } else if (part.match(mdTags.italic)) {
-        index++;
-        children.push(<i key={spanSeq++}>{parts[index]}</i>);
       } else if (part.match(mdTags.link)) {
         index++;
         const caption: string = parts[index];
         index++;
-        const link: string = parts[index];
-        const pos: number = link.indexOf(":");
-        if (pos > -1) {
-          children.push(<VSCodeLink key={spanSeq++} onClick={() => {
-            (document.getElementsByName("newMessage")[0] as any).control.value = caption;
-            sendExecute("", link.substring(pos + 1));
-          }}>{caption}</VSCodeLink>);
+        const link: string = part;
+        let matchesLink: any;  //RegExpMatchArray | null;
+        if (matchesLink = link.match(LINK_COMMAND_RE)) {
+          children.push(
+            <VSCodeLink key={spanSeq++}
+              onClick={() => {
+                (document.getElementsByName("newMessage")[0] as any).control.value = caption;
+                sendExecute(matchesLink!.input);
+              }
+              }>{matchesLink[1]}
+            </VSCodeLink>);
+        } else if (matchesLink = link.match(LINK_SOURCE_RE)) {
+          children.push(
+            <span key={spanSeq++}
+              onMouseOver={(e) => {
+                sendLinkMouseOver(matchesLink!.input);
+              }}>
+              <VSCodeLink key={spanSeq++}
+                onClick={() => {
+                  (document.getElementsByName("newMessage")[0] as any).control.value = caption;
+                  sendExecute(matchesLink!.input);
+                }
+                }>{matchesLink[1]}
+              </VSCodeLink>
+            </span>);
         } else {
           children.push(<span key={spanSeq++}>{part}</span>);
         }
+      } else if (part.match(mdTags.bold)) {
+        index++;
+        children.push(<b key={spanSeq++}>{parts[index]}</b>);
+      } else if (part.match(mdTags.italic)) {
+        index++;
+        children.push(<i key={spanSeq++}>{parts[index]}</i>);
       } else if (part.match(mdTags.blockquote)) {
         index++;
         children.push(<blockquote key={spanSeq++}>{parts[index]}</blockquote>);
       } else {
         children.push(<span key={spanSeq++}>{part}</span>);
       }
-
     }
   }
 
@@ -114,7 +124,7 @@ function mdToHtml(text: string): any[] {
   return children;
 }
 
-function txtToHtml(text: string): any[] {
+function mdTextToHtml(text: string): any[] {
   const children: any[] = [];
   const blocks: string[] = [text]; //text.split(tagsBlockMap["code"]);
 
@@ -149,37 +159,8 @@ function txtToHtml(text: string): any[] {
   return children;
 }
 
-function HandleText(part: string): any[] {
-
-  return txtToHtml(part);
-}
-
 function ShowMessage(message: TMessageModel) {
-  let children: any[] = [];
-
-  if (message.actions?.length) {
-    let text: string = message.message;
-
-    // message.actions?.forEach((action) => {
-    //   const pos_s: number = text.indexOf("{command:");
-    //   const pos_e: number = text.indexOf("}", pos_s);
-
-    //   if (pos_s > -1 && pos_e > -1) {
-    //     children.push(HandleText(text.substring(0, pos_s)));
-    //     children.push(HandleCommand(message, action));
-    //   } else {
-    //     children.push(HandleText(text));
-    //   }
-
-    //   text = text.substring(pos_e + 1);
-    // });
-
-    if (text.length > 0) {
-      children.push(HandleText(text));
-    }
-  } else {
-    children.push(HandleText(message.message));
-  }
+  let children: any[] = mdTextToHtml(message.message);
 
   return (
     <div className="tds-message" key={spanSeq++}>
@@ -248,11 +229,6 @@ export default function ChatView() {
           setErrorModel(methods.setError, errors);
 
           break;
-        // case CommonCommandFromPanelEnum.Configuration,
-        //   const model: TFields = command.data.commandsMap;
-        //     commandsMap: ChatApi.getCommandsMap()
-        //}
-        //});
 
         default:
           console.error("Unknown command received: " + command.command);
@@ -275,7 +251,7 @@ export default function ChatView() {
     type: "link",
     onClick: () => {
       (document.getElementsByName("newMessage")[0] as any).control.value = "clear";
-      sendExecute("", "clear");
+      sendExecute("clear");
     }
   });
 

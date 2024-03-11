@@ -9,10 +9,15 @@ import { chatApi } from '../extension';
 import { TQueueMessages } from '../api/chatApi';
 import { getDitoUser } from '../config';
 import { logger } from '../logger';
+import { highlightCode } from '../decoration';
 
 enum ChatCommandEnum {
 
 }
+
+const LINK_COMMAND_RE = /\[([^\]]+)\]\(command:([^\)]+)\)/i
+const LINK_SOURCE_RE = /\[([^\]]+)\]\(link:([^\)]+)\)/i
+const LINK_POSITION_RE = /([^&]+)&(\d+)(:(\d+)?(\-(\d+):(\d+)))?/i
 
 type ChatCommand = CommonCommandFromWebViewEnum & ChatCommandEnum;
 
@@ -27,6 +32,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     newMessage: "",
     messages: []
   };
+  private oldMouseOverPosition: string = "";
 
   constructor(
     private readonly _extensionUri: vscode.Uri,
@@ -81,6 +87,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       async (message: ReceiveMessage<CommonCommandFromWebViewEnum, TChatModel>) => {
         const command: ChatCommand = message.command as ChatCommand;
         const data = message.data;
+        let matches: string = "";
 
         switch (command) {
           case CommonCommandFromWebViewEnum.Ready:
@@ -97,8 +104,52 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
             break;
           case CommonCommandFromWebViewEnum.Execute:
-            chatApi.user(data.command, true);
+            matches = data.command.match(LINK_COMMAND_RE);
+
+            if (matches && matches.length > 1) {
+              chatApi.user(matches[2], true);
+            } else {
+              chatApi.user(data.command, true);
+            }
             break;
+          case CommonCommandFromWebViewEnum.LinkMouseOver:
+            let ok: boolean = false;
+
+            matches = data.command.match(LINK_SOURCE_RE);
+            if (matches && matches.length > 1) {
+              if (matches[2] !== this.oldMouseOverPosition) {
+                const positionMatches: RegExpMatchArray | null = matches[2].match(LINK_POSITION_RE);
+
+                if (positionMatches) {
+                  ok = true;
+                  const source: string = positionMatches[1];
+                  const startLine: number = parseInt(positionMatches[2]);
+                  const startColumn: number = parseInt(positionMatches[4] || "0");
+                  const endLine: number = parseInt(positionMatches[6] || "0");
+                  const endColumn: number = parseInt(positionMatches[7] || "0");
+                  const decorationType: vscode.TextEditorDecorationType = highlightCode(source, startLine, startColumn, endLine, endColumn);
+
+                  setTimeout(() => {
+                    this.oldMouseOverPosition = ""
+                    vscode.window.activeTextEditor?.setDecorations(decorationType, []);
+                  }, 5000);
+
+                }
+
+                if (!ok) {
+                  const msg: string = `Link inválido em MouseOver: ${data.command}`;
+                  chatApi.dito(["Desculpe. Não entendi esse comando.",
+                    "\n",
+                    `\`${msg}\``,
+                    "\n",
+                    `Favor abrir um ${chatApi.commandText("open_issue")}. Assim posso investigar melhor esse problema.`
+                  ], "");
+                  logger.warn(msg);
+                }
+              }
+
+              break;
+            }
         }
       }
     );

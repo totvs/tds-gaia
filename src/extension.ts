@@ -13,6 +13,10 @@ let ctx: vscode.ExtensionContext;
 export const iaApi: IaApiInterface = new CarolApi();
 export const chatApi: ChatApi = new ChatApi();
 
+/**
+ * Initializes the status bar items that will be displayed in VS Code. 
+ * Registers callbacks to update the items when necessary.
+*/
 export function activate(context: vscode.ExtensionContext) {
 	logger.info(
 		vscode.l10n.t('Congratulations, your extension "tds-dito" is now active!')
@@ -111,11 +115,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 					if (error.message.includes("502: Bad Gateway")) {
 						const parts: string = error.message.split("\n");
-						chatApi.ditoInfo(parts[1], messageId);
+						chatApi.ditoInfo(parts[1]);
 					}
 
 					if (detail) {
-						chatApi.ditoInfo(JSON.stringify(error, undefined, 2), messageId);
+						chatApi.ditoInfo(JSON.stringify(error, undefined, 2));
 					}
 				} else {
 					vscode.commands.executeCommand("tds-dito.login", true).then(() => {
@@ -162,33 +166,19 @@ export function activate(context: vscode.ExtensionContext) {
 			if (selection && !selection.isEmpty) {
 				const selectionRange: vscode.Range = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
 				codeToExplain = editor.document.getText(selectionRange);
-				if (selectionRange.isSingleLine) {
-					whatExplain = `linha ${selectionRange.start.line + 1}`;
-				} else {
-					whatExplain = `bloco ${selectionRange.start.line + 1}:${selectionRange.start.character + 1} : ${selectionRange.end.line + 1}:${selectionRange.end.character + 1}`;
-				}
+				whatExplain = chatApi.linkToSource(editor.document.uri, selectionRange);
+
 			} else {
 				const curPos: vscode.Position = selection.start;
-				const curLineStart = new vscode.Position(curPos.line, 0);
-				const nextLineStart = new vscode.Position(curPos.line + 1, 0);
-				const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
-				const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine).trim();
+				const contentLine: string = editor.document.lineAt(curPos.line).text;
 
-				whatExplain = `linha ${curLineStart.line + 1}`;
-
-				codeToExplain = contentWithFirstCharOfNextLine.trim();
+				whatExplain = chatApi.linkToSource(editor.document.uri, curPos.line);
+				codeToExplain = contentLine.trim();
 			}
 
 			if (codeToExplain.length > 0) {
-				const workspaceFolder: vscode.WorkspaceFolder | undefined = vscode.workspace.getWorkspaceFolder(editor.document.uri);
-				let filename: string = editor.document.fileName;
-
-				if (workspaceFolder !== undefined) {
-					filename = filename.replace(workspaceFolder.uri.fsPath, "...");
-				}
-
 				const messageId: string = chatApi.dito(
-					`Preparando explicação para o código em: \`\`${filename}, ${whatExplain}\`\`.`
+					`Explicando o código ${whatExplain}`
 				);
 
 				return iaApi.explainCode(codeToExplain).then((value: string) => {
@@ -198,14 +188,55 @@ export function activate(context: vscode.ExtensionContext) {
 					chatApi.dito(value, messageId);
 				});
 			} else {
-				chatApi.dito("Não consegui identificar um código para explica-lo.");
+				chatApi.ditoWarning("Não consegui identificar um código para explica-lo.");
 			}
 		} else {
-			chatApi.dito("Editor corrente não é valido para essa operação.");
+			chatApi.ditoWarning("Editor corrente não é valido para essa operação.");
 		}
 	});
 	context.subscriptions.push(explainCode);
 
+	const explainWord = vscode.commands.registerTextEditorCommand('tds-dito.explain-word', () => {
+		const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+
+		if (editor !== undefined) {
+			const selection: vscode.Selection = editor.selection;
+			const selectionRange: vscode.Range | undefined = editor.document.getWordRangeAtPosition(selection.start);
+
+			if (selectionRange !== undefined) {
+				let wordToExplain: string = editor.document.getText(selectionRange).trim();
+				let whatExplain = chatApi.linkToSource(editor.document.uri, selectionRange);
+
+				if (wordToExplain.length > 0) {
+					//const workspaceFolder: vscode.WorkspaceFolder | undefined = vscode.workspace.getWorkspaceFolder(editor.document.uri);
+
+					const messageId: string = chatApi.dito(
+						`Explicando palavra ${whatExplain}`
+					);
+
+					return iaApi.explainCode(wordToExplain).then((value: string) => {
+						if (getDitoConfiguration().clearBeforeExplain) {
+							chatApi.dito("clear");
+						}
+						chatApi.dito(value, messageId);
+					});
+				} else {
+					chatApi.ditoWarning("Não consegui identificar uma palavra para explica-la.");
+				}
+			} else {
+				chatApi.ditoWarning("Não consegui identificar uma palavra para explica-la.");
+			}
+		} else {
+			chatApi.ditoWarning("Editor corrente não é valido para essa operação.");
+		}
+	});
+	context.subscriptions.push(explainWord);
+
+	/**
+	 * Registers a command to infer types for a selected function in the active text editor. 
+	 * Finds the enclosing function based on the cursor position, extracts the function code, and sends it to an API to infer types.
+	 * Displays the inferred types in the chat window.
+	*/
 	const typify = vscode.commands.registerCommand('tds-dito.typify', async (...args) => {
 		const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
 		let codeToTypify: string = "";
@@ -250,9 +281,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 				if (matches) {
 					endFunction = new vscode.Position(curLine, 0);
-					if (matches[3]) {
-						whatExplain = matches[3];
-					}
 				}
 
 				curLine++;
@@ -267,16 +295,12 @@ export function activate(context: vscode.ExtensionContext) {
 				codeToTypify = editor.document.getText(rangeForTypify);
 
 				if (codeToTypify.length > 0) {
-					const workspaceFolder: vscode.WorkspaceFolder | undefined = vscode.workspace.getWorkspaceFolder(editor.document.uri);
-					let filename: string = editor.document.fileName;
-					whatExplain += `, bloco ${startFunction!.line + 1} : ${endFunction!.line + 1}`;
+					const rangeBlock = new vscode.Range(startFunction, endFunction);
 
-					if (workspaceFolder !== undefined) {
-						filename = filename.replace(workspaceFolder.uri.fsPath, "...");
-					}
+					whatExplain = chatApi.linkToSource(editor.document.uri, rangeBlock);
 
 					const messageId: string = chatApi.dito(
-						`Analisando para tipificar o código em: \`\`${filename}, ${whatExplain}\`\`.`
+						`Tipificando o código ${whatExplain}`
 					);
 
 					return iaApi.typify(codeToTypify).then((response: TypifyResponse) => {
@@ -292,13 +316,13 @@ export function activate(context: vscode.ExtensionContext) {
 					});
 				}
 			} else {
-				chatApi.dito([
+				chatApi.ditoWarning([
 					"Não consegui identificar uma função/método para tipificar.",
 					"Experimente posicionar o cursor em outra linha da implementação."
 				]);
 			}
 		} else {
-			chatApi.dito("Editor corrente não é valido para essa operação.");
+			chatApi.ditoWarning("Editor corrente não é valido para essa operação.");
 		}
 	});
 	context.subscriptions.push(typify);
@@ -353,89 +377,6 @@ function handleConfigChange(context: vscode.ExtensionContext) {
 	updateContextKey("logged", isDitoLogged());
 
 	context.subscriptions.push(listener);
-}
-
-// TODO: refactor to select only highlighted code
-export default async function highlightStackAttributions(): Promise<void> {
-	const document = vscode.window.activeTextEditor?.document
-	if (!document) return;
-
-	const config = vscode.workspace.getConfiguration("llm");
-	const attributionWindowSize = config.get("attributionWindowSize") as number;
-	const attributionEndpoint = config.get("attributionEndpoint") as string;
-
-	// get cursor position and offset
-	const cursorPosition = vscode.window.activeTextEditor?.selection.active;
-	if (!cursorPosition) return;
-	const cursorOffset = document.offsetAt(cursorPosition);
-
-	const start = Math.max(0, cursorOffset - attributionWindowSize);
-	const end = Math.min(document.getText().length, cursorOffset + attributionWindowSize);
-
-	// Select the start to end span
-	if (!vscode.window.activeTextEditor) return;
-	vscode.window.activeTextEditor.selection = new vscode.Selection(document.positionAt(start), document.positionAt(end));
-	// new Range(document.positionAt(start), document.positionAt(end));
-
-	const text = document.getText();
-	const textAroundCursor = text.slice(start, end);
-
-	const body = { document: textAroundCursor };
-
-	// notify user request has started
-	void vscode.window.showInformationMessage("Searching for nearby code in the stack...");
-
-	const resp: any = {};
-	// const resp = hf.nearestCodeSearch(body);
-	// if (!resp.ok) {
-	// 	return;
-	// }
-
-	const json = await resp.json() as any as { spans: [number, number][] }
-	const { spans } = json
-
-	if (spans.length === 0) {
-		void vscode.window.showInformationMessage("No code found in the stack");
-		return;
-	}
-
-	void vscode.window.showInformationMessage("Highlighted code was found in the stack.",
-		"Go to stack search"
-	).then(clicked => {
-		if (clicked) {
-			// open stack search url in browser
-			void vscode.env.openExternal(vscode.Uri.parse("https://huggingface.co/spaces/bigcode/search"));
-		}
-	});
-
-	// combine overlapping spans
-	const combinedSpans: [number, number][] = spans.reduce((acc, span) => {
-		const [s, e] = span;
-		if (acc.length === 0) return [[s, e]];
-		const [lastStart, lastEnd] = acc[acc.length - 1];
-		if (s <= lastEnd) {
-			acc[acc.length - 1] = [lastStart, Math.max(lastEnd, e)];
-		} else {
-			acc.push([s, e]);
-		}
-		return acc;
-	}, [] as [number, number][]);
-
-	const decorations = combinedSpans.map(([startChar, endChar]) => ({ range: new vscode.Range(document.positionAt(startChar + start), document.positionAt(endChar + start)), hoverMessage: "This code might be in the stack!" }))
-
-	// console.log("Highlighting", decorations.map(d => [d.range.start, d.range.end]));
-
-	const decorationType = vscode.window.createTextEditorDecorationType({
-		color: 'red',
-		textDecoration: 'underline',
-
-	});
-
-	vscode.window.activeTextEditor?.setDecorations(decorationType, decorations);
-
-	setTimeout(() => {
-		vscode.window.activeTextEditor?.setDecorations(decorationType, []);
-	}, 5000);
 }
 
 /**

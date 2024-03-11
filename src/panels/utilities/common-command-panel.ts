@@ -6,6 +6,7 @@ export enum CommonCommandFromWebViewEnum {
 	Save = "SAVE",
 	SaveAndClose = "SAVE_AND_CLOSE",
 	Execute = "EXECUTE",
+	LinkMouseOver = "LINK_MOUSE_OVER"
 }
 
 export type CommonCommandFromWebView = CommonCommandFromWebViewEnum;
