@@ -53,9 +53,10 @@ posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP 
 | Login          | Ctrl+D Ctrl+L | Apresenta o usuário ao IA. |
 | Complemento    |               | Acionado automaticamente durante a edição. |
 | Explicação*    | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
+|                | Ctrl+D Ctrl+W | Explica a palavra corrente (sob o cursor). |
 | Tipificação*   | Ctrl+D Ctrl+T | Tipifica variáveis de uma função/método. |
 
-_* Funcionalidades ainda em desenvolvimento. Podem levar 1 minuto ou mais para responder._
+_* Funcionalidades ainda em desenvolvimento. Podem levar 1 minuto ou mais para responder e apresentar respostas inesperadas._
 
 Leia [Funcionalidades](#funcionalidades), para saber maiores detalhes.
 
@@ -123,7 +124,7 @@ Por exemplo: "... identifique-se acionando `TDS-Dito: Login (Ctrl+D Ctrl+L) [log
 
 Quando o **TDS-Dito**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando `TDS-Dito: Login (Ctrl+D Ctrl+L) [login]`. 
 
-Caso não saiba o que fazer ou aparenta não estar funcionando, veja o que o **TDS-Dito** está lhe dizendo no bate-papo.
+Caso não saiba o que fazer ou aparenta não estar funcionando, veja quê o **TDS-Dito** está lhe dizendo no bate-papo.
 
 ## Funcionalidades
 
@@ -141,6 +142,10 @@ A extensão pode lhe fornecer explicações sobre o código ao acionar o comando
 #### Linha corrente
 
 Posicione o cursor na linha na qual deseja uma explicação e acione o comando. 
+
+#### Palavra corrente
+
+Posicione o cursor na palavra a qual deseja uma explicação e acione o comando. Útil para obter explicações sobre funções e métodos. 
 
 #### Bloco selecionado
 

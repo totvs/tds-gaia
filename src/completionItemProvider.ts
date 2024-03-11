@@ -1,3 +1,19 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from "vscode";
 import { delay } from "./util";
 import { getDitoConfiguration } from "./config";
@@ -5,6 +21,13 @@ import { CompletionResponse } from "./api/interfaceApi";
 import { iaApi } from "./extension"
 import { logger } from "./logger";
 
+/**
+ * Provides inline completion items by making requests to the IA API. 
+ * Checks configuration settings related to auto suggest and request delay.
+ * Makes API request with text before and after cursor. 
+ * Returns InlineCompletionList with completion items.
+ * Handles errors and cancellation.
+*/
 //acionamento manual: F1 + editor.action.inlineSuggest.trigger
 export function inlineCompletionItemProvider(context: vscode.ExtensionContext): vscode.InlineCompletionItemProvider {
 

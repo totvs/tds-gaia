@@ -1,3 +1,19 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from "vscode";
 import * as path from "path";
 import { getDitoUser, isDitoFirstUse, isDitoLogged, isDitoReady } from "../config";
@@ -6,8 +22,16 @@ import { TMessageActionModel, TMessageModel } from "../model/messageModel";
 import { exit } from "process";
 import { logger } from "../logger";
 
+/**
+ * Defines the queue message type for chat messages.
+ * Includes the message content, sender, and metadata like timestamp.
+*/
 export type TQueueMessages = Queue<TMessageModel>;
 
+/**
+ * Regular expressions to match chat commands.
+ * 
+ */
 const HELP_RE = /^(help)(\s+(\w+))?$/i;
 const LOGOUT_RE = /^logout$/i;
 const LOGIN_RE = /^login$/i;
@@ -24,6 +48,11 @@ const HINT_2_RE = /^(hint_2)$/i;
 
 const COMMAND_IN_MESSAGE = /\{command:([^\}]\w+)(\s+\b.*)?\}/i;
 
+/**
+ * Defines the shape of command objects used for chat command handling.
+ * Includes the command name, regex to match it, an optional ID, 
+ * optional caption and aliases, and an optional handler function.
+*/
 type TCommand = {
     command: string;
     regex: RegExp;
@@ -34,6 +63,10 @@ type TCommand = {
     process?: (chat: ChatApi, ...args: any[]) => boolean;
 }
 
+/**
+ * Defines a map of chat command objects used for handling chat commands.
+ * The keys are the primary command names.
+ */
 const commandsMap: Record<string, TCommand> = {
     "help": {
         caption: "Help",
@@ -137,6 +170,12 @@ export function completeCommandsMap(extension: vscode.Extension<any>) {
     });
 }
 
+/**
+ * Provides methods for interacting with the chat API. 
+ * Allows sending messages, responding to user input, executing commands, etc.
+ * Maintains internal state like user login status, message history.
+ * Dispatches events for new messages.
+ */
 export class ChatApi {
     static getCommand(_command: string): TCommand | undefined {
         const commandId: string = _command.toLowerCase();
@@ -345,7 +384,7 @@ export class ChatApi {
                 position = `${workRange.start.line + 1}:${workRange.start.character + 1}`;
                 position += `-${workRange.end.line + 1}:${workRange.end.character + 1}`;
             } else {
-                position = `${(range as number)+ 1}`;
+                position = `${(range as number) + 1}`;
             }
 
             return `[${filename}(${position})](link:${source.fsPath}&${position})`;
@@ -375,6 +414,11 @@ export class ChatApi {
     }
 }
 
+/**
+ * Processes a help command entered by the user. 
+ * Checks if a specific command was requested and provides help for it, 
+ * otherwise prints the list of available commands.
+*/
 function doHelp(chat: ChatApi, message: string): boolean {
     let matches = undefined;
     let result: boolean = false;
@@ -418,6 +462,11 @@ function doHelp(chat: ChatApi, message: string): boolean {
     return result;
 }
 
+/**
+ * Logs the user out by printing a logout message.
+ * 
+ * @returns Always returns true after printing the logout message.
+ */
 function doLogout(chat: ChatApi): boolean {
     chat.dito([
         `** ${getDitoUser()?.displayName}**, até logo!`,
@@ -428,7 +477,9 @@ function doLogout(chat: ChatApi): boolean {
     return true;
 }
 
+/**
+ * Clears the chat history.
+ */
 // function doClear(chat: ChatApi): any {
 //     chat.user("clear", true);
 // }
-

@@ -1,3 +1,18 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 import * as vscode from 'vscode';
 import { CommonCommandFromWebViewEnum, CommonCommandToWebViewEnum, ReceiveMessage } from './utilities/common-command-panel';
@@ -15,12 +30,25 @@ enum ChatCommandEnum {
 
 }
 
+/**
+ * Regular expressions to match chat message formatting for links.
+ * 
+ */
 const LINK_COMMAND_RE = /\[([^\]]+)\]\(command:([^\)]+)\)/i
 const LINK_SOURCE_RE = /\[([^\]]+)\]\(link:([^\)]+)\)/i
 const LINK_POSITION_RE = /([^&]+)&(\d+)(:(\d+)?(\-(\d+):(\d+)))?/i
 
+/**
+ * Type alias for chat commands that are both CommonCommandFromWebViewEnum 
+ * and ChatCommandEnum. Allows handling commands from both enums in one type.
+ */
 type ChatCommand = CommonCommandFromWebViewEnum & ChatCommandEnum;
 
+/**
+ * ChatViewProvider implements the webview for the chat panel. 
+ * It handles initializing the webview, sending messages between
+ * VS Code and the webview, and routing commands from the webview.
+ */
 export class ChatViewProvider implements vscode.WebviewViewProvider {
 
   public static readonly viewType = 'tds-dito-view';
@@ -34,10 +62,22 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   };
   private oldMouseOverPosition: string = "";
 
+  /**
+ * Constructor for ChatViewProvider class.
+ * 
+ * @param _extensionUri - The URI of the VS Code extension. Used to resolve resources 
+ *                        like images from the webview.
+ */
   constructor(
     private readonly _extensionUri: vscode.Uri,
   ) { }
 
+  /**
+ * Initializes the webview by setting options, registering listeners, and loading HTML.
+ * 
+ * Sets up communication between the webview and VS Code by registering a listener for 
+ * messages from the webview and sending the initial state. Loads the HTML content.
+ */
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
@@ -156,13 +196,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
   }
 
-  protected sendConfiguration(): void {
-    //this._view!.webview.postMessage({
-    //   command: CommonCommandToWebViewEnum.Configuration,
-    //   data: {
-    //     commandsMap: ChatApi.getCommandsMap()
-    //   }
-    // });
+  protected _sendConfiguration(): void {
 
   }
 
@@ -222,4 +256,3 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     // Utils.logMessage(message, MESSAGE_TYPE.Error, false);
   }
 }
-

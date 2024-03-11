@@ -1,51 +1,51 @@
-import { VSCodeTextField } from "@vscode/webview-ui-toolkit/react";
-import { useController, useFormContext } from "react-hook-form";
-import PopupMessage from "../popup-message";
-import { TdsFieldProps } from "../form";
+// import { VSCodeTextField } from "@vscode/webview-ui-toolkit/react";
+// import { useController, useFormContext } from "react-hook-form";
+// import PopupMessage from "../popup-message";
+// import { TdsFieldProps } from "../form";
 
-type TdsTextFieldProps = TdsFieldProps;
+// type TdsTextFieldProps = TdsFieldProps;
 
-/**
- *
- * - Uso de _hook_ ``useFieldArray`` e propriedade ``disabled``:
- *   Por comportamento do _hook_, campos com ``disabled`` ativo não são armazenados
- *   no _array_ associado ao _hook_.
- *   Caso seja necessário sua manipulação, use ``readOnly`` como alternativa.
- *
- * @param props
- *
- * @returns
- */
-export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
-	const {
-		register
-	} = useFormContext();
-	const { field, fieldState } = useController(props);
-	const registerField = register(props.name, props.rules);
+// /**
+//  *
+//  * - Uso de _hook_ ``useFieldArray`` e propriedade ``disabled``:
+//  *   Por comportamento do _hook_, campos com ``disabled`` ativo não são armazenados
+//  *   no _array_ associado ao _hook_.
+//  *   Caso seja necessário sua manipulação, use ``readOnly`` como alternativa.
+//  *
+//  * @param props
+//  *
+//  * @returns
+//  */
+// export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
+// 	const {
+// 		register
+// 	} = useFormContext();
+// 	const { field, fieldState } = useController(props);
+// 	const registerField = register(props.name, props.rules);
 
-	if (props.onChange) {
-		registerField.onChange = props.onChange;
-	}
+// 	if (props.onChange) {
+// 		registerField.onChange = props.onChange;
+// 	}
 
-	// value={value}
-	// onInput={e => fieldState.setValue(e.target.value)} />
+// 	// value={value}
+// 	// onInput={e => fieldState.setValue(e.target.value)} />
 
-	return (
-		<section
-			className={`tds-field-container tds-text-field ${props.className ? props.className : ''}`}
-		>
-			<label
-				htmlFor={field.name}
-			>
-				{props.label}
-				{props.rules?.required && <span className="tds-required" />}
-			</label>
-			<VSCodeTextField
-				readOnly={props.readOnly || false}
-				{...registerField}
-			>
-				<PopupMessage field={props} fieldState={fieldState} />
-			</VSCodeTextField>
-		</section>
-	)
-}
+// 	return (
+// 		<section
+// 			className={`tds-field-container tds-text-field ${props.className ? props.className : ''}`}
+// 		>
+// 			<label
+// 				htmlFor={field.name}
+// 			>
+// 				{props.label}
+// 				{props.rules?.required && <span className="tds-required" />}
+// 			</label>
+// 			<VSCodeTextField
+// 				readOnly={props.readOnly || false}
+// 				{...registerField}
+// 			>
+// 				<PopupMessage field={props} fieldState={fieldState} />
+// 			</VSCodeTextField>
+// 		</section>
+// 	)
+// }
