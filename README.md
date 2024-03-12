@@ -40,9 +40,15 @@ A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://co
 
 **Legendas**: :white_check_mark: Experimental :walking: Em andamento, sem prazo :white_square_button: Em estudo (pode ser cancelado)
 
-## Guia \(ultra\) rápido
+## Guia rápido
 
-> Indicado para quem já tem familiaridade com o **VS-Code**. Caso contrário, recomenda-se começar por [Instalação](#instalação).
+> Indicado para quem já tem familiaridade com o **VS-Code**. Caso contrário, recomenda-se começar:
+>
+> - [User Interface](https://code.visualstudio.com/docs/getstarted/userinterface)
+> - [Settings](https://code.visualstudio.com/docs/getstarted/settings)
+> - [Basic Edition](https://code.visualstudio.com/docs/editor/codebasics)
+> - [Marketplace](https://code.visualstudio.com/docs/editor/extension-gallery)
+> - [Instalação](README.md#instalação).
 
 Após a instalação da extensão **TDS-Dito**. Uma verificação de disponibilidade do serviço de IA é efetuada. 
 Se estiver tudo em ordem, identifique-se efetuando `Login [Ctrl+D Ctrl+E]`. Após validado, abra um fonte AdvPL/TLPP, 
