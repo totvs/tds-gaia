@@ -26,6 +26,8 @@ Esta pasta contém a parte visual da extensão [**TDS-Dito**](https://github.com
 
 ![Dito: Chat](images/chat.png)
 
+> DICA: Para melhor visualização, recomenda-se mover a aba `DITO` para o painel secundário (`Ctrl+Alt-B`).
+
 Na área principal do bate-papo, o **TDS-Dito** apresenta mensagens para o usuário, que podem ser, informações, instruções, alertas ou respostas.
 
 Na base do bate-papo, há uma caixa de texto, pelo qual o usuário pode interagir com o **TDS-Dito** através de comandos e textos.

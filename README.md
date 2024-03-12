@@ -100,6 +100,8 @@ Ao finalizar a instalação, lhe será apresentado um bate-bato (_chat_). É atr
 
 ![Dito: Chat](images/chat.png)
 
+> DICA: Para melhor visualização, recomenda-se mover a aba `DITO` para o painel secundário (`Ctrl+Alt-B`).
+
 ### Revertendo uma atualização
 
 Se for necessário reverter uma atualização, selecione o comando `Instalar Outra Versão...` após acionar o botão `Gerenciar` e selecione a outra versão que deseja instalar.
