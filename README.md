@@ -57,7 +57,8 @@ posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP 
 | Funcionalidade | Atalho        | Ação |
 | -------------- | ------------- | ---- |
 | Login          | Ctrl+D Ctrl+L | Apresenta o usuário ao IA. |
-| Complemento    |               | Acionado automaticamente durante a edição. |
+| Auto-completar |               | Acionado automaticamente durante a edição. |
+|                |               | **Dica:** Ao ser apresentada a sugestão posicione o _mouse_ sobre ela para obter uma lista de opções. |
 | Explicação*    | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
 |                | Ctrl+D Ctrl+W | Explica a palavra corrente (sob o cursor). |
 | Tipificação*   | Ctrl+D Ctrl+T | Tipifica variáveis de uma função/método. |
