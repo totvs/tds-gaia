@@ -20,7 +20,7 @@
 
 ## API ``typefy``
 
-> Salvo engano meu, a grafia correta é _typify_.
+> Salvo engano meu, a grafia correta é _typify_. Em outros produtos, esse processo é denominado "Infer".
 
 - Código vazio
   Ao efetuar a chamada com parâmetro ``code`` vazio, aparenta travamento da API.
