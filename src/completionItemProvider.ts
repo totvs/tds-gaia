@@ -16,7 +16,7 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { delay } from "./util";
-import { getDitoConfiguration } from "./config";
+import { TDitoConfig, getDitoConfiguration } from "./config";
 import { CompletionResponse } from "./api/interfaceApi";
 import { iaApi } from "./extension"
 import { logger } from "./logger";
@@ -29,81 +29,105 @@ import { logger } from "./logger";
  * Handles errors and cancellation.
 */
 //acionamento manual: F1 + editor.action.inlineSuggest.trigger
-export function inlineCompletionItemProvider(context: vscode.ExtensionContext): vscode.InlineCompletionItemProvider {
+export class InlineCompletionItemProvider implements vscode.InlineCompletionItemProvider {
 
-    const provider: vscode.InlineCompletionItemProvider = {
-        async provideInlineCompletionItems(document, position, innerContext, token) {
+    /**
+     * Registers the inline completion provider. 
+     * 
+    */
+    static register(context: vscode.ExtensionContext) {
+        const config: TDitoConfig = getDitoConfiguration();
+        const provider: vscode.InlineCompletionItemProvider = new InlineCompletionItemProvider();
+        const documentFilter = config.documentFilter;
+        const inlineRegister: vscode.Disposable = vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
+        context.subscriptions.push(inlineRegister);
 
-            // if (context.workspaceState.get("tds-dito.readyFoUse") === false) {
-            //     return;
-            // }
+        const afterInsert = vscode.commands.registerCommand('tds-dito.afterInsert', async (response: CompletionResponse) => {
+            const { request_id, completions } = response;
+            const params = {
+                requestId: request_id,
+                acceptedCompletion: 0,
+                shownCompletions: [0],
+                completions,
+            };
+            logger.debug("Params: %s", JSON.stringify(params, undefined, 2));
 
-            const config = getDitoConfiguration();
-            const autoSuggest = config.enableAutoSuggest;
-            const requestDelay = config.requestDelay;
+            //await client.sendRequest("llm-ls/acceptCompletion", params);
+        });
+        context.subscriptions.push(afterInsert);
+    }
 
-            if (innerContext.triggerKind === vscode.InlineCompletionTriggerKind.Automatic && !autoSuggest) {
-                return;
-            }
-            if (position.line < 0) {
-                return;
-            }
+    async provideInlineCompletionItems(document: vscode.TextDocument, position: vscode.Position, context: vscode.InlineCompletionContext, token: vscode.CancellationToken): Promise<vscode.InlineCompletionItem[]> {
+        // if (context.workspaceState.get("tds-dito.readyFoUse") === false) {
+        //     return;
+        // }
 
-            if (requestDelay > 0) {
-                logger.debug("Delay " + requestDelay + "ms before requesting completions");
-                const cancelled = await delay(requestDelay * 10, token);
-                if (cancelled) {
-                    logger.debug("Request cancelled by user");
-                    return;
-                }
-            }
+        const config = getDitoConfiguration();
+        const autoSuggest = config.enableAutoSuggest;
+        const requestDelay = config.requestDelay;
 
-            let textBeforeCursor: string = "";
-            let textAfterCursor: string = "";
-            const offset = document.offsetAt(position);
+        if (context.triggerKind === vscode.InlineCompletionTriggerKind.Automatic && !autoSuggest) {
+            return [];
+        }
+        if (position.line < 0) {
+            return [];
+        }
 
-            textBeforeCursor = document.getText().substring(0, offset);
-            textAfterCursor = document.getText().substring(offset + 1);
-
-            try {
-                const response: CompletionResponse =
-                    await iaApi.getCompletions(textBeforeCursor, textAfterCursor);
-
-                const items: vscode.InlineCompletionItem[] = [];
-                if (token.isCancellationRequested) {
-                    logger.warn('Request cancelled by user');
-                    return;
-                }
-
-                if (response !== undefined && response.completions.length) {
-                    for (const completion of response.completions) {
-                        items.push({
-                            insertText: completion.generated_text,
-                            range: new vscode.Range(position, position),
-                            command: {
-                                title: 'afterInsert',
-                                command: 'tds-dito.afterInsert',
-                                arguments: [completion],
-                            }
-                        });
-                    }
-                }
-
-                const list: vscode.InlineCompletionList = new vscode.InlineCompletionList(items);
-                return list;
-            } catch (e) {
-                const err_msg = (e as Error);
-
-                if (err_msg.message.includes("is currently loading")) {
-                    vscode.window.showWarningMessage(err_msg.message);
-                } else if (err_msg.message !== "Canceled") {
-                    vscode.window.showErrorMessage(err_msg.message);
-                }
-
-                console.error(e);
+        if (requestDelay > 0) {
+            logger.debug("Delay " + requestDelay + "ms before requesting completions");
+            const cancelled = await delay(requestDelay * 10, token);
+            if (cancelled) {
+                logger.debug("Request cancelled by user");
+                return [];
             }
         }
-    };
 
-    return provider;
+        let textBeforeCursor: string = "";
+        let textAfterCursor: string = "";
+        const offset = document.offsetAt(position);
+
+        textBeforeCursor = document.getText().substring(0, offset);
+        textAfterCursor = document.getText().substring(offset + 1);
+
+        try {
+            const response: CompletionResponse =
+                await iaApi.getCompletions(textBeforeCursor, textAfterCursor);
+
+            if (token.isCancellationRequested) {
+                logger.warn('Request cancelled by user');
+                return [];
+            }
+
+            const items: vscode.InlineCompletionItem[] = [];
+
+            if (response !== undefined && response.completions.length) {
+                for (const completion of response.completions) {
+                    items.push({
+                        insertText: completion.generated_text,
+                        range: new vscode.Range(position, position),
+                        command: {
+                            title: 'afterInsert',
+                            command: 'tds-dito.afterInsert',
+                            arguments: [completion],
+                        }
+                    });
+                }
+            }
+
+            const result: vscode.ProviderResult<vscode.InlineCompletionItem[]> = items;
+            return Promise.resolve(result);
+        } catch (e) {
+            const err_msg = (e as Error);
+
+            if (err_msg.message.includes("is currently loading")) {
+                vscode.window.showWarningMessage(err_msg.message);
+            } else if (err_msg.message !== "Canceled") {
+                vscode.window.showErrorMessage(err_msg.message);
+            }
+
+            console.error(e);
+
+            return [];
+        }
+    }
 }

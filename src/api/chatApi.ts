@@ -151,7 +151,7 @@ const commandsMap: Record<string, TCommand> = {
  * 
  * @param extension - The VS Code extension object.
  */
-export function completeCommandsMap(extension: vscode.Extension<any>) {
+function completeCommandsMap(extension: vscode.Extension<any>) {
     const commands: any = extension.packageJSON.contributes.commands;
     const keybindings: any = extension.packageJSON.contributes.keybindings;
 
@@ -191,6 +191,28 @@ export class ChatApi {
         }
 
         return command;
+    }
+
+    register(context: vscode.ExtensionContext) {
+        completeCommandsMap(context.extension);
+        const clear = vscode.commands.registerCommand('tds-dito.clear', async () => {
+            this.user("clear", true);
+        });
+        context.subscriptions.push(clear);
+
+        const openManual = vscode.commands.registerCommand('tds-dito.open-manual', async () => {
+            const messageId: string = this.dito("Abrindo manual do **TDS-Dito**.");
+            const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md";
+
+            return vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
+                this.dito("Manual do Dito aberto.", messageId);
+            }, (reason) => {
+                this.dito("Não foi possível abrir manual do **TDS-Dito**.", messageId);
+                logger.error(reason);
+            });
+        });
+        context.subscriptions.push(openManual);
+
     }
 
     private queueMessages: TQueueMessages = new Queue<TMessageModel>();

@@ -14,7 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { ExtensionContext } from "vscode";
 import { logger } from "../logger";
+import { TDitoConfig, getDitoConfiguration } from "../config";
+import { ChatApi } from "./chatApi";
 
 let execBeginTime: Date;
 
@@ -55,15 +58,10 @@ export interface TypifyResponse {
 /**
  * Interface defining the API for the AI assistant.
  * 
- * Contains methods for:
- * - Starting and stopping the assistant
- * - Checking assistant health
- * - User login/logout
- * - Code generation and completion
- * - Explaining code
- * - Inferring types
  */
 export interface IaApiInterface {
+    register(context: ExtensionContext): void;
+
     start(token: string): Promise<boolean>;
     stop(): Promise<boolean>;
     checkHealth(detail: boolean): Promise<Error | undefined>;
@@ -80,14 +78,19 @@ export interface IaApiInterface {
 /**
  * Contains methods for logging requests, responses, and errors.
  * 
- * The logRequest method logs the request details. 
- * The logResponse method logs the response details.
- * The logError method logs error details.
  */
 export class IaAbstractApi {
 
-    constructor() {
+    protected chat: ChatApi;
 
+    /**
+     * Constructor for IaAbstractApi class.
+     * Initializes the chat API client.
+     * 
+     * @param chat - ChatApi client instance
+     */
+    constructor(chat: ChatApi) {
+        this.chat = chat;
     }
 
     /**
