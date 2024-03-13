@@ -24,6 +24,8 @@
 - :white_check_mark: Criar API para a inteligência artificial.
 - :white_square_button: Identificação de usuário (_login_).
   Usar `vscode.AuthProvider` para autenticação.
+- :white_square_button: Mensagens associadas a processamento.
+  Encapsular o processamento e passar como _callback_ para ChatApi.Dito e esse passa a tratar o retorno da mensagem (`messageId`).
 
 ## API: Bate-papo (classe ChatApi)
 
@@ -35,6 +37,7 @@
 - :white_square_button: Executar o comando ao acionar `Enter`.
 - :white_square_button: Associar visualmente mensagem de resposta com a mensagem de entrada.
   Tratar `MouseOver` sobre a mensagem de resposta ou de entrada e destacar as duas. Dessa forma, se o usuário disparar vários processos, pode acompanhar qual mensagem está sendo respondida.
+- :white_square_button: Implementar `goto`em links de posicionamento de fontes.
 
 ## Visual: Editor de texto
 
