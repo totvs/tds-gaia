@@ -45,8 +45,6 @@ function initStatusBarItem(): vscode.StatusBarItem {
     vscode.StatusBarAlignment.Left,
     priorityStatusBarItem
   );
-  statusBarItem.command = "tds-dito.login";
-  statusBarItem.text = `$(gear~spin) ${vscode.l10n.t("(initializing)")}`;
 
   updateStatusBarItem();
 

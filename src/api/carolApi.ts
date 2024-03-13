@@ -5,7 +5,6 @@ import { fetch, Response } from "undici";
 import { capitalize } from "../util";
 import { CompletionResponse, IaAbstractApi, IaApiInterface, TypifyResponse } from "./interfaceApi";
 import { PREFIX_DITO, logger } from "../logger";
-import { ChatApi } from "./chatApi";
 import { updateContextKey } from "../extension";
 
 export class CarolApi extends IaAbstractApi implements IaApiInterface {
@@ -310,9 +309,6 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
      * 
      */
     register(context: vscode.ExtensionContext): void {
-        //TODO: Para identificação do usuário, implementar usando AuthProvider
-        //const authProvider = new AuthProvider(initialConfig)
-        //await authProvider.init()
 
         /**
          * Registers a command with VS Code to prompt the user to login.
@@ -323,6 +319,10 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
          * 
          * @param args - First arg is a boolean to skip auto-login if true.
         */
+        //TODO: Para identificação do usuário, implementar usando AuthProvider
+        //const authProvider = new AuthProvider(initialConfig)
+        //await authProvider.init()
+
         context.subscriptions.push(vscode.commands.registerCommand('tds-dito.login', async (...args) => {
             let apiToken = await context.secrets.get('apiToken');
 
@@ -365,9 +365,11 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
          * Logs the user out, deletes the stored API token and shows an informational message.
          */
         context.subscriptions.push(vscode.commands.registerCommand('tds-dito.logout', async (...args) => {
+            this.chat.logout();
             this.logout();
             await context.secrets.delete('apiToken');
             vscode.window.showInformationMessage(`${PREFIX_DITO} Logged out`);
+            this.chat.checkUser("");
         }));
 
         /**

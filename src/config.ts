@@ -49,6 +49,7 @@ export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
 * Other settings, preferably non-persistent, must be made in TDitoCustomConfig
  */
 export type TDitoConfig = {
+  enable: boolean;
   clearBeforeExplain: boolean;
   clearBeforeTypify: boolean;
   showBanner: boolean;

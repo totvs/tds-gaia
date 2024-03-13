@@ -6,7 +6,10 @@ User Function TSay()
 //	local map := { "a": { "n1": "v1" }}
 
 	DEFINE DIALOG oDlg TITLE "Exemplo TSay" FROM 180,180 TO 550,700 PIXEL
-
+	DEFINE SAY oSay FROM 10,10 TO 100,100 PIXEL
+	
+	
+	
 	// Cria Fonte para visualização
 	oFont := TFont():New('Courier new',,-18,.T.)
 

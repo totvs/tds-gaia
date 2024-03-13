@@ -60,11 +60,13 @@
   "main": "./out/extension.js",
   "contributes": {
     "viewsContainers": {
+      "activitybar": [
+      ],
       "panel": [
         {
           "id": "tds-dito-container",
           "title": "Dito",
-          "icon": "icons/tds-dito-24x24.png"
+          "icon": "icons/tds-dito.svg"
         }
       ]
     },
@@ -76,7 +78,8 @@
           "name": "Dito: Chat",
           "visibility": "visible",
           "icon": "icons/tds-dito.svg",
-          "contextualTitle": "Dito: Chat"
+          "contextualTitle": "Dito: Chat",
+          "initialSize": 0.25
         }
       ]
     },

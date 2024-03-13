@@ -55,8 +55,6 @@ export function activate(context: vscode.ExtensionContext) {
 	// 	return;
 	// }
 
-	const config: TDitoConfig = getDitoConfiguration();
-
 	ctx = context;
 	handleConfigChange(context);
 	context.subscriptions.push(...initStatusBarItems());

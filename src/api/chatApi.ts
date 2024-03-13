@@ -322,9 +322,16 @@ export class ChatApi {
         if (isDitoReady()) {
             if (!isDitoLogged()) {
                 if (isDitoFirstUse()) {
-                    this.dito(`Parece que é a primeira vez que nos encontramos. Quer saber como interagir comigo? ${this.commandText("hint_1")} `, answeringId);
+                    this.dito([
+                        "Parece que é a primeira vez que nos encontramos.\n",
+                        `Quer saber como interagir comigo? ${this.commandText("hint_1")} `
+                    ], answeringId);
                 }
-                this.dito(`Para começar, preciso conhecer você.Favor identifique-se  com o comando ${this.commandText('login')}.`, answeringId);
+                this.dito([
+                    "Para começar, preciso conhecer você.\n",
+                    `Favor identificar-se com o comando ${this.commandText('login')}.`
+                ],
+                    answeringId);
             } else {
                 this.dito(
                     `Olá, ** ${getDitoUser()?.displayName}**.\n\n` +
@@ -334,6 +341,13 @@ export class ChatApi {
         } else {
             vscode.commands.executeCommand("tds-dito.health");
         }
+    }
+
+    logout() {
+        this.dito([
+            `** ${getDitoUser()?.displayName}**, obrigado por trabalhar comigo!\n`,
+            "Até logo!",
+        ], "");
     }
 
     user(message: string, echo: boolean): void {
@@ -457,7 +471,7 @@ function doHelp(chat: ChatApi, message: string): boolean {
                     "- Menu de contexto do bate-papo ou fonte em edição.",
                     `Se você possui familiaridade com o ** VS - Code **, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, a ${chat.commandText("manual")} (será aberto no seu navegador padrão).`,
                     `Para saber os comandos, digite ${chat.commandText("help")}.`
-                ]);
+                ], "");
             } else if (matches[2].trim() == "hint_2") {
                 const messageId: string = chat.dito("Abrindo manual rápido do **TDS-Dito**.");
                 const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md#guia-ultra-r%C3%A1pido";
@@ -490,11 +504,8 @@ function doHelp(chat: ChatApi, message: string): boolean {
  * @returns Always returns true after printing the logout message.
  */
 function doLogout(chat: ChatApi): boolean {
-    chat.dito([
-        `** ${getDitoUser()?.displayName}**, até logo!`,
-        "Obrigado por trabalhar comigo!",
-        "Saindo..."
-    ]);
+    chat.logout();
+    chat.checkUser("");
 
     return true;
 }

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { TDitoConfig, getDitoConfiguration } from './config'
 // import { getEditor } from '../../editor/active-editor'
 // import { isValidTestFile } from '../utils/test-commands'
 // import { getDocumentSections } from '../../editor/utils/document-sections'
@@ -57,8 +58,8 @@ export class DitoCodeLensProvider implements vscode.CodeLensProvider {
      * Update the configurations
      */
     private updateConfig(): void {
-        const config = vscode.workspace.getConfiguration('cody')
-        this.isEnabled = config.get('commandCodeLenses') as boolean
+        const config: TDitoConfig = getDitoConfiguration();
+        this.isEnabled = config.enable || true;
 
         if (this.isEnabled && !this._disposables.length) {
             this.init()
