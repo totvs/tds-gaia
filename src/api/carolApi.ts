@@ -148,6 +148,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
     login(): Promise<boolean> {
         logger.info(`Logging in...`);
+        logger.profile("login");
 
         let result: boolean = false;
 
@@ -188,6 +189,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         logger.info(message);
 
         result = true;
+        logger.profile("login");
 
         return Promise.resolve(result);
     }
@@ -399,6 +401,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
                         if (error.message.includes("502: Bad Gateway")) {
                             const parts: string = error.message.split("\n");
+                            //TODO: Motta
                             this.chat.ditoInfo(parts[1]);
                         }
 
@@ -414,7 +417,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             });
         }));
 
-
+        //o que o usuário descrever vai vim veio argumento
         context.subscriptions.push(vscode.commands.registerTextEditorCommand('tds-dito.generate-code', () => {
             const text: string = "Gerar código para varrer um array";
             this.generateCode(text);

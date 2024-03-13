@@ -16,8 +16,8 @@ limitations under the License.
 
 import * as vscode from 'vscode';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
-import { TDitoConfig, getDitoConfiguration, getDitoLogLevel, isDitoLogged, isDitoShowBanner, setDitoReady, setDitoUser } from './config';
-import { CompletionResponse, IaApiInterface, TypifyResponse } from './api/interfaceApi';
+import { getDitoLogLevel, isDitoLogged, isDitoShowBanner } from './config';
+import { IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
 import { ChatViewProvider } from './panels/chatViewProvider';
 import { ChatApi } from './api/chatApi';

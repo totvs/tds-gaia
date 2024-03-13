@@ -254,6 +254,13 @@ export class ChatApi {
         }
     }
 
+    /**
+     * Sends a message to the message queue. 
+     * 
+     * @param message - The message text to send. Can be a string or string array. 
+     * @param answeringId - (Optional) The ID of the message this is answering.
+     * @returns The ID of the sent message.
+     */
     dito(message: string | string[], answeringId: string | undefined = undefined): string {
         let workMessage: string = typeof message == "string"
             ? message
