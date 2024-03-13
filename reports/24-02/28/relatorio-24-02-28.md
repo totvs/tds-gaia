@@ -10,7 +10,7 @@
 - Implementar:
   - Parâmetro para nível de detalhe na explicação, como "resumido" ou "detalhado", ou mesmo um indicador numérico para o usuário determinar o nível de abstração desejado (1 = mais alto nível, 5 = mais detalhado) ou um indicador de finalidade, algo como "para comentário" ou "como usar". No 1º, apresenta-se uma explicação focando a finalidade do código. No outro, detalhes do código (retorno atual).
 
-  - Sistema de retroalimentação para que usuários possam avaliar a qualidade das retornos recebidos e assim melhorar o modelo. Algum simples, como positivo ou negativo. Uma API para registrar essa opinião de forma textual poderia ser útil.
+  - Sistema de retroalimentação para que usuários possam avaliar a qualidade das retornos recebidos e assim melhorar o modelo. Algo simples, como positivo ou negativo e opcionalmente adição de comentários. Uma API para registrar essa opinião de forma textual poderia ser útil.
 
 - Eliminar a frase ``Explaining the code:....`` dos retornos de ``explain``. Não agrega informação útil.
 

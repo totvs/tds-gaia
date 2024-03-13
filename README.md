@@ -51,7 +51,7 @@ A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://co
 > - [Instalação](README.md#instalação).
 
 Após a instalação da extensão **TDS-Dito**. Uma verificação de disponibilidade do serviço de IA é efetuada. 
-Se estiver tudo em ordem, identifique-se efetuando `Login [Ctrl+D Ctrl+E]`. Após validado, abra um fonte AdvPL/TLPP, 
+Se estiver tudo em ordem, identifique-se efetuando `Login [Ctrl+D Ctrl+L]`. Após validado, abra um fonte AdvPL/TLPP, 
 posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP ou aguarde alguns instantes, que sugestões de códigos lhe serão apresentadas.
 
 | Funcionalidade | Atalho        | Ação |
