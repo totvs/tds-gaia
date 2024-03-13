@@ -7,11 +7,12 @@
 
 ## Inteligência Artificial (Carol Clockin Web API)
 
-- :white_check_mark: Criar API para uso da inteligência artificial.
+- :walking: API para uso da inteligência artificial.
 - :white_square_button: Controle de acesso (_login_).
 - :white_square_button: Definir tratamento para `What do you want me to explain?` ou `Explain What?`, inclusive de códigos já processados.
+- :white_square_button: Apresentado lista de opções ao final da resposta. Como proceder?
 - :white_square_button: Eliminar frases duplicadas.
-- :white_square_button: Mecanismo de avaliação de respostas pelo usuário, que será utilizada para refinamento do modelo.
+- :white_square_button: Mecanismo de avaliação de respostas pelo usuário, que poderá ser utilizada para refinamento do modelo.
 - :white_square_button: Configuração do idioma das respostas.
 - :white_square_button: Eliminar sugestões de código já existente.
 - :white_square_button: Adicionar suporte para outros idiomas.
@@ -21,7 +22,7 @@
 
 ## API: Inteligência Artificial (interface IaApiInterface)
 
-- :white_check_mark: Criar API para a inteligência artificial.
+- :walking: API para a inteligência artificial.
 - :white_square_button: Identificação de usuário (_login_).
   Usar `vscode.AuthProvider` para autenticação.
 - :white_square_button: Mensagens associadas a processamento.
@@ -29,15 +30,16 @@
 
 ## API: Bate-papo (classe ChatApi)
 
-- :white_check_mark: Criar API para bate-papo.
+- :walking: API para bate-papo.
 - :white_square_button: Detalhar a `ajuda`(_help_) dos comandos.
+- :white_square_button: Melhorar/implementar tratamento de argumentos em comandos.
 
 ## Visual: Bate-papo
 
 - :white_square_button: Executar o comando ao acionar `Enter`.
 - :white_square_button: Associar visualmente mensagem de resposta com a mensagem de entrada.
   Tratar `MouseOver` sobre a mensagem de resposta ou de entrada e destacar as duas. Dessa forma, se o usuário disparar vários processos, pode acompanhar qual mensagem está sendo respondida.
-- :white_square_button: Implementar `goto`em links de posicionamento de fontes.
+- :white_square_button: Implementar `goto` em ligações (_links_) de posicionamento em fontes.
 
 ## Visual: Editor de texto
 
