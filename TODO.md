@@ -31,8 +31,10 @@
 ## API: Bate-papo (classe ChatApi)
 
 - :walking: API para bate-papo.
+- :white_square_button: Implementar sistema de tradução L10N.
 - :white_square_button: Detalhar a `ajuda`(_help_) dos comandos.
 - :white_square_button: Melhorar/implementar tratamento de argumentos em comandos.
+- :white_square_button: Implementar processo de abertura de chamado (comando `open_issue`).
 
 ## Visual: Bate-papo
 
