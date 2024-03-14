@@ -8,16 +8,18 @@
 ## Inteligência Artificial (Carol Clockin Web API)
 
 - :walking: API para uso da inteligência artificial.
-- :white_square_button: Controle de acesso (_login_).
 - :white_square_button: Definir tratamento para `What do you want me to explain?` ou `Explain What?`, inclusive de códigos já processados.
-- :white_square_button: Apresentado lista de opções ao final da resposta. Como proceder?
+- :white_square_button: Apresentado lista de opções ao final da resposta (`Show me...`). Como proceder?
 - :white_square_button: Eliminar frases duplicadas.
-- :white_square_button: Mecanismo de avaliação de respostas pelo usuário, que poderá ser utilizada para refinamento do modelo.
-- :white_square_button: Configuração do idioma das respostas.
 - :white_square_button: Eliminar sugestões de código já existente.
-- :white_square_button: Adicionar suporte para outros idiomas.
 - :white_square_button: Adicionar tempo de processamento em todas as funções da API.
 - :white_square_button: Configuração do nível de detalhes das respostas.
+  Nessa etapa, apresentar sempre de forma sucinta, com opção para detalhamento.
+
+- :white_square_button: Controle de acesso (_login_).
+- :white_square_button: Mecanismo de avaliação de respostas pelo usuário, que poderá ser utilizada para refinamento do modelo.
+- :white_square_button: Configuração do idioma das respostas.
+- :white_square_button: Adicionar suporte para outros idiomas.
 - :white_square_button: Em alguns retornos de explicação de um bloco, retornou referências a linha (`First line`, `Second Line...`). Melhor seria textos mais corridos, sem ser linha a linha e de acordo com nível de detalhe desejado.
 
 ## API: Inteligência Artificial (interface IaApiInterface)
@@ -27,6 +29,8 @@
   Usar `vscode.AuthProvider` para autenticação.
 - :white_square_button: Mensagens associadas a processamento.
   Encapsular o processamento e passar como _callback_ para ChatApi.Dito e esse passa a tratar o retorno da mensagem (`messageId`).
+- :white_square_button: No caso de erro 504 e com informação de tempo para nova tentativa, agendar nova tentativa.
+  Mensagem com tempo: ``The server encountered a temporary error and could not complete your request. Please try again in 30 seconds.``
 
 ## API: Bate-papo (classe ChatApi)
 
