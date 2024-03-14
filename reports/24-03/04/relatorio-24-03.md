@@ -10,11 +10,12 @@ Para detalhes, favor ler o relatório do dia.
 - Sistema de retroalimentação para que usuários possam avaliar a qualidade das retornos. [28/02](../../24-02/28/relatorio-24-02-28.md)
 - Mensurar o tempo de execução em todas as API. [28/02](../../24-02/28/relatorio-24-02-28.md)
 - Limpeza nas respostas:
-  - `Explain the code..."
+  - `Explain the code...`
   - Repetição do código enviado
-- Erros de grafia. [07/03](../../24-02/28/relatorio-24-07-03.md)
-- Algumas inconsistências. Sistema de retroalimentação. [07/03](../../24-02/28/relatorio-24-07-03.md)
-- Respostas como `Explain What?` de códigos já testados. [12/03](../../24-02/28/relatorio-24-07-12.md)
+  - Links
+- Erros de grafia. [07/03](relatorio-24-03-07.md)
+- Algumas inconsistências. Sistema de retroalimentação. [07/03](relatorio-24-07-03.md)
+- Respostas como `Explain What?` de códigos já testados. [12/03](relatorio-24-07-12.md)
 - Respostas como `What do you want me to explain?`
-- Respostas contendo uma lista de opções. [12/03](../../24-02/28/relatorio-24-07-13.md)
-- Citação de outras linguagens. [12/03](../../24-02/28/relatorio-24-07-13.md)
+- Respostas contendo uma lista de opções. [12/03](relatorio-24-04-13.md)
+- Citação de outras linguagens. [12/03](relatorio-24-07-13.md)

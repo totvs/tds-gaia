@@ -80,10 +80,10 @@ Correto, mas veio em português. O IA deduziu que estou usando idioma português
 > Por exemplo, considere o seguinte trecho de código em Python:
 > x = 5 + 2 *3
 > 
-> Neste trecho, x recebe o valor 7, pois foi calculado o resultado da expressão 5 + 2* 3, que é 11. O operador *é > chamado de operador aritmético e tem a mesma prioridade que os operadores + e -.
+> Neste trecho, x recebe o valor 7, pois foi calculado o resultado da expressão 5 + 2* 3, que é 11. O operador *é chamado de operador aritmético e tem a mesma prioridade que os operadores + e -.
 > 
 
-Não acho interessante citar outras linguagens, talvez quando solicitado uma resposta mais detalhada ou para iniciante em AdvPL.
+Não acho interessante citar outras linguagens, talvez quando solicitado uma resposta mais detalhada ou para iniciante em AdvPL. Perfil de usuário?
 
 > No ADVPL, porém, o operador*= é chamado de operador de multiplicação. Ele tem maior prioridade que o operador +, > portanto, a expressão anterior será avaliada como 5 + 6 * 3, que resulta em 19.
 > 
