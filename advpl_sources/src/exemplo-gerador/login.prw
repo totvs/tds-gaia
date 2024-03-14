@@ -20,7 +20,8 @@ user function dlglogin()
 	@ 085, 065 get oGet2 var cPassword size 060, 010 of oDlg pixel
 
 	@ 105, 065 button oButton1 prompt "OK" of oDlg action {|| oDlg:end() } size 36,11 pixel // oButton1 := TButton()....
-
+	@ 105, 085 button oButton1 prompt "Cancel" of oDlg action {|| oDlg:end() }
+	
 	activate msdialog oDlg centered
 
 	//adicione o seu código

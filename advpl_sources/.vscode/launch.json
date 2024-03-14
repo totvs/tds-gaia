@@ -39,9 +39,24 @@
 				"1234"
 			],
 			"label": "u_escolheNum"
+		},
+		{
+			"label": "u_p1_cadastro"
+		},
+		{
+			"label": "u_p1_cadastro 02"
+		},
+		{
+			"label": "up2_consulta 01"
+		},
+		{
+			"label": "u_p2_consulta 01"
+		},
+		{
+			"label": "u_p3_relatorio"
 		}
 	],
-	"lastProgramExecuted": "u_escolheNum",
+	"lastProgramExecuted": "u_p3_relatorio",
 	"lastProgramArguments": [
 		"true",
 		"W:\\ws_tds_vscode\\tds-dito\\advpl_sources\\replay.trplay",
