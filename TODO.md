@@ -32,10 +32,13 @@
 - :white_square_button: No caso de erro 504 e com informação de tempo para nova tentativa, agendar nova tentativa.
   Mensagem com tempo: ``The server encountered a temporary error and could not complete your request. Please try again in 30 seconds.``
 
+## Extensão
+
+- :white_square_button: Implementar sistema de tradução L10N.
+
 ## API: Bate-papo (classe ChatApi)
 
 - :walking: API para bate-papo.
-- :white_square_button: Implementar sistema de tradução L10N.
 - :white_square_button: Detalhar a `ajuda`(_help_) dos comandos.
 - :white_square_button: Melhorar/implementar tratamento de argumentos em comandos.
 - :white_square_button: Implementar processo de abertura de chamado (comando `open_issue`).
@@ -46,6 +49,8 @@
 - :white_square_button: Associar visualmente mensagem de resposta com a mensagem de entrada.
   Tratar `MouseOver` sobre a mensagem de resposta ou de entrada e destacar as duas. Dessa forma, se o usuário disparar vários processos, pode acompanhar qual mensagem está sendo respondida.
 - :white_square_button: Implementar `goto` em ligações (_links_) de posicionamento em fontes.
+- :white_square_button: Implementar indicador de "Processando" durante execução da API `complete`.
+  Ideias: `Completing code...` ou barra de progresso (`vscode.window.withProgress`) ou outro indicador acima do campo `NewMessage`.
 
 ## Visual: Editor de texto
 
