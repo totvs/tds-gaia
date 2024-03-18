@@ -55,7 +55,7 @@
   ],
   "homepage": "https://github.com/totvs/tds-dito-vscode",
   "activationEvents": [
-    "onStartupFinished:TOTVS.tds-vscode"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
