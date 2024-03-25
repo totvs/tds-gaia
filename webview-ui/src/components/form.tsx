@@ -186,9 +186,9 @@ let isProcessRing: boolean = false;
  * Handles submit and reset events.
  */
 export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataModel>): JSX.Element {
-	const {
-		formState: { errors, isDirty, isValid, isSubmitting },
-	} = useFormContext();
+	 const {
+	  	formState: { errors, isDirty, isValid, isSubmitting },
+	 } = useFormContext();
 
 	let actions: IFormAction[] = props.actions ? props.actions : getDefaultActionsForm();
 
@@ -269,7 +269,7 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 						}
 
 						return (action.type == "link" ?
-							<VSCodeLink onClick={() => action.onClick()}>{action.caption}</VSCodeLink>
+							<VSCodeLink key={action.id} onClick={() => action.onClick()}>{action.caption}</VSCodeLink>
 							: <VSCodeButton
 								className={`tds-button-button ${visible}`}
 								{...propsField} >
