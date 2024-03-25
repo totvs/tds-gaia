@@ -35,6 +35,7 @@ Return(.T.)
 
 // Montar um browse para a tabela de produtos, usando MVC
 // Montar um browse para a SB1, usando MVC
+// Criar uma tela usando a tabela de produtos SB1 e usando MVC
 static function proc_02()
 	//>>> opcional, mas recomendado para rotinas do usuário
 	Local aArea   := GetArea()

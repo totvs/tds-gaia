@@ -13,6 +13,7 @@ user function P3_RELATORIO()
 return
 
 // Gerar um relatório de produtos com código e nome
+// Gerar um relatorio usando FwMSPrinter com cabeçalho, rodapé e paginação e a tabela de produtos SB1 
 static function proc_01()
 	//>>> opcional, mas recomendado para rotinas do usuário
 	Local aArea   := GetArea()

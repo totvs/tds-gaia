@@ -1,5 +1,6 @@
 #include "protheus.ch"
 
+// Gerar uma função para exibir diálogo de menu de cadastro usando AxCadastro e MVC
 user function menu_ia()
 	local aOpcoes := {}
 	local cOpcao := ""
@@ -22,6 +23,7 @@ user function menu_ia()
 
 return
 
+//Criar uma tela contendo botoes para cada opcao de um array de opcoes recebidos por parametro e que retorne o nome da opcao selecionada
 static function tela(aaOpcoes)
 	Local oDlg, oBtn
 	local cOpcao

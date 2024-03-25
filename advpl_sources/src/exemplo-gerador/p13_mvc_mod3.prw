@@ -11,6 +11,7 @@ user function P13_CADASTRO(process)
 return
 
 // Listar as NFs  de um cliente selecionado
+// Criar um browse para SF2 filtrando pelo cliente selecionado no browse de SA1
 /*/{Protheus.doc} proc_01
 
 Permite a visualização das NF emitidas um cliente selecionado.
