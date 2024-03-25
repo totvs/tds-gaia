@@ -36,7 +36,7 @@ export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
                 {props.label}
                 {props.rules?.required && <span className="tds-required" />}
             </label>
-            <VSCodeTextField
+            <VSCodeTextField placeholder="Tell me what you need.." size={30}
                 readOnly={props.readOnly || false}
                 {...registerField}
             >
