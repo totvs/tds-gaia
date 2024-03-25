@@ -22,6 +22,8 @@
 - :white_square_button: Adicionar suporte para outros idiomas.
 - :white_square_button: Em alguns retornos de explicação de um bloco, retornou referências a linha (`First line`, `Second Line...`). Melhor seria textos mais corridos, sem ser linha a linha e de acordo com nível de detalhe desejado.
 
+- :white_square_button: API de log e avaliacao de auto-complete
+
 ## API: Inteligência Artificial (interface IaApiInterface)
 
 - :walking: API para a inteligência artificial.
@@ -35,6 +37,10 @@
 ## Extensão
 
 - :white_square_button: Implementar sistema de tradução L10N.
+- :white_square_button: Implementar processo para salvar os logs do auto-complete
+- :white_square_button: Implementar uma forma de feedback do resultado do auto-complete. 
+    - Caso o usuario aceite o auto-complete, gerar um log com avaliacao positiva.
+    - Pensar em alguma solução para o usuário, ativamente, avaliar negativamente o auto-complete sugerido pela IA.
 
 ## API: Bate-papo (classe ChatApi)
 
@@ -55,3 +61,7 @@
 ## Visual: Editor de texto
 
 - :white_square_button: Colocar _codeLens_ no código que esta sendo processado.
+
+## Problemas gerais:
+
+- :white_check_mark: Extensão não ativa corretamente caso a visão do DitoChat tenha sido fechada anteriorment
