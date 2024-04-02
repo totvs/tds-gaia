@@ -1,23 +1,18 @@
-#include "protheus.ch"
-#Include "FWMVCDef.ch"
-#INCLUDE "FWPrintSetup.ch"
-#INCLUDE "RPTDEF.CH"
 
-//Ignorar, rotina somente para rodar o código exemplos
-user function P3_RELATORIO()
 
-	RPCSetEnv("T1", "D MG 01",,,"FAT",,,,,,)
+// //Ignorar, rotina somente para rodar o código exemplos
+// user function P3_RELATORIO()
 
-	DEFINE WINDOW oMainWnd FROM 001,001 TO 400,500 TITLE 'Janela Principal'
-	ACTIVATE WINDOW oMainWnd MAXIMIZED ON INIT ( proc_01() , oMainWnd:End() )
-return
+// 	RPCSetEnv("T1", "D MG 01",,,"FAT",,,,,,)
+
+// 	DEFINE WINDOW oMainWnd FROM 001,001 TO 400,500 TITLE 'Janela Principal'
+// 	ACTIVATE WINDOW oMainWnd MAXIMIZED ON INIT ( proc_01() , oMainWnd:End() )
+// return
 
 // Gerar um relatório de produtos com código e nome
 // Gerar um relatorio usando FwMSPrinter com cabeçalho, rodapé e paginação e a tabela de produtos SB1 
-static function proc_01()
-	//>>> opcional, mas recomendado para rotinas do usuário
+user function proc_01()
 	Local aArea   := GetArea()
-	//<<<
 	local oPrint
 	local nRow := 99
 	local nPage := 0
@@ -54,13 +49,11 @@ static function proc_01()
 	if oPrint:nModalResult == PD_OK
 		oPrint:Preview()
 	EndIf
-	//>>> recomendado
 	RestArea(aArea)
-	//<<<
 
 Return(.T.)
 
-static function printHeader(oPrint, nPage, nRow)
+user function printHeader(oPrint, nPage, nRow)
 	nRow := 2
 	nPage++
 

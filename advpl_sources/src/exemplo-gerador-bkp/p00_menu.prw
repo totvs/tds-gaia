@@ -1,6 +1,11 @@
 #include "protheus.ch"
 
-// Gerar uma função para exibir diálogo de menu de cadastro usando AxCadastro e MVC
+// basico: Gerar uma função para exibir diálogo de menu de cadastro usando AxCadastro e MVC e que retorna a opção selecionada.
+// complementar: Usar uma função estática já implementada no código para gerar o diálogo de opções contendo
+// botões para cada opção do array passado por parâmetro, uma validação que verifica se o tipo do parametro informado é um array,
+// e em caso positivo, apenas continua o processo, e caso nagativo apresenta um alerta com o texto: "Parametro aaOpcoes não é uma lista (array)"
+// e retorna a variavel de opcão selecionada. Após a seleção da opção pelo usuário, validar a seleção, onde caso tenha sido selecionado a opção 1, 
+// chama a função p10_cadastro(), caso tenha sido selecionado a opção 2 chama a função p11_cadastro() e caso tenha sido selecionado a opção 3 (asterisco) encerra o loop.
 user function menu_ia()
 	local aOpcoes := {}
 	local cOpcao := ""
@@ -14,16 +19,15 @@ user function menu_ia()
 		cOpcao := tela(aOpcoes)
 
 		if cOpcao == aOpcoes[1]
-			u_p10_cadastro()
+			p10_cadastro()
 		elseif cOpcao == aOpcoes[2]
-			u_p11_cadastro()
+			p11_cadastro()
 		endif
 
 	enddo
 
 return
 
-//Criar uma tela contendo botoes para cada opcao de um array de opcoes recebidos por parametro e que retorne o nome da opcao selecionada
 static function tela(aaOpcoes)
 	Local oDlg, oBtn
 	local cOpcao
@@ -49,8 +53,6 @@ static function tela(aaOpcoes)
         oBtn:blClicked := &("{|| cOpcao := '"+x+"', oDlg:end() }"),;
 		})
 
-//ACTIVATE DIALOG oDlg CENTERED
 	oDlg:Activate( oDlg:bLClicked, oDlg:bMoved, oDlg:bPainted,.T.,,,, oDlg:bRClicked, )
-//oDlg:Activate()
 
 Return cOpcao

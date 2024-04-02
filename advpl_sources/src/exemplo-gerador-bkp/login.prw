@@ -1,6 +1,9 @@
 #include "protheus.ch"
 
-// gerar diálogo solicitando usuário e senha
+// basico: gerar diálogo solicitando usuário e senha
+// complementar: Adicionar botão de confirmação e cancelamento, validação da senha informada pelo usuário, 
+// um alerta caso a senha esteja correta com o texto "senha correta" e título "ok" 
+// e um alerta casoa senha esteja errada com o texto "senha incorreta" e título "erro"
 user function dlglogin()
 	local oDlg
 	local oButton1
