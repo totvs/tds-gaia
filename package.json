@@ -137,11 +137,6 @@
         "category": "TDS-Dito"
       },
       {
-        "command": "tds-dito.logCompletionFeedback",
-        "title": "Log Completion Feedback",
-        "category": "TDS-Dito"
-      },
-      {
         "command": "tds-dito.health",
         "title": "Health Service",
         "shortTitle": "Health",
