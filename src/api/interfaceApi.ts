@@ -24,7 +24,7 @@ let execBeginTime: Date;
 /**
  * Interface for completion response from autocomplete API.
  */
-interface Completion {
+export interface Completion {
     generated_text: string;
 }
 
@@ -73,6 +73,8 @@ export interface IaApiInterface {
     getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse>
     explainCode(code: string): Promise<string>;
     typify(code: string): Promise<TypifyResponse>;
+
+    logCompletionFeedback(completions: {completion: Completion, textBefore: string, textAfter: string}): void;
 }
 
 /**

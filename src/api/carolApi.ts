@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoReady, setDitoUser } from "../config";
 import { fetch, Response } from "undici";
 import { capitalize } from "../util";
-import { CompletionResponse, IaAbstractApi, IaApiInterface, TypifyResponse } from "./interfaceApi";
+import { Completion, CompletionResponse, IaAbstractApi, IaApiInterface, TypifyResponse } from "./interfaceApi";
 import { PREFIX_DITO, logger } from "../logger";
 import { updateContextKey } from "../extension";
 
@@ -304,6 +304,21 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     stop(): Promise<boolean> {
 
         return this.logout();
+    }
+
+      /**
+     * Registers commands for the extension.
+     * 
+     */
+    logCompletionFeedback(completions: {completion: Completion, textBefore: string, textAfter: string}): void {
+       logger.debug("Logging completion feedback...");
+       //logger.debug("Logging Completions: %s", JSON.stringify(completions, undefined, 2));
+
+       let generatedText = completions.completion.generated_text;
+       let textBefore = completions.textBefore;
+       let textAfter = completions.textAfter;
+
+       //Implementar a chamada para a API Rest para enviar feedback quando estiver disponivel
     }
 
     /**

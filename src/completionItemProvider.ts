@@ -17,9 +17,12 @@ limitations under the License.
 import * as vscode from "vscode";
 import { delay } from "./util";
 import { TDitoConfig, getDitoConfiguration } from "./config";
-import { CompletionResponse } from "./api/interfaceApi";
+import { Completion, CompletionResponse } from "./api/interfaceApi";
 import { iaApi } from "./extension"
 import { logger } from "./logger";
+
+let textBeforeCursor: string = "";
+let textAfterCursor: string = "";
 
 /**
  * Provides inline completion items by making requests to the IA API. 
@@ -42,19 +45,26 @@ export class InlineCompletionItemProvider implements vscode.InlineCompletionItem
         const inlineRegister: vscode.Disposable = vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
         context.subscriptions.push(inlineRegister);
 
-        const afterInsert = vscode.commands.registerCommand('tds-dito.afterInsert', async (response: CompletionResponse) => {
-            const { request_id, completions } = response;
-            const params = {
-                requestId: request_id,
-                acceptedCompletion: 0,
-                shownCompletions: [0],
-                completions,
-            };
-            logger.debug("Params: %s", JSON.stringify(params, undefined, 2));
-
+        const afterInsert = vscode.commands.registerCommand('tds-dito.afterInsert', async (response: Completion) => {
+            //const { request_id, completions } = response;
+            // const params = {
+            //     requestId: request_id,
+            //     acceptedCompletion: 0,
+            //     shownCompletions: [0],
+            //     completions,
+            // };
+            //logger.debug("After Insert Params: %s", JSON.stringify(params, undefined, 2));
+            vscode.commands.executeCommand("tds-dito.logCompletionFeedback", {completion: response, textBefore: textBeforeCursor, textAfter: textAfterCursor});
+            
             //await client.sendRequest("llm-ls/acceptCompletion", params);
         });
+        
+        const logCompletionFeedback = vscode.commands.registerCommand('tds-dito.logCompletionFeedback', async (response: {completion: Completion, textBefore: string, textAfter: string}) => {
+            iaApi.logCompletionFeedback(response);
+        });
+
         context.subscriptions.push(afterInsert);
+        context.subscriptions.push(logCompletionFeedback);
     }
 
     async provideInlineCompletionItems(document: vscode.TextDocument, position: vscode.Position, context: vscode.InlineCompletionContext, token: vscode.CancellationToken): Promise<vscode.InlineCompletionItem[]> {
@@ -82,8 +92,6 @@ export class InlineCompletionItemProvider implements vscode.InlineCompletionItem
             }
         }
 
-        let textBeforeCursor: string = "";
-        let textAfterCursor: string = "";
         const offset = document.offsetAt(position);
 
         textBeforeCursor = document.getText().substring(0, offset);
