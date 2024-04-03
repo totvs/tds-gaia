@@ -314,9 +314,13 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
        logger.debug("Logging completion feedback...");
        //logger.debug("Logging Completions: %s", JSON.stringify(completions, undefined, 2));
 
-       let generatedText = completions.completion.generated_text;
-       let textBefore = completions.textBefore;
-       let textAfter = completions.textAfter;
+        if(completions !== undefined)   {
+            if(completions.completion !== undefined) {
+                let generatedText = completions.completion.generated_text;
+            }
+            let textBefore = completions.textBefore;
+            let textAfter = completions.textAfter;
+        }
 
        //Implementar a chamada para a API Rest para enviar feedback quando estiver disponivel
     }
