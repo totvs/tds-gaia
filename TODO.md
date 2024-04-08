@@ -37,8 +37,7 @@
 ## Extensão
 
 - :white_square_button: Implementar sistema de tradução L10N.
-- :white_square_button: Implementar processo para salvar os logs do auto-complete
-- :white_square_button: Implementar uma forma de feedback do resultado do auto-complete. 
+- :walking: Implementar uma forma de feedback do resultado do auto-complete. 
     - Caso o usuario aceite o auto-complete, gerar um log com avaliacao positiva.
     - Pensar em alguma solução para o usuário, ativamente, avaliar negativamente o auto-complete sugerido pela IA.
 
@@ -48,6 +47,7 @@
 - :white_square_button: Detalhar a `ajuda`(_help_) dos comandos.
 - :white_square_button: Melhorar/implementar tratamento de argumentos em comandos.
 - :white_square_button: Implementar processo de abertura de chamado (comando `open_issue`).
+- :walking: Implementar substituicao de texto ao fazer o typify
 
 ## Visual: Bate-papo
 
