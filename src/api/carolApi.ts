@@ -545,6 +545,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
                 const selection: vscode.Selection = editor.selection;
                 const function_re: RegExp = /(function|method(...)class)\s*(\w+)/i
+                const return_re: RegExp = /^\s*(Return|EndClass)/i
                 const curPos: vscode.Position = selection.start;
                 let whatExplain: string = "";
                 let curLine = curPos.line;
@@ -574,7 +575,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
                     const nextLineStart = new vscode.Position(lineStart.line + 1, 0);
                     const rangeWithFirstCharOfNextLine = new vscode.Range(curLineStart, nextLineStart);
                     const contentWithFirstCharOfNextLine = editor.document.getText(rangeWithFirstCharOfNextLine);
-                    const matches = contentWithFirstCharOfNextLine.match(function_re);
+                    const matches = contentWithFirstCharOfNextLine.match(return_re);
 
                     if (matches) {
                         endFunction = new vscode.Position(curLine, 0);
@@ -603,12 +604,21 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
                         return this.typify(codeToTypify).then((response: TypifyResponse) => {
                             let text: string[] = [];
 
-                            if (response !== undefined && response.types.length) {
+                            if (response !== undefined && response.types !== undefined && response.types.length) {
                                 for (const varType of response.types) {
                                     text.push(`- **${varType.var}** as **${varType.type}** ${this.chat.commandText("update")}`);
                                 }
-
                                 this.chat.dito(text, messageId);
+
+                                //const edit = new vscode.WorkspaceEdit();
+                                //edit.insert(YOUR_URI, rangeForTypify.start, "TEST");
+                                //let success = await vscode.workspace.applyEdit(edit);
+                                const ss: vscode.SnippetString = new vscode.SnippetString;
+                                ss.appendText("TEST");
+                                editor.insertSnippet(ss,rangeForTypify);
+
+                            } else {
+                                this.chat.dito("Desculpe, não consegui fazer a tipificação por conta de um problema interno.", messageId);
                             }
                         });
                     }
