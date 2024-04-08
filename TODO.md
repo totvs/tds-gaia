@@ -17,12 +17,12 @@
   Nessa etapa, apresentar sempre de forma sucinta, com opção para detalhamento.
 
 - :white_square_button: Controle de acesso (_login_).
-- :white_square_button: Mecanismo de avaliação de respostas pelo usuário, que poderá ser utilizada para refinamento do modelo.
 - :white_square_button: Configuração do idioma das respostas.
 - :white_square_button: Adicionar suporte para outros idiomas.
 - :white_square_button: Em alguns retornos de explicação de um bloco, retornou referências a linha (`First line`, `Second Line...`). Melhor seria textos mais corridos, sem ser linha a linha e de acordo com nível de detalhe desejado.
 
-- :white_square_button: API de log e avaliacao de auto-complete
+- :white_square_button: Mecanismo de avaliação de respostas pelo usuário, que poderá ser utilizada para refinamento do modelo.
+- :white_square_button: API de log e avaliação de auto-complete
 
 ## API: Inteligência Artificial (interface IaApiInterface)
 
@@ -37,9 +37,9 @@
 ## Extensão
 
 - :white_square_button: Implementar sistema de tradução L10N.
-- :walking: Implementar uma forma de feedback do resultado do auto-complete. 
-    - Caso o usuario aceite o auto-complete, gerar um log com avaliacao positiva.
-    - Pensar em alguma solução para o usuário, ativamente, avaliar negativamente o auto-complete sugerido pela IA.
+- :walking: Implementar uma forma de _feedback_ do resultado do auto-complete.
+  - Caso o usuário aceite o auto-complete, gerar um log com avaliação positiva.
+  - Pensar em alguma solução para o usuário, ativamente, avaliar negativamente o auto-complete sugerido pela IA.
 
 ## API: Bate-papo (classe ChatApi)
 
@@ -62,6 +62,6 @@
 
 - :white_square_button: Colocar _codeLens_ no código que esta sendo processado.
 
-## Problemas gerais:
+## Problemas gerais
 
-- :white_check_mark: Extensão não ativa corretamente caso a visão do DitoChat tenha sido fechada anteriorment
+- :white_check_mark: Extensão não ativa corretamente caso a visão do DitoChat tenha sido fechada anteriormente
