@@ -24,6 +24,8 @@ import { ChatApi } from './api/chatApi';
 import { DitoCodeLensProvider } from './codeLens';
 import { logger } from './logger';
 import { InlineCompletionItemProvider } from './completionItemProvider';
+import { registerIaCommands } from './commands/IA/index';
+import { registerChatCommands } from './commands/chat';
 
 let ctx: vscode.ExtensionContext;
 
@@ -61,9 +63,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	showBanner()
 
-	iaApi.register(context);
-	
-	chatApi.register(context);
+	registerIaCommands(context, iaApi, chatApi);
+	registerChatCommands(context, chatApi);
 
 	InlineCompletionItemProvider.register(context);
 	

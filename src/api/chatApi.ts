@@ -41,7 +41,7 @@ const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
 const EXPLAIN_WORD_RE = /^explain\sword\s(source)?$/i;
 const TYPIFY_RE = /^typify\s(source)?$/i;
-const UPDATE_RE = /^update\s(source)?$/i;
+const UPDATE_RE = /^updatetypify\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
 const HINT_2_RE = /^(hint_2)$/i;
@@ -53,7 +53,7 @@ const COMMAND_IN_MESSAGE = /\{command:([^\}]\w+)(\s+\b.*)?\}/i;
  * Includes the command name, regex to match it, an optional ID, 
  * optional caption and aliases, and an optional handler function.
 */
-type TCommand = {
+export type TCommand = {
     command: string;
     regex: RegExp;
     commandId?: string;
@@ -138,37 +138,12 @@ const commandsMap: Record<string, TCommand> = {
         commandId: "tds-dito.typify",
     },
     "update": {
-        caption: "Update",
+        caption: "Update typified Variables",
         command: "update",
         regex: UPDATE_RE,
-        //commandId: "tds-dito.typify",
+        commandId: "tds-dito.updateTypify",
     }
 };
-
-/**
- * Completes the commands map by adding details like captions, keybindings etc. 
- * from the extension's package.json.
- * 
- * @param extension - The VS Code extension object.
- */
-function completeCommandsMap(extension: vscode.Extension<any>) {
-    const commands: any = extension.packageJSON.contributes.commands;
-    const keybindings: any = extension.packageJSON.contributes.keybindings;
-
-    Object.keys(commands).forEach((key: string) => {
-        const command: TCommand | undefined = ChatApi.getCommand(commands[key].command);
-
-        if (command) {
-            command.caption = command.caption || commands[key].shortTitle || commands[key].title;
-
-            Object.keys(keybindings).forEach((key2: string) => {
-                if (keybindings[key2].command == command.commandId) {
-                    command.key = keybindings[key2].key;
-                }
-            });
-        }
-    });
-}
 
 /**
  * Provides methods for interacting with the chat API. 
@@ -194,25 +169,8 @@ export class ChatApi {
     }
 
     register(context: vscode.ExtensionContext) {
-        completeCommandsMap(context.extension);
-        const clear = vscode.commands.registerCommand('tds-dito.clear', async () => {
-            this.user("clear", true);
-        });
-        context.subscriptions.push(clear);
-
-        const openManual = vscode.commands.registerCommand('tds-dito.open-manual', async () => {
-            const messageId: string = this.dito("Abrindo manual do **TDS-Dito**.");
-            const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md";
-
-            return vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
-                this.dito("Manual do Dito aberto.", messageId);
-            }, (reason) => {
-                this.dito("Não foi possível abrir manual do **TDS-Dito**.", messageId);
-                logger.error(reason);
-            });
-        });
-        context.subscriptions.push(openManual);
-
+        //Os registros de comandos devem ficar em uma estrutura propria.
+        //Seguir o exemplo da pasta src/commands/chat
     }
 
     private queueMessages: TQueueMessages = new Queue<TMessageModel>();

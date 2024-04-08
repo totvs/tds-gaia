@@ -196,6 +196,12 @@
         "title": "Typify variables",
         "shortTitle": "typify",
         "category": "TDS-Dito"
+      },
+      {
+        "command": "tds-dito.updateTypify",
+        "title": "Update Typifed variables",
+        "shortTitle": "Update",
+        "category": "TDS-Dito"
       }
     ],
     "configuration": [
