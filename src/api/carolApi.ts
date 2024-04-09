@@ -306,8 +306,6 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             return { types: [] };
         }
 
-        //  logger.debug(`Code explain end with ${response.length} size`);
-        logger.debug(json);
         logger.profile("typify");
 
         return json;
