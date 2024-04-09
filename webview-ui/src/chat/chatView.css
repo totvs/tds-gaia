@@ -39,6 +39,7 @@ section.tds-chat section.tds-content {
 	flex-grow: 1;
 	flex-shrink: 1;
 	order: 0;
+	margin-top: 15px;
 }
 
 section.tds-chat section.tds-footer {
@@ -82,7 +83,7 @@ section.tds-chat div.tds-message-row div.tds-message-author #inProcess {
 	font-style: italic;
 	font-size: 80%;
 	flex-grow: 3;
-	align-self: baseline ;
+	align-self: baseline;
 }
 
 section.tds-chat div.tds-message-row div.tds-message-author #timeStamp {

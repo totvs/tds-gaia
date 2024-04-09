@@ -5,6 +5,7 @@ import { fetch, Response } from "undici";
 import { capitalize } from "../util";
 import { Completion, CompletionResponse, IaAbstractApi, IaApiInterface, TypifyResponse } from "./interfaceApi";
 import { logger } from "../logger";
+import { ChatViewProvider } from "../panels/chatViewProvider";
 
 export class CarolApi extends IaAbstractApi implements IaApiInterface {
     // prefixo _ indica envolvidas com a API CAROL
@@ -28,63 +29,75 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         logger.http(url, { method, headers, data });
 
         let result: any;
-
-        try {
-            let resp: Response = await fetch(url, {
-                method: method,
-                body: typeof (data) == "string" ? data : JSON.stringify(data),
-                headers: headers
+        await vscode.window.withProgress({
+            location: { viewId: ChatViewProvider.viewType },
+            cancellable: false,
+            title: "Dito: requesting data..."
+        }, async (progress, token) => {
+            token.onCancellationRequested(() => {
+                result = new Error();
+                result.message = "Cancelled";
             });
 
-            logger.info(`Status: ${resp.status}`);
+            try {
+                let resp: Response = await fetch(url, {
+                    method: method,
+                    body: typeof (data) == "string" ? data : JSON.stringify(data),
+                    headers: headers
+                });
 
-            const bodyResp: string = await resp.text();
-            if (!resp.ok) {
-                let statusText = "";
+                logger.info(`Status: ${resp.status}`);
 
-                if (resp.status === 502) { //bad gateway
-                    const pos_s: number = bodyResp.indexOf("<h2>");
-                    const pos_e: number = bodyResp.indexOf("</h2>");
+                const bodyResp: string = await resp.text();
+                if (!resp.ok) {
+                    let statusText = "";
 
-                    statusText = "\n" + bodyResp.substring(pos_s + 4, pos_e).replace(/<p>/g, " ");
-                }
+                    if (resp.status === 502) { //bad gateway
+                        const pos_s: number = bodyResp.indexOf("<h2>");
+                        const pos_e: number = bodyResp.indexOf("</h2>");
 
-                result = new Error();
-                result.name = `REQUEST_${method.toUpperCase()}`;
-                result.cause = "Error requesting [type: " + method + ", url: " + url + " ]";
-                result.message = `${resp.status}: ${resp.statusText}${statusText}`;
-
-                if (resp.headers.get("content-type") == "application/json") {
-                    const json = JSON.parse(bodyResp);
-                    if (json) {
-                        if (json.detail) {
-                            result.message += `\n Detail: ${json.detail}`;
-                        }
+                        statusText = "\n" + bodyResp.substring(pos_s + 4, pos_e).replace(/<p>/g, " ");
                     }
-                } else {
-                    result.cause += `${result.cause}\n Detail: ${bodyResp}`;
 
-                }
-                Error.captureStackTrace(result);
-                this.logError(url, result, bodyResp);
-            } else {
-                this.logResponse(url, bodyResp);
-                if (resp.headers.get("content-type") == "application/json") {
-                    try {
-                        result = JSON.parse(bodyResp);
-                    } catch (error) {
+                    result = new Error();
+                    result.name = `REQUEST_${method.toUpperCase()}`;
+                    result.cause = "Error requesting [type: " + method + ", url: " + url + " ]";
+                    result.message = `${resp.status}: ${resp.statusText}${statusText}`;
+
+                    if (resp.headers.get("content-type") == "application/json") {
+                        const json = JSON.parse(bodyResp);
+                        if (json) {
+                            if (json.detail) {
+                                result.message += `\n Detail: ${json.detail}`;
+                            }
+                        }
+                    } else {
+                        result.cause += `${result.cause}\n Detail: ${bodyResp}`;
+
+                    }
+                    Error.captureStackTrace(result);
+                    this.logError(url, result, bodyResp);
+                } else {
+                    this.logResponse(url, bodyResp);
+                    if (resp.headers.get("content-type") == "application/json") {
+                        try {
+                            result = JSON.parse(bodyResp);
+                        } catch (error) {
+                            result = bodyResp.trim();
+                        }
+                    } else {
                         result = bodyResp.trim();
                     }
-                } else {
-                    result = bodyResp.trim();
                 }
+            } catch (error: any) {
+                result = new Error();
+                result.message = "Unexpected error";
+                result.cause = error;
+                this.logError(url, error, "");
             }
-        } catch (error: any) {
-            result = new Error();
-            result.message = "Unexpected error";
-            result.cause = error;
-            this.logError(url, error, "");
-        }
+
+            progress.report({ increment: 100 });
+        });
 
         logger.profile(`${url}-${this._requestId++}`);
         return result;
@@ -305,23 +318,23 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         return this.logout();
     }
 
-      /**
-     * Registers commands for the extension.
-     * 
-     */
-    logCompletionFeedback(completions: {completion: Completion, textBefore: string, textAfter: string}): void {
-       logger.debug("Logging completion feedback...");
-       //logger.debug("Logging Completions: %s", JSON.stringify(completions, undefined, 2));
+    /**
+   * Registers commands for the extension.
+   * 
+   */
+    logCompletionFeedback(completions: { completion: Completion, textBefore: string, textAfter: string }): void {
+        logger.debug("Logging completion feedback...");
+        //logger.debug("Logging Completions: %s", JSON.stringify(completions, undefined, 2));
 
-        if(completions !== undefined)   {
-            if(completions.completion !== undefined) {
+        if (completions !== undefined) {
+            if (completions.completion !== undefined) {
                 let generatedText = completions.completion.generated_text;
             }
             let textBefore = completions.textBefore;
             let textAfter = completions.textAfter;
         }
 
-       //Implementar a chamada para a API Rest para enviar feedback quando estiver disponivel
+        //Implementar a chamada para a API Rest para enviar feedback quando estiver disponivel
     }
 
     /**
@@ -329,9 +342,9 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
      * 
      */
     register(context: vscode.ExtensionContext): void {
-      
+
         //Os registros de comandos devem ficar em uma estrutura propria.
         //Seguir o exemplo da pasta src/commands/IA
-              
+
     }
 }
