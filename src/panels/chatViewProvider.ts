@@ -148,8 +148,37 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             if (matches && matches.length > 1) {
               chatApi.user(matches[2], true);
             } else {
-              chatApi.user(data.command, true);
+              matches = data.command.match(LINK_SOURCE_RE);
+
+              if (matches && matches.length > 1) {
+                const positionMatches: RegExpMatchArray | null = matches[2].match(LINK_POSITION_RE);
+
+                if (positionMatches) {
+                  const fileName: string = positionMatches[1];
+
+                  vscode.workspace.openTextDocument(fileName).then(d => {
+                    const startLine: number = parseInt(positionMatches[2]);
+                    const startColumn: number = parseInt(positionMatches[4] || "0");
+                    const position: vscode.Position = new vscode.Position(startLine - 1, startColumn - 1);
+
+                    if (!d) {
+                      if (vscode.window.activeTextEditor !== undefined) {
+                        vscode.window.activeTextEditor.revealRange(
+                          new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+                        vscode.window.activeTextEditor.selection = new vscode.Selection(position, position);
+                      }
+                    } else {
+                      vscode.window.showTextDocument(d, undefined, false).then((e: vscode.TextEditor) => {
+                        e.revealRange(
+                          new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+                        e.selection = new vscode.Selection(position, position);
+                      });
+                    }
+                  });
+                }
+              }
             }
+
             break;
           case CommonCommandFromWebViewEnum.LinkMouseOver:
             let ok: boolean = false;
