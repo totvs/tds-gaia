@@ -5,6 +5,7 @@
 ### Melhorias
 
 - Indicação visual de processamento de qualquer requisição ao serviço IA (barra de progresso no topo da visão de bate-papo).
+- Adicionado _goto_ sobre uma ligação de posição.
 
 ## TDS-Dito 0.0.5
 
