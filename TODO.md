@@ -55,7 +55,7 @@
 - :white_square_button: Associar visualmente mensagem de resposta com a mensagem de entrada.
   Tratar `MouseOver` sobre a mensagem de resposta ou de entrada e destacar as duas. Dessa forma, se o usuário disparar vários processos, pode acompanhar qual mensagem está sendo respondida.
 - :white_square_button: Implementar `goto` em ligações (_links_) de posicionamento em fontes.
-- :white_square_button: Implementar indicador de "Processando" durante execução da API `complete`.
+- :white_check_mark: Implementar indicador de "Processando" durante execução da API `complete`.
   Ideias: `Completing code...` ou barra de progresso (`vscode.window.withProgress`) ou outro indicador acima do campo `NewMessage`.
 
 ## Visual: Editor de texto
@@ -65,3 +65,4 @@
 ## Problemas gerais
 
 - :white_check_mark: Extensão não ativa corretamente caso a visão do DitoChat tenha sido fechada anteriormente
+- :white_square_button: Abrir DitoChat no painel secundário
