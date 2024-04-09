@@ -47,14 +47,14 @@
 - :white_square_button: Detalhar a `ajuda`(_help_) dos comandos.
 - :white_square_button: Melhorar/implementar tratamento de argumentos em comandos.
 - :white_square_button: Implementar processo de abertura de chamado (comando `open_issue`).
-- :walking: Implementar substituicao de texto ao fazer o typify
+- :walking: Implementar substituição de texto ao fazer o typify
 
 ## Visual: Bate-papo
 
 - :white_square_button: Executar o comando ao acionar `Enter`.
 - :white_square_button: Associar visualmente mensagem de resposta com a mensagem de entrada.
   Tratar `MouseOver` sobre a mensagem de resposta ou de entrada e destacar as duas. Dessa forma, se o usuário disparar vários processos, pode acompanhar qual mensagem está sendo respondida.
-- :walking: Implementar `goto` em ligações (_links_) de posicionamento em fontes.
+- :white_check_mark: Implementar `goto` em ligações (_links_) de posicionamento em fontes.
 - :white_check_mark: Implementar indicador de "Processando" durante execução da API `complete`.
   Ideias: `Completing code...` ou barra de progresso (`vscode.window.withProgress`) ou outro indicador acima do campo `NewMessage`.
 
