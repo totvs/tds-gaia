@@ -74,6 +74,23 @@ const tagsBlockMap: Record<BlockTagName, RegExp> = {
 
 let spanSeq: number = 0;
 
+/**
+ * Converts Markdown-formatted text to HTML elements.
+ *
+ * This function takes a string of Markdown-formatted text and converts it to an array of React elements that can be rendered in the UI. It supports the following Markdown syntax:
+ *
+ * - `code`: Inline code blocks
+ * - `**bold**`: Bold text
+ * - `_italic_`: Italic text
+ * - `[link text](command:link)`: Links that execute a command when clicked
+ * - `[link text](link:url)`: Links that open a URL when clicked
+ * - `> blockquote`: Blockquotes
+ *
+ * The function returns an array of React elements that can be directly rendered in the UI.
+ *
+ * @param text - The Markdown-formatted text to be converted to HTML.
+ * @returns An array of React elements representing the HTML equivalent of the input Markdown text.
+ */
 function mdToHtml(text: string): any[] {
   let children: any[] = [];
   let parts: string[] | null = text.split(allTags_re);
@@ -295,7 +312,12 @@ export default function ChatView() {
             >
 
               <section className="tds-row-container" >
-                <TdsTextField name="newMessage" label={""} />
+                <TdsTextField name="newMessage"
+                  label={""}
+                  textArea={true}
+                  placeholder={"Tell me what you need.."}
+                  size={40}
+                />
 
                 <VSCodeButton
                   name="btnSend"

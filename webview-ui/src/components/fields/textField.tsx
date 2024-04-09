@@ -1,4 +1,4 @@
-import { VSCodeTextField } from "@vscode/webview-ui-toolkit/react";
+import { VSCodeTextArea, VSCodeTextField } from "@vscode/webview-ui-toolkit/react";
 import { useController, useFormContext } from "react-hook-form";
 import PopupMessage from "../popup-message";
 import { TdsFieldProps } from "../form";
@@ -36,12 +36,26 @@ export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
                 {props.label}
                 {props.rules?.required && <span className="tds-required" />}
             </label>
-            <VSCodeTextField placeholder="Tell me what you need.." size={30}
-                readOnly={props.readOnly || false}
-                {...registerField}
-            >
-                <PopupMessage field={props} fieldState={fieldState} />
-            </VSCodeTextField>
+            {props.textArea ?? false ? (
+                <VSCodeTextArea
+                    readOnly={props.readOnly || false}
+                    {...registerField}
+                    placeholder={props.placeholder}
+                    resize="vertical"
+                    cols={props.size ?? 30}
+                >
+                    <PopupMessage field={props} fieldState={fieldState} />
+                </VSCodeTextArea>
+            ) : (
+                <VSCodeTextField
+                    readOnly={props.readOnly || false}
+                    {...registerField}
+                    placeholder={props.placeholder}
+                    size={props.size ?? 30}
+                >
+                    <PopupMessage field={props} fieldState={fieldState} />
+                </VSCodeTextField>
+            )}
         </section>
     )
 }

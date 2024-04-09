@@ -111,6 +111,9 @@ export type TdsFieldProps = {
 	readOnly?: boolean
 	className?: string;
 	rules?: RegisterOptions<FieldValues, string>;
+	textArea?: boolean
+	placeholder?: string;
+	size?: number;
 	onChange?: ChangeHandler;
 }
 
@@ -186,9 +189,9 @@ let isProcessRing: boolean = false;
  * Handles submit and reset events.
  */
 export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataModel>): JSX.Element {
-	 const {
-	  	formState: { errors, isDirty, isValid, isSubmitting },
-	 } = useFormContext();
+	const {
+		formState: { errors, isDirty, isValid, isSubmitting },
+	} = useFormContext();
 
 	let actions: IFormAction[] = props.actions ? props.actions : getDefaultActionsForm();
 
