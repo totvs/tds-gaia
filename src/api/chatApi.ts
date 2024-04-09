@@ -370,6 +370,13 @@ export class ChatApi {
         return _command;
     }
 
+    /**
+     * Generates a formatted link to a source code location.
+     *
+     * @param source - The URI of the source file.
+     * @param range - The range within the source file to link to, specified as either a `vscode.Range` or a line number.
+     * @returns A formatted link to the specified source code location, or an error message if the workspace folder cannot be found.
+     */
     linkToSource(source: vscode.Uri, range: vscode.Range | number): string {
         const workspaceFolder: vscode.WorkspaceFolder | undefined = vscode.workspace.getWorkspaceFolder(source);
 
