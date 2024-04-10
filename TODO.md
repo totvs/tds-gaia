@@ -27,11 +27,11 @@
 ## API: Inteligência Artificial (interface IaApiInterface)
 
 - :walking: API para a inteligência artificial.
-- :white_square_button: Identificação de usuário (_login_).
+- :walking: Identificação de usuário (_login_).
   Usar `vscode.AuthProvider` para autenticação.
 - :white_square_button: Mensagens associadas a processamento.
   Encapsular o processamento e passar como _callback_ para ChatApi.Dito e esse passa a tratar o retorno da mensagem (`messageId`).
-- :white_square_button: No caso de erro 504 e com informação de tempo para nova tentativa, agendar nova tentativa.
+- :white_check_mark: No caso de erro 504 e com informação de tempo para nova tentativa, agendar nova tentativa.
   Mensagem com tempo: ``The server encountered a temporary error and could not complete your request. Please try again in 30 seconds.``
 
 ## Extensão
