@@ -64,6 +64,7 @@ export type TDitoConfig = {
   requestDelay: number;
   maxLine: number;
   maxSuggestions: number;
+  tryAutoReconnection: number;
 
   trace: {
     server: string | undefined

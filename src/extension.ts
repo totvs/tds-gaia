@@ -26,6 +26,7 @@ import { logger } from './logger';
 import { InlineCompletionItemProvider } from './completionItemProvider';
 import { registerIaCommands } from './commands/IA/index';
 import { registerChatCommands } from './commands/chat';
+import { registerAuthentication } from './authenticationProvider';
 
 let ctx: vscode.ExtensionContext;
 
@@ -62,7 +63,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(...initStatusBarItems());
 
 	showBanner()
-
+	
+	registerAuthentication(context)
 	registerIaCommands(context, iaApi, chatApi);
 	registerChatCommands(context, chatApi);
 

@@ -244,8 +244,8 @@
           "tds-dito.requestDelay": {
             "order": 5,
             "type": "number",
-            "default": 600,
-            "description": "Delay in typing to activate the IA"
+            "default": 400,
+            "description": "Delay in typing to activate the IA completion"
           },
           "tds-dito.maxLine": {
             "order": 6,
@@ -263,6 +263,11 @@
             "type": "boolean",
             "default": true,
             "description": "Displays banner when starting"
+          },
+          "tds-dito.tryAutoReconnection": {
+            "type": "number",
+            "default": 3,
+            "description": "Number of auto-reconnection attempts in case of unavailability (0 to disable)"
           },
           "tds-dito.clearBeforeExplain": {
             "type": "boolean",

@@ -158,6 +158,11 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         return Promise.resolve(result);
     }
 
+    /**
+     * Logs in the user and sets the Dito user information.
+     *
+     * @returns {Promise<boolean>} A promise that resolves to `true` if the login was successful, or `false` otherwise.
+     */
     login(): Promise<boolean> {
         logger.info(`Logging in...`);
         logger.profile("login");
@@ -332,7 +337,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             let textAfter = completions.textAfter;
         }
 
-        //Implementar a chamada para a API Rest para enviar feedback quando estiver disponivel
+        //Implementar a chamada para a API Rest para enviar feedback quando estiver disponível
     }
 
     /**
@@ -341,7 +346,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
      */
     register(context: vscode.ExtensionContext): void {
 
-        //Os registros de comandos devem ficar em uma estrutura propria.
+        //Os registros de comandos devem ficar em uma estrutura própria.
         //Seguir o exemplo da pasta src/commands/IA
 
     }

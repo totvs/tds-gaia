@@ -222,7 +222,7 @@ export class ChatApi {
     dito(message: string | string[], answeringId: string | undefined = undefined): string {
         let workMessage: string = typeof message == "string"
             ? message
-            : message.join("\n");
+            : message.join("\n\n");
 
         //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
         const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
@@ -294,7 +294,7 @@ export class ChatApi {
                 }
                 this.dito([
                     "Para começar, preciso conhecer você.\n",
-                    `Favor identificar-se com o comando ${this.commandText('login')}.`
+                    `Por favor, identifique-se com o comando ${this.commandText('login')}.`
                 ],
                     answeringId);
             } else {
