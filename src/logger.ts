@@ -21,7 +21,7 @@ import Transport = require('winston-transport');
 import { getDitoLogLevel } from './config';
 
 const outputChannel: vscode.LogOutputChannel = vscode.window.createOutputChannel('TDS-Dito', { log: true });
-export const PREFIX_DITO = "[TDS-Dito] ";
+export const PREFIX_DITO = "[TDS-Dito]";
 const LABEL_DITO = "tds-dito";
 
 /**

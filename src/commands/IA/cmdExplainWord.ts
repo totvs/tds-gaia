@@ -3,15 +3,15 @@ import { IaApiInterface } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
 import { getDitoConfiguration } from "../../config";
 
-export function registerExplainWord(context: vscode.ExtensionContext, iaApi: IaApiInterface,  chatApi: ChatApi): void {
+export function registerExplainWord(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
 
-     /**
-         * Registers a text editor command to explain the word under the cursor selection. 
-         * Gets the current active text editor, then gets the word range at the cursor position. 
-         * Sends the word to be explained to the chatbot.
-         * Displays the explanation in the chat window.
-        */
-     context.subscriptions.push(vscode.commands.registerTextEditorCommand('tds-dito.explain-word', () => {
+    /**
+        * Registers a text editor command to explain the word under the cursor selection. 
+        * Gets the current active text editor, then gets the word range at the cursor position. 
+        * Sends the word to be explained to the chatbot.
+        * Displays the explanation in the chat window.
+       */
+    context.subscriptions.push(vscode.commands.registerTextEditorCommand('tds-dito.explain-word', () => {
         const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
 
         if (editor !== undefined) {
@@ -23,10 +23,8 @@ export function registerExplainWord(context: vscode.ExtensionContext, iaApi: IaA
                 let whatExplain = chatApi.linkToSource(editor.document.uri, selectionRange);
 
                 if (wordToExplain.length > 0) {
-                    //const workspaceFolder: vscode.WorkspaceFolder | undefined = vscode.workspace.getWorkspaceFolder(editor.document.uri);
-
                     const messageId: string = chatApi.dito(
-                        `Explicando palavra ${whatExplain}`
+                        vscode.l10n.t("Explaining Word \'{0}\'", whatExplain)
                     );
 
                     return iaApi.explainCode(wordToExplain).then((value: string) => {
@@ -36,14 +34,13 @@ export function registerExplainWord(context: vscode.ExtensionContext, iaApi: IaA
                         chatApi.dito(value, messageId);
                     });
                 } else {
-                    chatApi.ditoWarning("Não consegui identificar uma palavra para explica-la.");
+                    chatApi.ditoWarning("I couldn't identify a word to explain it.");
                 }
             } else {
-                chatApi.ditoWarning("Não consegui identificar uma palavra para explica-la.");
+                chatApi.ditoWarning("I couldn't identify a word to explain it.");
             }
         } else {
-            chatApi.ditoWarning("Editor corrente não é valido para essa operação.");
+            chatApi.ditoWarning("Current editor is not valid for this operation.");
         }
     }));
-
 }

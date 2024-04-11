@@ -45,9 +45,9 @@ export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
  * request delays, max lines/suggestions, tracing, 
  * and OpenAI API settings.
 
-* Must be a mirror of what is defined in package.json
-* Other settings, preferably non-persistent, must be made in TDitoCustomConfig
- */
+ * Must be a mirror of what is defined in package.json
+ * Other settings, preferably non-persistent, must be made in TDitoCustomConfig
+*/
 export type TDitoConfig = {
   enable: boolean;
   clearBeforeExplain: boolean;

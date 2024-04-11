@@ -5,17 +5,23 @@ import { logger } from "../../logger";
 
 export function registerOpenManual(context: vscode.ExtensionContext, chatApi: ChatApi): void {
 
-    const openManual = vscode.commands.registerCommand('tds-dito.open-manual', async () => {
-        const messageId: string = chatApi.dito("Abrindo manual do **TDS-Dito**.");
-        const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md";
+    const openManual = vscode.commands.registerCommand('tds-dito.open-manual', async (...args) => {
+        const baseUrl: string = "https://github.com/brodao2/tds-dito/blob/main";
+        const url: string = args.length > 0
+            ? `${baseUrl}/${args[0]}`
+            : `${baseUrl}/README.md`;
+        const title: string = args.length > 0
+            ? args[1]
+            : vscode.l10n.t("**TDS-Dito** Manual");
+        const messageId: string = chatApi.dito(vscode.l10n.t("Opening {0}.", title));
 
         return vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
-            chatApi.dito("Manual do Dito aberto.", messageId);
+            chatApi.dito(vscode.l10n.t("{0} opened.", title), messageId);
         }, (reason) => {
-            chatApi.dito("Não foi possível abrir manual do **TDS-Dito**.", messageId);
+            chatApi.dito(vscode.l10n.t("It was not possible to open {0}.", title), messageId);
             logger.error(reason);
         });
     });
-    context.subscriptions.push(openManual);
 
+    context.subscriptions.push(openManual);
 }

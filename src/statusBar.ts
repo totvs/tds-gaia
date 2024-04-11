@@ -52,7 +52,7 @@ function initStatusBarItem(): vscode.StatusBarItem {
 }
 
 function updateStatusBarItem(): void {
-  statusBarItem.text = "Dito: ";
+  statusBarItem.text = "TDS-Dito: ";
 
   if (isDitoLogged()) {
     const user: LoggedUser | undefined = getDitoUser();
@@ -61,9 +61,9 @@ function updateStatusBarItem(): void {
     statusBarItem.command = "tds-dito.logout";
     statusBarItem.tooltip = buildTooltip(user!);
   } else {
-    statusBarItem.text += `Need login`;
+    statusBarItem.text += vscode.l10n.t("Need login");
     statusBarItem.command = "tds-dito.login";
-    statusBarItem.tooltip = "Acione para efetuar a identificação";
+    statusBarItem.tooltip = vscode.l10n.t("Trigger to make the identification");
   }
 
   statusBarItem.show();
@@ -72,12 +72,15 @@ function updateStatusBarItem(): void {
 function buildTooltip(user: LoggedUser) {
   let result: string = "";
 
-  result += `Nome: ${user.fullname} [${user.name}]\n`;
-  result += `Id: ${user.id}\n`;
+  result += vscode.l10n.t("Name: {0} [{1}]", user.fullname, user.name);
+  result += "\n";
+  result += vscode.l10n.t("ID: {0}", user.id);
+  result += "\n";
 
   if (user.orgs) {
     if (user.orgs.length) {
-      result += `Organizações\n`;
+      result += vscode.l10n.t("Organizations");
+      result += "\n";
       user.orgs.forEach((org: UserOrganization) => {
         result += `${org.name}\n`;
       })

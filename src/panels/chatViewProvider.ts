@@ -85,7 +85,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   ) {
 
     chatApi.onMessage((queueMessage: TQueueMessages) => {
-      logger.info(`ChatViewProvider.onMessage=> ${queueMessage.size()}`);
+      logger.debug(`ChatViewProvider.onMessage=> ${queueMessage.size()}`);
 
       while (queueMessage.size() > 0) {
         const message: TMessageModel = queueMessage.dequeue() as TMessageModel;
@@ -205,12 +205,12 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                 }
 
                 if (!ok) {
-                  const msg: string = `Link inválido em MouseOver: ${data.command}`;
-                  chatApi.dito(["Desculpe. Não entendi esse comando.",
-                    "\n",
+                  const msg: string = vscode.l10n.t("invalid link in MouseOver: {0}", data.command);
+
+                  chatApi.dito([
+                    "Sorry.I didn't understand this command.",
                     `\`${msg}\``,
-                    "\n",
-                    `Favor abrir um ${chatApi.commandText("open_issue")}. Assim posso investigar melhor esse problema.`
+                    vscode.l10n.t("Favor abrir um {0}. Assim posso investigar melhor esse problema.", chatApi.commandText("open_issue"))
                   ], "");
                   logger.warn(msg);
                 }

@@ -21,12 +21,12 @@ import { IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
 import { ChatViewProvider } from './panels/chatViewProvider';
 import { ChatApi } from './api/chatApi';
-import { DitoCodeLensProvider } from './codeLens';
-import { logger } from './logger';
+//import { DitoCodeLensProvider } from './codeLens';
+import { PREFIX_DITO, logger } from './logger';
 import { InlineCompletionItemProvider } from './completionItemProvider';
 import { registerIaCommands } from './commands/IA/index';
 import { registerChatCommands } from './commands/chat';
-import { registerAuthentication } from './authenticationProvider';
+//import { registerAuthentication } from './authenticationProvider';
 
 let ctx: vscode.ExtensionContext;
 
@@ -38,7 +38,7 @@ export const iaApi: IaApiInterface = new CarolApi(chatApi);
 */
 export function activate(context: vscode.ExtensionContext) {
 	logger.info(
-		vscode.l10n.t('Congratulations, your extension "tds-dito" is now active!')
+		vscode.l10n.t('Congratulations, your extension "{0}" is now active!', PREFIX_DITO)
 	);
 
 	// Get the TS extension
@@ -71,14 +71,14 @@ export function activate(context: vscode.ExtensionContext) {
 	InlineCompletionItemProvider.register(context);
 
 	// Register TDS-Dito CodeLens provider
-	let codeLensProviderDisposable = vscode.languages.registerCodeLensProvider(
-		{
-			language: "advpl",
-			scheme: "file"
-		},
-		new DitoCodeLensProvider()
-	);
-	ctx.subscriptions.push(codeLensProviderDisposable);
+	// let codeLensProviderDisposable = vscode.languages.registerCodeLensProvider(
+	// 	{
+	// 		language: "advpl",
+	// 		scheme: "file"
+	// 	},
+	// 	new DitoCodeLensProvider()
+	// );
+	// ctx.subscriptions.push(codeLensProviderDisposable);
 
 	//Chat DITO
 	const chat: ChatViewProvider = new ChatViewProvider(context.extensionUri);
@@ -123,9 +123,9 @@ function handleConfigChange(context: vscode.ExtensionContext) {
 }
 
 /**
-   * Shows a welcome banner on the first start of the extension.
-   * The banner contains the extension name, version, info, and link to the repo.
-  */
+ * Shows a welcome banner on the first start of the extension.
+ * The banner contains the extension name, version, info, and link to the repo.
+ */
 function showBanner(force: boolean = false): void {
 	const showBanner: boolean = isDitoShowBanner();
 

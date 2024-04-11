@@ -41,14 +41,17 @@
 
 ## Extensão
 
-- :walking: Implementar sistema de tradução L10N.
-
 - :white_square_button: Implementar uma forma de _feedback_ do resultado do auto-complete.
   - Caso o usuário aceite o auto-complete, gerar um log com avaliação positiva.
   - Pensar em alguma solução para o usuário, ativamente, avaliar negativamente o auto-complete sugerido pela IA.
+- :white_square_button: Traduzir `l10n\bundle.l10n.json` para Português.
+- :white_square_button: Traduzir `l10n\bundle.l10n.json` para Espanhol.
+- :white_square_button: Traduzir `l10n\bundle.l10n.json` para Russo.
 
 - :alarm_clock: Definir processo de identificação de usuário (_login_).
   Aguardando definição de processo externo.
+
+- :white_check_mark: Implementar sistema de tradução L10N.
 
 ## API: Bate-papo (classe ChatApi)
 

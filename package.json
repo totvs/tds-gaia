@@ -23,7 +23,7 @@
     "development"
   ],
   "engines": {
-    "vscode": "^1.85.1"
+    "vscode": "^1.73.0"
   },
   "icon": "icons/tds-dito.png",
   "categories": [
@@ -58,6 +58,7 @@
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
+  "l10n": "./l10n",
   "contributes": {
     "viewsContainers": {
       "activitybar": [],
@@ -381,6 +382,8 @@
     "watch:extension": "tsc -watch -p ./",
     "watch:views": "cd webview-ui && npm run watch",
     "lint": "eslint src --ext ts",
+    "--L10N--": "",
+    "l10n:export": "npx @vscode/l10n-dev export -o ./l10n ./src",
     "--PUBLISH--": "",
     "vscode:package": "vsce package",
     "vscode:prepublish": "npm run compile",

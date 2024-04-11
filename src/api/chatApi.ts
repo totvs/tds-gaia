@@ -69,20 +69,20 @@ export type TCommand = {
  */
 const commandsMap: Record<string, TCommand> = {
     "help": {
-        caption: "Help",
+        caption: vscode.l10n.t("Help"),
         command: "help",
         regex: HELP_RE,
         alias: ["h", "?"],
         process: (chat: ChatApi, command: string) => doHelp(chat, command)
     },
     "hint_1": {
-        caption: "Dica",
+        caption: vscode.l10n.t("Hint"),
         command: "hint_1",
         regex: HINT_1_RE,
         process: (chat: ChatApi, command: string) => doHelp(chat, "help hint_1")
     },
     "hint_2": {
-        caption: "Guia rápido",
+        caption: vscode.l10n.t("Quick Guide"),
         command: "hint_2",
         regex: HINT_2_RE,
         process: (chat: ChatApi, command: string) => doHelp(chat, "help hint_2")
@@ -113,7 +113,7 @@ const commandsMap: Record<string, TCommand> = {
         commandId: "tds-dito.health",
     },
     "clear": {
-        caption: "Clear",
+        caption: vscode.l10n.t("Clear"),
         command: "clear",
         regex: CLEAR_RE,
         alias: ["c"],
@@ -138,7 +138,7 @@ const commandsMap: Record<string, TCommand> = {
         commandId: "tds-dito.typify",
     },
     "update": {
-        caption: "Update typified Variables",
+        caption: vscode.l10n.t("Update Typified Variables"),
         command: "update",
         regex: UPDATE_RE,
         commandId: "tds-dito.updateTypify",
@@ -166,11 +166,6 @@ export class ChatApi {
         }
 
         return command;
-    }
-
-    register(context: vscode.ExtensionContext) {
-        //Os registros de comandos devem ficar em uma estrutura propria.
-        //Seguir o exemplo da pasta src/commands/chat
     }
 
     private queueMessages: TQueueMessages = new Queue<TMessageModel>();
@@ -215,7 +210,7 @@ export class ChatApi {
     /**
      * Sends a message to the message queue. 
      * 
-     * @param message - The message text to send. Can be a string or string array. 
+     * @param message - The message text to send. Can be a string or string array, where each element is a paragraph. 
      * @param answeringId - (Optional) The ID of the message this is answering.
      * @returns The ID of the sent message.
      */
@@ -272,7 +267,7 @@ export class ChatApi {
 
             if (command) {
                 actions.push({
-                    caption: command.caption || `< No caption > ${command.command} `,
+                    caption: command.caption || vscode.l10n.t("<No caption> {0}", command.command),
                     command: commandId
                 });
             }
@@ -288,20 +283,19 @@ export class ChatApi {
             if (!isDitoLogged()) {
                 if (isDitoFirstUse()) {
                     this.dito([
-                        "Parece que é a primeira vez que nos encontramos.\n",
-                        `Quer saber como interagir comigo? ${this.commandText("hint_1")} `
+                        vscode.l10n.t("It seems like this is the first time we've met."),
+                        vscode.l10n.t("Want to know how to interact with me? {0}", this.commandText("hint_1"))
                     ], answeringId);
                 }
                 this.dito([
-                    "Para começar, preciso conhecer você.\n",
-                    `Por favor, identifique-se com o comando ${this.commandText('login')}.`
-                ],
-                    answeringId);
+                    vscode.l10n.t("To start, I need to know you."),
+                    vscode.l10n.t("Please, identify yourself with the command {0}", this.commandText("login"))
+                ], answeringId);
             } else {
-                this.dito(
-                    `Olá, ** ${getDitoUser()?.displayName}**.\n\n` +
-                    `Estou pronto para ajudá-lo no que for possível!`
-                    , answeringId);
+                this.dito([
+                    vscode.l10n.t("Hello, **{0}**.", getDitoUser()?.displayName || "<unknown>"),
+                    vscode.l10n.t("I'm ready to help you in any way possible!"),
+                ], answeringId);
             }
         } else {
             vscode.commands.executeCommand("tds-dito.health");
@@ -310,8 +304,8 @@ export class ChatApi {
 
     logout() {
         this.dito([
-            `** ${getDitoUser()?.displayName}**, obrigado por trabalhar comigo!\n`,
-            "Até logo!",
+            vscode.l10n.t("**{0}**, thank you for working with me!", getDitoUser()?.displayName || "<unknown>"),
+            vscode.l10n.t("See you soon!"),
         ], "");
     }
 
@@ -327,7 +321,7 @@ export class ChatApi {
                 answering: "",
                 inProcess: false,
                 timeStamp: new Date(),
-                author: getDitoUser()?.displayName || "<Not Logged>",
+                author: getDitoUser()?.displayName || "<unknown>",
                 message: message == undefined ? "???" : message,
             });
 
@@ -398,7 +392,7 @@ export class ChatApi {
             return `[${filename}(${position})](link:${source.fsPath}&${position})`;
         }
 
-        return `Workspace of \`${source.fsPath}\` not found.`;
+        return vscode.l10n.t("Workspace of \`{0}\` not found.", source.fsPath);
     }
 
     private processMessage(message: string) {
@@ -417,7 +411,7 @@ export class ChatApi {
                 //this.dito(`Funcionalidade não implementada.Por favor, entre em contato com o desenvolvedor.`);
             }
         } else {
-            this.dito(`Não entendi.Você pode digitar ${this.commandText("help")} para ver os comandos disponíveis.`, "");
+            this.dito(vscode.l10n.t("I didn't understand. You can type {0} to see available commands.", this.commandText("help")), "");
         }
     }
 }
@@ -435,32 +429,26 @@ function doHelp(chat: ChatApi, message: string): boolean {
         if (matches[2]) {
             if (matches[2].trim() == "hint_1") {
                 chat.dito([
-                    "Para interagir comigo, você usará comandos que podem ser acionados por um desses modos:",
-                    "- Um atalho;",
-                    "- Pelo painel de comandos(`Ctrl + Shit - P` ou `F1`), filtrando por \"TDS-Dito\";",
-                    "- Por uma ligação apresentada nesse bate-papo;",
-                    "- Digitando o comando no prompt abaixo;",
-                    "- Menu de contexto do bate-papo ou fonte em edição.",
-                    `Se você possui familiaridade com o ** VS - Code **, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, a ${chat.commandText("manual")} (será aberto no seu navegador padrão).`,
-                    `Para saber os comandos, digite ${chat.commandText("help")}.`
+                    vscode.l10n.t("To interact with me, you will use commands that can be triggered by one of these modes:"),
+                    vscode.l10n.t("- A shortcut;"),
+                    vscode.l10n.t("- By the command panel (`ctrl + shift - p` or` f1`), filtering by \"tds-dito\";"),
+                    vscode.l10n.t("- By a link presented in this chat;"),
+                    vscode.l10n.t("- Typing the command in the prompt chat;"),
+                    vscode.l10n.t("- Context menu of the chat or source in edition."),
+                    vscode.l10n.t("If you are familiar with **VS-Code**, see {0}, if you do not or want more details, {1} (will open on your default browser).", chat.commandText("hint_2"), chat.commandText("manual")),
+                    vscode.l10n.t("To know the commands, type `{0}` or `{0} command`.", chat.commandText("help"))
                 ], "");
             } else if (matches[2].trim() == "hint_2") {
-                const messageId: string = chat.dito("Abrindo manual rápido do **TDS-Dito**.");
-                const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md#guia-ultra-r%C3%A1pido";
+                const messageId: string = chat.dito(vscode.l10n.t("Opening Quick Guide from **TDS-Dito**."));
 
-                vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
-                    chat.dito("Manual do Dito aberto.", messageId);
-                }, (reason) => {
-                    chat.dito("Não foi possível abrir manual rápido do **TDS-Dito**.", messageId);
-                    logger.error(reason);
-                });
+                vscode.commands.executeCommand("tds-dito.open-manual", "README.md#guia-r%C3%A1pido", vscode.l10n.t("Quick Guide"), messageId);
             } else {
-                chat.dito(`AJUDA DO COMANDO ${matches[2]}.`);
+                chat.dito(vscode.l10n.t("Command aid {0}.", matches[2]));
             }
         } else {
             chat.dito([
-                `Os comandos disponíveis, no momento, são: ${chat.commandList()}.`,
-                `Se você possui familiaridade com o ** VS - Code **, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, leia o ${chat.commandText("manual")} (será aberto no seu navegador padrão).`
+                vscode.l10n.t("The commands available at the moment are: {0}.", chat.commandList()),
+                vscode.l10n.t("If you are familiar with **VS-Code**, see {0}, if you do not or want more details, {1} (will open on your default browser).", chat.commandText("hint_2"), chat.commandText("manual")),
             ], "");
         }
 

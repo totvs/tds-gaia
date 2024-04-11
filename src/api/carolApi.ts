@@ -4,7 +4,7 @@ import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoUser } from "../
 import { fetch, Response } from "undici";
 import { capitalize } from "../util";
 import { Completion, CompletionResponse, IaAbstractApi, IaApiInterface, TypifyResponse } from "./interfaceApi";
-import { logger } from "../logger";
+import { PREFIX_DITO, logger } from "../logger";
 import { ChatViewProvider } from "../panels/chatViewProvider";
 
 export class CarolApi extends IaAbstractApi implements IaApiInterface {
@@ -19,7 +19,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     async start(token: string): Promise<boolean> {
         this._token = token;
 
-        logger.info(`Extension is using [${this._urlRequest}]`);
+        logger.info(vscode.l10n.t("Extension is using [{0}]", this._urlRequest));
 
         return Promise.resolve(true)
     }
@@ -32,7 +32,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         await vscode.window.withProgress({
             location: { viewId: ChatViewProvider.viewType },
             cancellable: false,
-            title: "Dito: requesting data..."
+            title: vscode.l10n.t("{0}: requesting data...", PREFIX_DITO)
         }, async (progress, token) => {
             token.onCancellationRequested(() => {
                 result = new Error();
@@ -46,7 +46,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
                     headers: headers
                 });
 
-                logger.info(`Status: ${resp.status}`);
+                logger.info(vscode.l10n.t("Status: {0}", resp.status));
 
                 const bodyResp: string = await resp.text();
                 if (!resp.ok) {
@@ -61,18 +61,18 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
                     result = new Error();
                     result.name = `REQUEST_${method.toUpperCase()}`;
-                    result.cause = "Error requesting [type: " + method + ", url: " + url + " ]";
+                    result.cause = vscode.l10n.t("Error requesting [type: {0}, url: {1}]", method, url);
                     result.message = `${resp.status}: ${resp.statusText}${statusText}`;
 
                     if (resp.headers.get("content-type") == "application/json") {
                         const json = JSON.parse(bodyResp);
                         if (json) {
                             if (json.detail) {
-                                result.message += `\n Detail: ${json.detail}`;
+                                result.message += `\n ${vscode.l10n.t("Detail: {0}", json.detail)}`;
                             }
                         }
                     } else {
-                        result.cause += `${result.cause}\n Detail: ${bodyResp}`;
+                        result.cause += `${result.cause}\n ${vscode.l10n.t("Detail: {0}", bodyResp)}`;
 
                     }
                     Error.captureStackTrace(result);
@@ -103,27 +103,6 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         return result;
     }
 
-    private async textRequest(method: "GET" | "POST", url: string, data?: string): Promise<string | Error> {
-        logger.debug("textRequest");
-        const headers: {} = {};
-        //  = {
-        //     "accept": "*/*",
-        //     "Content-Type": "*/* ; charset=UTF8"
-        // };
-
-        let result: Error & { cause?: string } | string;
-        this.logRequest(url, method, headers || {}, data || "");
-
-        let resp: any = await this.fetch(url, method, headers, data);
-        if (typeof (resp) === "object" && resp instanceof Error) {
-            result = resp;
-        } else {
-            result = resp;
-        }
-
-        return Promise.resolve(result);
-    }
-
     private async jsonRequest(method: "GET" | "POST", url: string, data: any = undefined): Promise<{} | Error> {
         const headers: {} = {
             "accept": "application/json",
@@ -140,19 +119,19 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
     async checkHealth(detail: boolean): Promise<Error | undefined> {
         let result: any = undefined
-        logger.info("Getting health check...");
+        logger.info(vscode.l10n.t("Getting health check..."));
 
         let resp: any = await this.jsonRequest("GET", `${this._apiRequest}/health_check`);
 
         if (typeof (resp) === "object" && resp instanceof Error) {
             result = resp
         } else if (resp.message !== "Server is on.") {
-            result = new Error("Server is off-line or unreachable.");
+            result = new Error(vscode.l10n.t("Server is off-line or unreachable."));
             result.cause = resp;
             Error.captureStackTrace(result);
             logger.error(result);
         } else {
-            logger.info("IA Service on-line");
+            logger.info(vscode.l10n.t("IA Service on-line"));
         }
 
         return Promise.resolve(result);
@@ -164,8 +143,8 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
      * @returns {Promise<boolean>} A promise that resolves to `true` if the login was successful, or `false` otherwise.
      */
     login(): Promise<boolean> {
-        logger.info(`Logging in...`);
         logger.profile("login");
+        logger.info(vscode.l10n.t("Logging in..."));
 
         let result: boolean = false;
 
@@ -202,7 +181,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             });
         }
 
-        let message: string = `Logged in as ${getDitoUser()?.displayName}`;
+        let message: string = vscode.l10n.t("Logged in as {0}", getDitoUser()?.displayName || vscode.l10n.t("<unknown>"));
         logger.info(message);
 
         result = true;
@@ -212,7 +191,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     }
 
     logout(): Promise<boolean> {
-        logger.info("Logging out...");
+        logger.info(vscode.l10n.t("Logging out..."));
         this._token = "";
         setDitoUser(undefined);
 
@@ -220,15 +199,21 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     }
 
     async generateCode(text: string): Promise<string[]> {
-        throw new Error("Method not implemented.");
+        throw new Error(vscode.l10n.t("Method not implemented."));
     }
 
+    /**
+     * Retrieves code completions from the Carol API based on the provided text before and after the cursor.
+     *
+     * @param textBeforeCursor - The text before the cursor position.
+     * @param textAfterCursor - The text after the cursor position.
+     * @returns A promise that resolves to a `CompletionResponse` object containing the generated code completions.
+     */
     async getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse> {
-        const config: TDitoConfig = getDitoConfiguration();
-
-        logger.info("Code completions...");
         logger.profile("getCompletions");
+        logger.info(vscode.l10n.t("Code completions..."));
 
+        const config: TDitoConfig = getDitoConfiguration();
         const body: {} = {
             "prefix": textBeforeCursor,
             "suffix": textAfterCursor,
@@ -239,9 +224,8 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         };
 
         let json: any = await this.jsonRequest("POST", `${this._apiRequest}/complete`, body);
-
         if (!json || json.length === 0) {
-            void vscode.window.showInformationMessage("No code found in the stack");
+            void vscode.window.showInformationMessage(vscode.l10n.t("No code found in the stack"));
             logger.profile("getCompletions");
             return { completions: [] };
         }
@@ -251,7 +235,6 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             const lines: string[] = json.completions[index];
             let blockCode: string = "";
 
-            // blockCode += `//\n//\n//bloco ${index}\n//\n//`;
             lines.forEach((line: string) => {
                 if (line.length > 0) {
                     blockCode += line + "\n";
@@ -263,16 +246,22 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             }
         }
 
-        logger.debug(`Code completions end with ${response.completions.length} suggestions in ${json.elapsed_time} ms`);
+        logger.debug(vscode.l10n.t("Code completions end with {0} suggestions in {1} ms", response.completions.length, json.elapsed_time));
         logger.debug(JSON.stringify(response.completions, undefined, 2));
         logger.profile("getCompletions");
 
         return response;
     }
 
+    /**
+     * Explains the provided code by sending a request to the API and returning the explanation.
+     *
+     * @param code - The code to be explained.
+     * @returns The explanation of the provided code, or an empty string if an error occurs.
+     */
     async explainCode(code: string): Promise<string> {
-        logger.info("Code explain...");
         logger.profile("explainCode");
+        logger.info(vscode.l10n.t("Code explain..."));
 
         const body: any = {
             "code": code,
@@ -287,29 +276,39 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             return "";
         }
 
-        //  logger.debug(`Code explain end with ${response.length} size`);
-        const explanation: string = response.explanation.trim().replace(/<\|[^\|].*\|>/i, "").trim()
+        logger.debug(vscode.l10n.t("Code explain end with {0} size", response.length));
         logger.debug(response);
-        logger.profile("explainCode");
 
+        const explanation: string = response.explanation.trim().replace(/<\|[^\|].*\|>/i, "").trim()
+
+        logger.profile("explainCode");
         return explanation;
     }
 
+    /**
+     * Typifies the provided code and returns the resulting types.
+     *
+     * @param code - The code to be typified.
+     * @returns A promise that resolves to a `TypifyResponse` object containing the inferred types.
+     */
     async typify(code: string): Promise<TypifyResponse> {
-        logger.info("Code typify...");
         logger.profile("typify");
+        logger.info(vscode.l10n.t("Code typify..."));
 
         const body: {} = {
             "code": code,
         };
 
-        let json: any = await this.jsonRequest("POST", `${this._apiRequest}/typefy`, body);
+        let json: any = await this.jsonRequest("POST", `${this._apiRequest}/infer_type`, body);
 
         if (!json || json.length === 0) {
-            void vscode.window.showInformationMessage("No code found in the stack");
+            void vscode.window.showInformationMessage(vscode.l10n.t("No code found in the stack"));
             logger.profile("typify");
             return { types: [] };
         }
+
+        logger.debug(vscode.l10n.t("Code typify end with {0} size", json.length));
+        logger.debug(JSON.stringify(json, undefined, 2));;
 
         logger.profile("typify");
 
@@ -326,8 +325,8 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
    * 
    */
     logCompletionFeedback(completions: { completion: Completion, textBefore: string, textAfter: string }): void {
+        logger.profile("logCompletionFeedback");
         logger.debug("Logging completion feedback...");
-        //logger.debug("Logging Completions: %s", JSON.stringify(completions, undefined, 2));
 
         if (completions !== undefined) {
             if (completions.completion !== undefined) {
@@ -338,16 +337,6 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         }
 
         //Implementar a chamada para a API Rest para enviar feedback quando estiver disponível
-    }
-
-    /**
-     * Registers commands for the extension.
-     * 
-     */
-    register(context: vscode.ExtensionContext): void {
-
-        //Os registros de comandos devem ficar em uma estrutura própria.
-        //Seguir o exemplo da pasta src/commands/IA
-
+        logger.profile("logCompletionFeedback");
     }
 }

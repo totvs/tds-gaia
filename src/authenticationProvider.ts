@@ -237,6 +237,11 @@ export class DitoAuthenticationProvider implements vscode.AuthenticationProvider
     }
 }
 
+/**
+ * Registers the authentication provider for the extension.
+ * This function sets up the authentication provider, subscribes to session changes, and handles the authentication flow.
+ * @param context - The extension context.
+ */
 export function registerAuthentication(context: vscode.ExtensionContext) {
     const subscriptions = context.subscriptions;
 
@@ -278,7 +283,7 @@ const getMsSession = async () => {
     ], { createIfNone: false });
 
     if (session) {
-        vscode.window.showInformationMessage(`Welcome back ${session.account.label}`)
+        vscode.window.showInformationMessage(vscode.l10n.t("Welcome back {0}", session.account.label))
     }
 }
 
@@ -289,6 +294,6 @@ const getMsDefaultSession = async () => {
     ], { createIfNone: false });
 
     if (session) {
-        vscode.window.showInformationMessage(`Welcome back ${session.account.label}`)
+        vscode.window.showInformationMessage(vscode.l10n.t("Welcome back {0}", session.account.label))
     }
 }

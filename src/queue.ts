@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import * as vscode from "vscode";
+
 /**
  * Interface for a queue data structure.
  * 
@@ -37,7 +39,7 @@ export class Queue<T> implements IQueue<T> {
 
     enqueue(item: T): void {
         if (this.size() === this.capacity) {
-            throw Error("Queue has reached max capacity, you cannot add more items");
+            throw Error(vscode.l10n.t("Queue has reached max capacity, you cannot add more items"));
         }
         this.storage.push(item);
     }

@@ -84,7 +84,7 @@ let spanSeq: number = 0;
  * - `_italic_`: Italic text
  * - `[link text](command:link)`: Links that execute a command when clicked
  * - `[link text](link:url)`: Links that open a URL when clicked
- * - `> blockquote`: Blockquotes
+ * - `> blockquote`: Blockquotes (warning)
  *
  * The function returns an array of React elements that can be directly rendered in the UI.
  *
@@ -262,8 +262,8 @@ export default function ChatView() {
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
 
-          console.log("************************");
-          console.dir(model);
+          // console.log("************************");
+          // console.dir(model);
 
           setDataModel<TFields>(methods.setValue, model);
           setErrorModel(methods.setError, errors);

@@ -3,7 +3,7 @@ import { IaApiInterface } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
 import { PREFIX_DITO } from "../../logger";
 
-export function registerLogout(context: vscode.ExtensionContext, iaApi: IaApiInterface,  chatApi: ChatApi): void {
+export function registerLogout(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
 
     /**
      * Registers a command to log out the user by deleting the stored API token.
@@ -12,8 +12,10 @@ export function registerLogout(context: vscode.ExtensionContext, iaApi: IaApiInt
     context.subscriptions.push(vscode.commands.registerCommand('tds-dito.logout', async (...args) => {
         chatApi.logout();
         iaApi.logout();
+
         await context.secrets.delete('apiToken');
-        vscode.window.showInformationMessage(`${PREFIX_DITO} Logged out`);
+
+        vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged out", PREFIX_DITO));
         chatApi.checkUser("");
     }));
 

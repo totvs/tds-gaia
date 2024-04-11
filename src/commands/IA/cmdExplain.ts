@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { IaApiInterface } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
-import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoReady, setDitoUser } from "../../config";
+import { getDitoConfiguration } from "../../config";
 
 export function registerExplain(context: vscode.ExtensionContext, iaApi: IaApiInterface,  chatApi: ChatApi): void {
         /**
@@ -33,7 +33,7 @@ export function registerExplain(context: vscode.ExtensionContext, iaApi: IaApiIn
 
                 if (codeToExplain.length > 0) {
                     const messageId: string = chatApi.dito(
-                        `Explicando o código ${whatExplain}`
+                        vscode.l10n.t("Explaining the code " ,whatExplain)
                     );
 
                     return iaApi.explainCode(codeToExplain).then((value: string) => {
@@ -43,10 +43,10 @@ export function registerExplain(context: vscode.ExtensionContext, iaApi: IaApiIn
                         chatApi.dito(value, messageId);
                     });
                 } else {
-                    chatApi.ditoWarning("Não consegui identificar um código para explica-lo.");
+                    chatApi.ditoWarning("I couldn't identify a code to explain it. ");
                 }
             } else {
-                chatApi.ditoWarning("Editor corrente não é valido para essa operação.");
+                chatApi.ditoWarning("Current editor is not valid for this operation.");
             }
         }   
     ));

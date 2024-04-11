@@ -46,17 +46,7 @@ export class InlineCompletionItemProvider implements vscode.InlineCompletionItem
         context.subscriptions.push(inlineRegister);
 
         const afterInsert = vscode.commands.registerCommand('tds-dito.afterInsert', async (response: Completion) => {
-            //const { request_id, completions } = response;
-            // const params = {
-            //     requestId: request_id,
-            //     acceptedCompletion: 0,
-            //     shownCompletions: [0],
-            //     completions,
-            // };
-            //logger.debug("After Insert Params: %s", JSON.stringify(params, undefined, 2));
             vscode.commands.executeCommand("tds-dito.logCompletionFeedback", {completion: response, textBefore: textBeforeCursor, textAfter: textAfterCursor});
-            
-            //await client.sendRequest("llm-ls/acceptCompletion", params);
         });
         
         const logCompletionFeedback = vscode.commands.registerCommand('tds-dito.logCompletionFeedback', async (response: {completion: Completion, textBefore: string, textAfter: string}) => {

@@ -60,8 +60,6 @@ export interface TypifyResponse {
  * 
  */
 export interface IaApiInterface {
-    register(context: ExtensionContext): void;
-
     start(token: string): Promise<boolean>;
     stop(): Promise<boolean>;
     checkHealth(detail: boolean): Promise<Error | undefined>;
