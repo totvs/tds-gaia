@@ -41,7 +41,7 @@ export function registerLogin(context: vscode.ExtensionContext, iaApi: IaApiInte
 
         const input = await vscode.window.showInputBox({
             prompt: vscode.l10n.t('Please enter your API token or @your name):'),
-            placeHolder: vscode.l10n.t('Your token goes here ...')
+            placeHolder: vscode.l10n.t('Your token goes here...')
         });
 
         if (input !== undefined) {

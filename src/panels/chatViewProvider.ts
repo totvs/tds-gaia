@@ -210,7 +210,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                   chatApi.dito([
                     "Sorry.I didn't understand this command.",
                     `\`${msg}\``,
-                    vscode.l10n.t("Favor abrir um {0}. Assim posso investigar melhor esse problema.", chatApi.commandText("open_issue"))
+                    vscode.l10n.t("Please open a {0}. That way I can investigate this issue better.", chatApi.commandText("open_issue"))
                   ], "");
                   logger.warn(msg);
                 }

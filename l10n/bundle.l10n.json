@@ -30,7 +30,7 @@
   "Explaining the code ": "Explaining the code ",
   "Explaining Word '{0}'": "Explaining Word '{0}'",
   "Extension is using [{0}]": "Extension is using [{0}]",
-  "Favor abrir um {0}. Assim posso investigar melhor esse problema.": "Favor abrir um {0}. Assim posso investigar melhor esse problema.",
+  "Please open a {0}. That way I can investigate this issue better.": "Please open a {0}. That way I can investigate this issue better.",
   "Getting health check...": "Getting health check...",
   "Hello, **{0}**.": "Hello, **{0}**.",
   "Help": "Help",
@@ -80,5 +80,5 @@
   "Want to know how to interact with me? {0}": "Want to know how to interact with me? {0}",
   "Welcome back {0}": "Welcome back {0}",
   "Workspace of `{0}` not found.": "Workspace of `{0}` not found.",
-  "Your token goes here ...": "Your token goes here ..."
+  "Your token goes here...": "Your token goes here..."
 }
