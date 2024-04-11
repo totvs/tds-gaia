@@ -27,7 +27,7 @@
 ## API: Inteligência Artificial (interface IaApiInterface)
 
 - :walking: API para a inteligência artificial.
-- :walking: Identificação de usuário (_login_).
+- :white_check_mark: Identificação de usuário (_login_).
   Usar `vscode.AuthProvider` para autenticação.
 - :white_square_button: Mensagens associadas a processamento.
   Encapsular o processamento e passar como _callback_ para ChatApi.Dito e esse passa a tratar o retorno da mensagem (`messageId`).
@@ -40,6 +40,7 @@
 - :walking: Implementar uma forma de _feedback_ do resultado do auto-complete.
   - Caso o usuário aceite o auto-complete, gerar um log com avaliação positiva.
   - Pensar em alguma solução para o usuário, ativamente, avaliar negativamente o auto-complete sugerido pela IA.
+- :white_square_button: Definir processo de identificação de usuário (_login_).
 
 ## API: Bate-papo (classe ChatApi)
 
