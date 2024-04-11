@@ -63,13 +63,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(...initStatusBarItems());
 
 	showBanner()
-	
-	registerAuthentication(context)
+
+	//registerAuthentication(context)
 	registerIaCommands(context, iaApi, chatApi);
 	registerChatCommands(context, chatApi);
 
 	InlineCompletionItemProvider.register(context);
-	
+
 	// Register TDS-Dito CodeLens provider
 	let codeLensProviderDisposable = vscode.languages.registerCodeLensProvider(
 		{

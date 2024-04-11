@@ -43,8 +43,8 @@ export function registerLogin(context: vscode.ExtensionContext, iaApi: IaApiInte
             placeHolder: 'Your token goes here ...'
         });
         if (input !== undefined) {
-            const session: vscode.AuthenticationSession = await vscode.authentication.getSession(DitoAuthenticationProvider.AUTH_TYPE, [], { createIfNone: true });
-            console.log(session);
+            // const session: vscode.AuthenticationSession = await vscode.authentication.getSession(DitoAuthenticationProvider.AUTH_TYPE, [], { createIfNone: true });
+            // console.log(session);
 
             if (await iaApi.start(input)) {
                 if (await iaApi.login()) {
