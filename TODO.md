@@ -34,7 +34,6 @@
 
 - :white_check_mark: No caso de erro 504 e com informação de tempo para nova tentativa, agendar nova tentativa.
   Mensagem com tempo: ``The server encountered a temporary error and could not complete your request. Please try again in 30 seconds.``
-
 - :white_check_mark: :alarm_clock: Identificação de usuário (_login_).
   Usar `vscode.AuthProvider` para autenticação.
   Aguardando definição do processo externo para liberação.
@@ -44,14 +43,15 @@
 - :white_square_button: Implementar uma forma de _feedback_ do resultado do auto-complete.
   - Caso o usuário aceite o auto-complete, gerar um log com avaliação positiva.
   - Pensar em alguma solução para o usuário, ativamente, avaliar negativamente o auto-complete sugerido pela IA.
-- :white_square_button: Traduzir `l10n\bundle.l10n.json` para Espanhol.
 - :white_square_button: Traduzir `l10n\bundle.l10n.json` para Russo.
 
+- :alarm_clock: Revisar traduções.
 - :alarm_clock: Definir processo de identificação de usuário (_login_).
   Aguardando definição de processo externo.
 
 - :white_check_mark: Implementar sistema de tradução L10N.
 - :white_check_mark: Traduzir `l10n\bundle.l10n.json` para Português.
+- :white_check_mark: Traduzir `l10n\bundle.l10n.json` para Espanhol.
 
 ## API: Bate-papo (classe ChatApi)
 
