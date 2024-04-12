@@ -111,10 +111,8 @@ export type TdsFieldProps = {
 	readOnly?: boolean
 	className?: string;
 	rules?: RegisterOptions<FieldValues, string>;
-	textArea?: boolean
-	placeholder?: string;
-	size?: number;
 	onChange?: ChangeHandler;
+	onInput?: any;
 }
 
 /**
@@ -213,16 +211,6 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 			id={id}
 			onSubmit={props.methods.handleSubmit(props.onSubmit)}
 			onReset={() => sendReset(props.methods.getValues())}
-			onKeyUp={(ev: React.KeyboardEvent<HTMLElement>) => {
-				// console.log(ev.key, ev.ctrlKey, ev.metaKey, ev.altKey, ev.shiftKey);
-				// //TODO: ainda com erro, não envia newMessage
-				// if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) {
-				// 	ev.preventDefault();
-				// 	ev.stopPropagation();
-				// 	document.getElementById("btnSend")?.focus();
-				// 	document.getElementById("btnSend")?.click();
-				// }
-			}}
 			autoComplete="off"
 		>
 			<section className={"tds-form-content"}>
@@ -272,7 +260,7 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 						}
 
 						return (action.type == "link" ?
-							<VSCodeLink key={action.id} onClick={() => action.onClick()}>{action.caption}</VSCodeLink>
+							<VSCodeLink key={action.id} onClick={(sender) => action.onClick(sender)}>{action.caption}</VSCodeLink>
 							: <VSCodeButton
 								className={`tds-button-button ${visible}`}
 								{...propsField} >

@@ -250,6 +250,8 @@ export default function ChatView() {
     });
 
   const onSubmit: SubmitHandler<TFields> = (data) => {
+    data.newMessage = data.newMessage.trim().toLowerCase();
+
     sendSave(data);
   }
 
@@ -289,9 +291,19 @@ export default function ChatView() {
     id: 0,
     caption: "Clear",
     type: "link",
-    onClick: () => {
-      (document.getElementsByName("newMessage")[0] as any).control.value = "clear";
-      sendExecute("clear");
+    onClick: (sender: any) => {
+      (document.getElementsByName("newMessage")[0] as any).control.value = "Clear";
+      sendExecute("[Clear](command:clear)");
+    }
+  });
+  actions.push({
+    id: 1,
+    caption: "Help",
+    type: "link",
+    onClick: (sender: any) => {
+      model.newMessage = "Help";
+      (document.getElementsByName("newMessage")[0] as any).control.value = "Help";
+      sendExecute("[Help](command:help)");
     }
   });
 
@@ -317,6 +329,11 @@ export default function ChatView() {
                   textArea={true}
                   placeholder={"Tell me what you need.."}
                   size={40}
+                  onInput={(e: any) => {
+                    //necessário usar OnInput, pois o ENTER aciona submit e 
+                    //não há tempo de processar mensagens internas do React
+                    methods.setValue(e.target.name, e.target.value);
+                  }}
                 />
 
                 <VSCodeButton

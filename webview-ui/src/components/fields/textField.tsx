@@ -2,7 +2,12 @@ import { VSCodeTextArea, VSCodeTextField } from "@vscode/webview-ui-toolkit/reac
 import { useController, useFormContext } from "react-hook-form";
 import PopupMessage from "../popup-message";
 import { TdsFieldProps } from "../form";
-type TdsTextFieldProps = TdsFieldProps;
+
+type TdsTextFieldProps = TdsFieldProps & {
+    textArea?: boolean
+    placeholder?: string;
+    size?: number;
+};
 
 /**
  *
@@ -21,11 +26,11 @@ export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
     } = useFormContext();
     const { field, fieldState } = useController(props);
     const registerField = register(props.name, props.rules);
+
     if (props.onChange) {
         registerField.onChange = props.onChange;
     }
-    // value={value}
-    // onInput={e => fieldState.setValue(e.target.value)} />
+
     return (
         <section
             className={`tds-field-container tds-text-field ${props.className ? props.className : ''}`}
@@ -43,6 +48,7 @@ export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
                     placeholder={props.placeholder}
                     resize="vertical"
                     cols={props.size ?? 30}
+                    onInput={props.onInput}
                 >
                     <PopupMessage field={props} fieldState={fieldState} />
                 </VSCodeTextArea>
@@ -52,6 +58,7 @@ export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
                     {...registerField}
                     placeholder={props.placeholder}
                     size={props.size ?? 30}
+                    onInput={props.onInput}
                 >
                     <PopupMessage field={props} fieldState={fieldState} />
                 </VSCodeTextField>

@@ -62,6 +62,7 @@ limitations under the License.
 	flex-flow: row-reverse;
 	display: flex;
 	flex-wrap: nowrap;
+	gap: 10px;
 }
 
 .tds-field-container {

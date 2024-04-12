@@ -7,6 +7,7 @@
 - Indicação visual de processamento de qualquer requisição ao serviço IA (barra de progresso no topo da visão de bate-papo).
 - Adicionado _goto_ sobre uma ligação de posição.
 - Alterado _prompt_ de mensagem de VSCodeTextField (uma linha) para VSCodeTextArea (mais de uma linha).
+- Ao acionar `Enter` no _prompt_, aciona o envio deste para processamento
 
 ## TDS-Dito 0.0.5
 
