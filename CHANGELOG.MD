@@ -8,6 +8,8 @@
 - Adicionado _goto_ sobre uma ligação de posição.
 - Alterado _prompt_ de mensagem de VSCodeTextField (uma linha) para VSCodeTextArea (mais de uma linha).
 - Ao acionar `Enter` no _prompt_, aciona o envio deste para processamento
+- Indicação visualmente entre mensagem de resposta e a mensagem de solicitação (comando).
+  Ao efetuar  `MouseOver` sobre a mensagem de resposta ou de solicitação, as duas são destacadas.
 
 ## TDS-Dito 0.0.5
 

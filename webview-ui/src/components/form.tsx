@@ -111,8 +111,8 @@ export type TdsFieldProps = {
 	readOnly?: boolean
 	className?: string;
 	rules?: RegisterOptions<FieldValues, string>;
-	onChange?: ChangeHandler;
-	onInput?: any;
+	//onChange?: ChangeHandler;
+	onInput?: any; //https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/react/README.md#use-oninput-instead-of-onchange-to-handle-keystrokes
 }
 
 /**

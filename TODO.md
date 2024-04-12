@@ -64,13 +64,12 @@
 
 ## Visual: Bate-papo
 
-- :white_square_button: Associar visualmente mensagem de resposta com a mensagem de entrada.
-  Tratar `MouseOver` sobre a mensagem de resposta ou de entrada e destacar as duas. Dessa forma, se o usuário disparar vários processos, pode acompanhar qual mensagem está sendo respondida.
-
 - :white_check_mark: Implementar `goto` em ligações (_links_) de posicionamento em fontes.
 - :white_check_mark: Implementar indicador de "Processando" durante execução da API `complete`.
   Ideias: `Completing code...` ou barra de progresso (`vscode.window.withProgress`) ou outro indicador acima do campo `NewMessage`.
 - :white_check_mark: Executar o comando ao acionar `Enter`.
+- :white_check_mark: Associar visualmente mensagem de resposta com a mensagem de entrada.
+  Tratar `MouseOver` sobre a mensagem de resposta ou de entrada e destacar as duas. Dessa forma, se o usuário disparar vários processos, pode acompanhar qual mensagem está sendo respondida.
 
 ## Visual: Editor de texto
 

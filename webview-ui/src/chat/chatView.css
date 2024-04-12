@@ -64,9 +64,6 @@ section.tds-chat div.tds-message-row {
 
 section.tds-chat div.tds-message-row+div.tds-message-row {
 	margin-top: 0.5em;
-}
-
-section.tds-chat div.tds-message-row+div.tds-message-row {
 	margin-bottom: 0.5em;
 }
 
@@ -88,6 +85,10 @@ section.tds-chat div.tds-message-row div.tds-message-author #inProcess {
 
 section.tds-chat div.tds-message-row div.tds-message-author #timeStamp {
 	font-style: italic;
+}
+
+section.tds-chat div.tds-message-row-flash {
+	background-color: var(--vscode-selection-background);
 }
 
 div.tds-message {

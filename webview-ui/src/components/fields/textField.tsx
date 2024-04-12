@@ -27,9 +27,10 @@ export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
     const { field, fieldState } = useController(props);
     const registerField = register(props.name, props.rules);
 
-    if (props.onChange) {
-        registerField.onChange = props.onChange;
-    }
+    // https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/react/README.md#use-oninput-instead-of-onchange-to-handle-keystrokes
+    // if (props.onChange) {
+    //     registerField.onChange = props.onChange;
+    // }
 
     return (
         <section

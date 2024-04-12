@@ -139,6 +139,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
           case CommonCommandFromWebViewEnum.Save:
             if (data.model.newMessage.trim() !== "") {
               chatApi.user(data.model.newMessage, true);
+              data.model.newMessage = "";
             }
 
             break;
@@ -236,9 +237,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
       this.chatModel.messages.forEach((message: TMessageModel) => {
         if (message.answering.length > 0) {
-          this.chatModel.messages.filter((answered: TMessageModel) => answered.id == message.answering)
+          this.chatModel.messages.filter((answered: TMessageModel) => answered.messageId == message.answering)
             .forEach((answered: TMessageModel) => {
               answered.inProcess = false;
+              answered.answering = message.answering;
             });
         }
       });

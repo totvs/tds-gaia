@@ -33,7 +33,8 @@ type TMessageActionModel = {
 }
 
 type TMessageModel = {
-  id: string;
+  _id: string; //utilizado pelo React.UseArray;
+  messageId: string;
   answering: string;
   inProcess: boolean;
   timeStamp: Date;
@@ -196,21 +197,21 @@ function ShowMessage(message: TMessageModel) {
   let children: any[] = mdTextToHtml(message.message);
 
   return (
-    <div className="tds-message" key={spanSeq++}>
+    <div className="tds-message" key={spanSeq++} >
       {...children}
     </div>
   )
 }
 
-function MessageRow(row: TMessageModel, index: number, control: Control<TFields, any, TFields>): any {
+function MessageRow(row: TMessageModel, messages: TMessageModel[]): any {
   let children: any[] = [];
-  let timeStamp: string | undefined = new Date(row.timeStamp).toTimeString().substring(0, 5);
-  let author: string | undefined = row.author;
 
   if (row.author.length > 0) {
+    let timeStamp: string = new Date(row.timeStamp).toTimeString().substring(0, 5);
+
     children.push(
       <div className="tds-message-author" key={spanSeq++}>
-        <span key={spanSeq++} id="author">{author}</span>
+        <span key={spanSeq++} id="author">{row.author}</span>
         {row.inProcess && <span id="inProcess" key={spanSeq++}>Processing..</span>}
         <span id="timeStamp">{timeStamp}</span>
       </div>
@@ -220,10 +221,34 @@ function MessageRow(row: TMessageModel, index: number, control: Control<TFields,
   children.push(ShowMessage(row));
 
   return (
-    <div key={row.id.toString()} className="tds-message-row">
+    <div key={row.messageId.toString()}
+      data-message-id={row.messageId.toString()}
+      data-answering={row.answering.toString()}
+      className="tds-message-row"
+      onMouseOver={(e) => flashMessage(row, messages)}>
       {...children}
     </div>
   )
+}
+
+function flashMessage(row: TMessageModel, messages: TMessageModel[]) {
+  if (row.answering.length == 0) {
+    return;
+  }
+
+  const elements = document.getElementsByClassName("tds-message-row");
+
+  for (let index = 0; index < elements.length; index++) {
+    const element: Element = elements[index];
+
+    if ((element.getAttribute("data-message-id") == row.answering) ||
+      ((element.getAttribute("data-answering") == row.answering))) {
+      element.classList.add("tds-message-row-flash");
+      setTimeout(() => {
+        element.classList.remove("tds-message-row-flash");
+      }, 2000);
+    }
+  }
 }
 
 /**
@@ -249,6 +274,16 @@ export default function ChatView() {
       name: "messages"
     });
 
+  React.useEffect(() => {
+    if (model.messages.length > 0) {
+      const lastMessage: TMessageModel = model.messages[model.messages.length - 1];
+
+      //document.getElementById(lastMessage.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      flashMessage(lastMessage, model.messages);
+    }
+  }, ["messages"]);
+
   const onSubmit: SubmitHandler<TFields> = (data) => {
     data.newMessage = data.newMessage.trim().toLowerCase();
 
@@ -264,8 +299,8 @@ export default function ChatView() {
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
 
-          // console.log("************************");
-          // console.dir(model);
+          console.log("************************");
+          console.dir(model);
 
           setDataModel<TFields>(methods.setValue, model);
           setErrorModel(methods.setError, errors);
@@ -311,7 +346,7 @@ export default function ChatView() {
     <main>
       <section className="tds-chat">
         <section className="tds-content">
-          {fields.map((row: any, index: number) => MessageRow(row, index, methods.control))}
+          {fields.map((row: any, index: number) => MessageRow(row, model.messages))}
         </section >
         <section className="tds-footer">
           <FormProvider {...methods} >

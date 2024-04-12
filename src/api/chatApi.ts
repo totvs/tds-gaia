@@ -145,6 +145,8 @@ const commandsMap: Record<string, TCommand> = {
     }
 };
 
+type TCommandKey = keyof typeof commandsMap;
+
 /**
  * Provides methods for interacting with the chat API. 
  * Allows sending messages, responding to user input, executing commands, etc.
@@ -152,8 +154,8 @@ const commandsMap: Record<string, TCommand> = {
  * Dispatches events for new messages.
  */
 export class ChatApi {
-    static getCommand(_command: string): TCommand | undefined {
-        const commandId: string = _command.toLowerCase();
+    static getCommand(_command: TCommandKey): TCommand | undefined {
+        const commandId: TCommandKey = _command;
         let command: TCommand | undefined = commandsMap[commandId];
 
         if (!command) {
@@ -223,7 +225,7 @@ export class ChatApi {
         const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
 
         this.sendMessage({
-            id: id,
+            messageId: id,
             answering: answeringId || "",
             inProcess: (answeringId === undefined),
             timeStamp: new Date(),
@@ -317,7 +319,7 @@ export class ChatApi {
             this.beginMessageGroup();
 
             this.sendMessage({
-                id: id,
+                messageId: id,
                 answering: "",
                 inProcess: false,
                 timeStamp: new Date(),
@@ -345,7 +347,7 @@ export class ChatApi {
         } else if (isDitoLogged()) {
             commands.push(`${this.commandText("logout")}`);
             commands.push(`${this.commandText("explain")}`);
-            commands.push(`${this.commandText("explain-word")}`);
+            commands.push(`${this.commandText("explain-world")}`);
             commands.push(`${this.commandText("typify")}`);
         } else {
             commands.push(`${this.commandText("login")}`);
@@ -354,7 +356,7 @@ export class ChatApi {
         return commands.join(", ");
     }
 
-    commandText(_command: string, ...args: string[]): string {
+    commandText(_command: TCommandKey, ...args: string[]): string {
         const command: TCommand | undefined = ChatApi.getCommand(_command);
 
         if (command) {

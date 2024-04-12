@@ -23,8 +23,8 @@ import { TAbstractModel } from "./abstractMode";
  * @property command - The command to execute when the message action is triggered.
  */
 export type TMessageActionModel = {
-    caption: string;
-    command: string;
+  caption: string;
+  command: string;
 }
 
 /**
@@ -33,12 +33,12 @@ export type TMessageActionModel = {
  * Can optionally contain an array of action models.
  */
 export type TMessageModel = TAbstractModel & {
-    id: string;
-    answering: string;
-    inProcess: boolean;
-    timeStamp: Date;
-    author: string;
-    message: string;
-    actions?: TMessageActionModel[];
+  messageId: string;
+  answering: string;
+  inProcess: boolean;
+  timeStamp: Date;
+  author: string;
+  message: string;
+  actions?: TMessageActionModel[];
 }
 
