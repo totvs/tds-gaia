@@ -1,12 +1,12 @@
 {
-  "name": "tds-dito-vscode",
-  "displayName": "TDS-Dito, your partner in AdvPL/TLPP programming",
-  "description": "Using artificial intelligence resources, TDS-Dito will assist you in AdvPL programming",
+  "name": "tds-gaia-vscode",
+  "displayName": "TDS-Gaia, your partner in AdvPL/TLPP programming",
+  "description": "Using artificial intelligence resources, TDS-Gaia will assist you in AdvPL programming",
   "version": "0.0.5",
   "publisher": "TOTVS",
   "preview": true,
   "author": {
-    "name": "TOTVS",
+  "name": "TOTVS",
     "email": "tecnologia@totvs.com.br"
   },
   "license": "Apache-2.0",
@@ -25,17 +25,17 @@
   "engines": {
     "vscode": "^1.73.0"
   },
-  "icon": "icons/tds-dito.png",
+  "icon": "icons/tds-gaia.png",
   "categories": [
     "Machine Learning",
     "Programming Languages"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/totvs/tds-dito-vscode.git"
+    "url": "https://github.com/totvs/tds-gaia-vscode.git"
   },
   "bugs": {
-    "url": "https://github.com/totvs/tds-dito-vscode.git"
+    "url": "https://github.com/totvs/tds-gaia-vscode.git"
   },
   "galleryBanner": {
     "color": "#100f11",
@@ -43,9 +43,9 @@
   },
   "badges": [
     {
-      "url": "https://img.shields.io/github/stars/totvs/tds-dito-vscode?style=social",
-      "description": "Star tds-dito-vscode on Github",
-      "href": "https://github.com/totvs/tds-dito-vscode"
+      "url": "https://img.shields.io/github/stars/totvs/tds-gaia-vscode?style=social",
+      "description": "Star tds-gaia-vscode on Github",
+      "href": "https://github.com/totvs/tds-gaia-vscode"
     },
     {
       "url": "https://img.shields.io/twitter/follow/totvs?style=social",
@@ -53,7 +53,7 @@
       "href": "https://twitter.com/TOTVS"
     }
   ],
-  "homepage": "https://github.com/totvs/tds-dito-vscode",
+  "homepage": "https://github.com/totvs/tds-gaia-vscode",
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -64,21 +64,21 @@
       "activitybar": [],
       "panel": [
         {
-          "id": "tds-dito-container",
-          "title": "Dito",
-          "icon": "icons/tds-dito.svg"
+          "id": "tds-gaia-container",
+          "title": "Gaia",
+          "icon": "icons/tds-gaia.svg"
         }
       ]
     },
     "views": {
-      "tds-dito-container": [
+      "tds-gaia-container": [
         {
           "type": "webview",
-          "id": "tds-dito-view",
-          "name": "Dito: Chat",
+          "id": "tds-gaia-view",
+          "name": "Gaia: Chat",
           "visibility": "visible",
-          "icon": "icons/tds-dito.svg",
-          "contextualTitle": "Dito: Chat",
+          "icon": "icons/tds-gaia.svg",
+          "contextualTitle": "Gaia: Chat",
           "initialSize": 0.25
         }
       ]
@@ -86,141 +86,141 @@
     "menus": {
       "view/title": [
         {
-          "command": "tds-dito.clear",
-          "when": "webviewId == 'tds-dito-view'",
+          "command": "tds-gaia.clear",
+          "when": "webviewId == 'tds-gaia-view'",
           "group": "navigation"
         }
       ],
       "webview/context": [
         {
-          "command": "tds-dito.login",
-          "when": "webviewId == 'tds-dito-view' && !tds-dito.logged"
+          "command": "tds-gaia.login",
+          "when": "webviewId == 'tds-gaia-view' && !tds-gaia.logged"
         },
         {
-          "command": "tds-dito.logout",
-          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+          "command": "tds-gaia.logout",
+          "when": "webviewId == 'tds-gaia-view' && tds-gaia.logged"
         },
         {
-          "command": "tds-dito.health",
-          "when": "webviewId == 'tds-dito-view' && !tds-dito.logged"
+          "command": "tds-gaia.health",
+          "when": "webviewId == 'tds-gaia-view' && !tds-gaia.logged"
         },
         {
-          "command": "tds-dito.open-manual",
-          "when": "webviewId == 'tds-dito-view'"
+          "command": "tds-gaia.open-manual",
+          "when": "webviewId == 'tds-gaia-view'"
         },
         {
-          "command": "tds-dito.generate-code",
-          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+          "command": "tds-gaia.generate-code",
+          "when": "webviewId == 'tds-gaia-view' && tds-gaia.logged"
         },
         {
-          "command": "tds-dito.explain",
-          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+          "command": "tds-gaia.explain",
+          "when": "webviewId == 'tds-gaia-view' && tds-gaia.logged"
         },
         {
-          "command": "tds-dito.explain-word",
-          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+          "command": "tds-gaia.explain-word",
+          "when": "webviewId == 'tds-gaia-view' && tds-gaia.logged"
         },
         {
-          "command": "tds-dito.clear",
-          "when": "webviewId == 'tds-dito-view'"
+          "command": "tds-gaia.clear",
+          "when": "webviewId == 'tds-gaia-view'"
         },
         {
-          "command": "tds-dito.infer",
-          "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
+          "command": "tds-gaia.infer",
+          "when": "webviewId == 'tds-gaia-view' && tds-gaia.logged"
         }
       ]
     },
     "commands": [
       {
-        "command": "tds-dito.afterInsert",
+        "command": "tds-gaia.afterInsert",
         "title": "After Insert",
-        "category": "TDS-Dito"
+        "category": "TDS-Gaia"
       },
       {
-        "command": "tds-dito.health",
+        "command": "tds-gaia.health",
         "title": "Health Service",
         "shortTitle": "Health",
-        "category": "TDS-Dito"
+        "category": "TDS-Gaia"
       },
       {
-        "command": "tds-dito.open-manual",
+        "command": "tds-gaia.open-manual",
         "title": "Open Manual",
         "shortTitle": "Manual",
-        "category": "TDS-Dito"
+        "category": "TDS-Gaia"
       },
       {
-        "command": "tds-dito.login",
+        "command": "tds-gaia.login",
         "title": "Login",
-        "category": "TDS-Dito",
-        "enablement": "!tds-dito.logged",
+        "category": "TDS-Gaia",
+        "enablement": "!tds-gaia.logged",
         "icon": {
           "dark": "icons/dark/_login.png",
           "light": "icons/light/_login.png"
         }
       },
       {
-        "command": "tds-dito.logout",
+        "command": "tds-gaia.logout",
         "title": "Logout",
-        "category": "TDS-Dito",
-        "enablement": "tds-dito.logged",
+        "category": "TDS-Gaia",
+        "enablement": "tds-gaia.logged",
         "icon": {
           "dark": "icons/dark/_logout.png",
           "light": "icons/light/_logout.png"
         }
       },
       {
-        "command": "tds-dito.generate-code",
+        "command": "tds-gaia.generate-code",
         "title": "Generate Code",
         "shortTitle": "Generate",
-        "category": "TDS-Dito"
+        "category": "TDS-Gaia"
       },
       {
-        "command": "tds-dito.explain",
+        "command": "tds-gaia.explain",
         "title": "Explain source or function/method Code",
         "shortTitle": "Explain",
-        "category": "TDS-Dito"
+        "category": "TDS-Gaia"
       },
       {
-        "command": "tds-dito.explain-word",
+        "command": "tds-gaia.explain-word",
         "title": "Explain word",
-        "category": "TDS-Dito"
+        "category": "TDS-Gaia"
       },
       {
-        "command": "tds-dito.clear",
+        "command": "tds-gaia.clear",
         "title": "Clear messages in chat",
         "shortTitle": "Clear",
-        "category": "TDS-Dito"
+        "category": "TDS-Gaia"
       },
       {
-        "command": "tds-dito.infer",
+        "command": "tds-gaia.infer",
         "title": "Infer variables",
         "shortTitle": "Infer",
-        "category": "TDS-Dito"
+        "category": "TDS-Gaia"
       },
       {
-        "command": "tds-dito.updateTypify",
+        "command": "tds-gaia.updateTypify",
         "title": "Update Typified variables",
         "shortTitle": "Update",
-        "category": "TDS-Dito"
+        "category": "TDS-Gaia"
       }
     ],
     "configuration": [
       {
-        "title": "TDS-Dito",
+        "title": "TDS-Gaia",
         "properties": {
-          "tds-dito.endPoint": {
+          "tds-gaia.endPoint": {
             "order": 1,
             "type": "string",
             "default": "https://advpl.ds.dta.totvs.ai",
             "description": "endPoint"
           },
-          "tds-dito.apiVersion": {
+          "tds-gaia.apiVersion": {
             "order": 2,
             "type": "string",
             "default": "v1",
             "description": "API Version"
           },
-          "tds-dito.documentFilter": {
+          "tds-gaia.documentFilter": {
             "order": 3,
             "type": [
               "object",
@@ -236,51 +236,51 @@
             ],
             "description": "Filter documents to enable suggestions for"
           },
-          "tds-dito.enableAutoSuggest": {
+          "tds-gaia.enableAutoSuggest": {
             "order": 4,
             "type": "boolean",
             "default": true,
             "description": "enableAutoSuggest"
           },
-          "tds-dito.requestDelay": {
+          "tds-gaia.requestDelay": {
             "order": 5,
             "type": "number",
             "default": 400,
             "description": "Delay in typing to activate the IA completion"
           },
-          "tds-dito.maxLine": {
+          "tds-gaia.maxLine": {
             "order": 6,
             "type": "number",
             "default": 5,
             "description": "Maximum lines per suggestion"
           },
-          "tds-dito.maxSuggestions": {
+          "tds-gaia.maxSuggestions": {
             "order": 7,
             "type": "number",
             "default": 3,
             "description": "Maximum suggestions per requisition"
           },
-          "tds-dito.showBanner": {
+          "tds-gaia.showBanner": {
             "type": "boolean",
             "default": true,
             "description": "Displays banner when starting"
           },
-          "tds-dito.tryAutoReconnection": {
+          "tds-gaia.tryAutoReconnection": {
             "type": "number",
             "default": 3,
             "description": "Number of auto-reconnection attempts in case of unavailability (0 to disable)"
           },
-          "tds-dito.clearBeforeExplain": {
+          "tds-gaia.clearBeforeExplain": {
             "type": "boolean",
             "default": false,
             "description": "Clear messages before explain"
           },
-          "tds-dito.clearBeforeInfer": {
+          "tds-gaia.clearBeforeInfer": {
             "type": "boolean",
             "default": false,
             "description": "Clear messages before infer"
           },
-          "tds-dito.logLevel": {
+          "tds-gaia.logLevel": {
             "type": "string",
             "enum": [
               "off",
@@ -303,7 +303,7 @@
               "Erros"
             ]
           },
-          "tds-dito.trace": {
+          "tds-gaia.trace": {
             "type": "string",
             "enum": [
               "off",
@@ -324,7 +324,7 @@
               "Erros"
             ]
           },
-          "tds-dito.lastLogin": {
+          "tds-gaia.lastLogin": {
             "type": "string",
             "default": "",
             "description": "When last user logged",
@@ -337,51 +337,51 @@
       {
         "key": "Ctrl+D Ctrl+L",
         "mac": "Cmd+D Cmd+L",
-        "command": "tds-dito.login"
+        "command": "tds-gaia.login"
       },
       {
         "key": "Ctrl+D Ctrl+B",
         "mac": "Cmd+D Cmd+B",
-        "command": "tds-dito.logout"
+        "command": "tds-gaia.logout"
       },
       {
         "key": "Ctrl+D Ctrl+T",
         "mac": "Cmd+D Cmd+T",
-        "command": "tds-dito.infer",
-        "when": "editorTextFocus"
+        "command": "tds-gaia.infer",
+        "when": "egaiarTextFocus"
       },
       {
         "key": "Ctrl+shift+l",
         "mac": "Cmd+shift+l",
-        "command": "editor.action.inlineSuggest.trigger",
-        "when": "editorTextFocus"
+        "command": "egaiar.action.inlineSuggest.trigger",
+        "when": "egaiarTextFocus"
       },
       {
         "key": "Ctrl+D Ctrl+C",
         "mac": "Cmd+D Cmd+C",
-        "command": "tds-dito.clear"
+        "command": "tds-gaia.clear"
       },
       {
         "key": "Ctrl+D Ctrl+E",
         "mac": "Cmd+D Cmd+E",
-        "command": "tds-dito.explain",
-        "when": "editorTextFocus"
+        "command": "tds-gaia.explain",
+        "when": "egaiarTextFocus"
       },
       {
         "key": "Ctrl+D Ctrl+W",
         "mac": "Cmd+D Cmd+W",
-        "command": "tds-dito.explain-word",
-        "when": "editorTextFocus"
+        "command": "tds-gaia.explain-word",
+        "when": "egaiarTextFocus"
       },
       {
         "key": "Ctrl+D Ctrl+G",
         "mac": "Cmd+D Cmd+G",
-        "command": "tds-dito.generate-code"
+        "command": "tds-gaia.generate-code"
       },
       {
         "key": "Ctrl+D Ctrl+M",
         "mac": "Cmd+D Cmd+M",
-        "command": "tds-dito.open-manual"
+        "command": "tds-gaia.open-manual"
       }
     ]
   },

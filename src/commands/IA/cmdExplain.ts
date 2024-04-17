@@ -1,52 +1,52 @@
 import * as vscode from "vscode";
 import { IaApiInterface } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
-import { getDitoConfiguration } from "../../config";
+import { getGaiaConfiguration } from "../../config";
 
 export function registerExplain(context: vscode.ExtensionContext, iaApi: IaApiInterface,  chatApi: ChatApi): void {
         /**
-         * Registers a text editor command to explain the code under the cursor or selection. 
-         * Checks if there is an active text editor, gets the current selection or line under cursor, 
+         * Registers a text egaiar command to explain the code under the cursor or selection. 
+         * Checks if there is an active text egaiar, gets the current selection or line under cursor, 
          * extracts the code to explain, sends it to the explainCode() method, 
          * and prints the explanation to the chat window.
          */
-        context.subscriptions.push(vscode.commands.registerTextEditorCommand('tds-dito.explain', () => {
-            const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+        context.subscriptions.push(vscode.commands.registerTextEditorCommand('tds-gaia.explain', () => {
+            const egaiar: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
             let codeToExplain: string = "";
 
-            if (editor !== undefined) {
-                const selection: vscode.Selection = editor.selection;
+            if (egaiar !== undefined) {
+                const selection: vscode.Selection = egaiar.selection;
                 let whatExplain: string = "";
 
                 if (selection && !selection.isEmpty) {
                     const selectionRange: vscode.Range = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
-                    codeToExplain = editor.document.getText(selectionRange);
-                    whatExplain = chatApi.linkToSource(editor.document.uri, selectionRange);
+                    codeToExplain = egaiar.document.getText(selectionRange);
+                    whatExplain = chatApi.linkToSource(egaiar.document.uri, selectionRange);
 
                 } else {
                     const curPos: vscode.Position = selection.start;
-                    const contentLine: string = editor.document.lineAt(curPos.line).text;
+                    const contentLine: string = egaiar.document.lineAt(curPos.line).text;
 
-                    whatExplain = chatApi.linkToSource(editor.document.uri, curPos.line);
+                    whatExplain = chatApi.linkToSource(egaiar.document.uri, curPos.line);
                     codeToExplain = contentLine.trim();
                 }
 
                 if (codeToExplain.length > 0) {
-                    const messageId: string = chatApi.dito(
+                    const messageId: string = chatApi.gaia(
                         vscode.l10n.t("Explaining the code " ,whatExplain)
                     );
 
                     return iaApi.explainCode(codeToExplain).then((value: string) => {
-                        if (getDitoConfiguration().clearBeforeExplain) {
-                            chatApi.dito("clear");
+                        if (getGaiaConfiguration().clearBeforeExplain) {
+                            chatApi.gaia("clear");
                         }
-                        chatApi.dito(value, messageId);
+                        chatApi.gaia(value, messageId);
                     });
                 } else {
-                    chatApi.ditoWarning("I couldn't identify a code to explain it. ");
+                    chatApi.gaiaWarning("I couldn't identify a code to explain it. ");
                 }
             } else {
-                chatApi.ditoWarning("Current editor is not valid for this operation.");
+                chatApi.gaiaWarning("Current egaiar is not valid for this operation.");
             }
         }   
     ));

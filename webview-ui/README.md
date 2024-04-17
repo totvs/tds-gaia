@@ -1,8 +1,8 @@
-# TDS-Dito: Pasta `webview-ui`
+# TDS-Gaia: Pasta `webview-ui`
 
 > Este diretório contém todo o código que será executado no contexto do webview. Pode ser pensado como o local onde está contido todo o código "frontend" de um webview.
 
-Esta pasta contém a parte visual da extensão [**TDS-Dito**](https://github.com/brodao2/tds-dito).
+Esta pasta contém a parte visual da extensão [**TDS-Gaia**](https://github.com/brodao2/tds-gaia).
 
 ## Funcionalidades (_status_)
 
@@ -20,17 +20,17 @@ Esta pasta contém a parte visual da extensão [**TDS-Dito**](https://github.com
 >
 > - [User Interface](https://code.visualstudio.com/docs/getstarted/userinterface)
 > - [Settings](https://code.visualstudio.com/docs/getstarted/settings)
-> - [Basic Edition](https://code.visualstudio.com/docs/editor/codebasics)
-> - [Marketplace](https://code.visualstudio.com/docs/editor/extension-gallery)
+> - [Basic Edition](https://code.visualstudio.com/docs/egaiar/codebasics)
+> - [Marketplace](https://code.visualstudio.com/docs/egaiar/extension-gallery)
 > - [Instalação](README.md#instalação).
 
-![Dito: Chat](images/chat.png)
+![Gaia: Chat](images/chat.png)
 
-> DICA: Para melhor visualização, recomenda-se mover a aba `DITO` para o painel secundário (`Ctrl+Alt-B`).
+> DICA: Para melhor visualização, recomenda-se mover a aba `Gaia` para o painel secundário (`Ctrl+Alt-B`).
 
-Na área principal do bate-papo, o **TDS-Dito** apresenta mensagens para o usuário, que podem ser, informações, instruções, alertas ou respostas.
+Na área principal do bate-papo, o **TDS-Gaia** apresenta mensagens para o usuário, que podem ser, informações, instruções, alertas ou respostas.
 
-Na base do bate-papo, há uma caixa de texto, pelo qual o usuário pode interagir com o **TDS-Dito** através de comandos e textos.
+Na base do bate-papo, há uma caixa de texto, pelo qual o usuário pode interagir com o **TDS-Gaia** através de comandos e textos.
 
 Leia [Funcionalidades](README.md#funcionalidades), para saber maiores detalhes.
 

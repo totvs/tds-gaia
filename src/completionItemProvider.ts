@@ -16,7 +16,7 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { delay } from "./util";
-import { TDitoConfig, getDitoConfiguration } from "./config";
+import { TGaiaConfig, getGaiaConfiguration } from "./config";
 import { Completion, CompletionResponse } from "./api/interfaceApi";
 import { iaApi } from "./extension"
 import { logger } from "./logger";
@@ -31,7 +31,7 @@ let textAfterCursor: string = "";
  * Returns InlineCompletionList with completion items.
  * Handles errors and cancellation.
 */
-//acionamento manual: F1 + editor.action.inlineSuggest.trigger
+//acionamento manual: F1 + egaiar.action.inlineSuggest.trigger
 export class InlineCompletionItemProvider implements vscode.InlineCompletionItemProvider {
 
     /**
@@ -39,17 +39,17 @@ export class InlineCompletionItemProvider implements vscode.InlineCompletionItem
      * 
     */
     static register(context: vscode.ExtensionContext) {
-        const config: TDitoConfig = getDitoConfiguration();
+        const config: TGaiaConfig = getGaiaConfiguration();
         const provider: vscode.InlineCompletionItemProvider = new InlineCompletionItemProvider();
         const documentFilter = config.documentFilter;
         const inlineRegister: vscode.Disposable = vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
         context.subscriptions.push(inlineRegister);
 
-        const afterInsert = vscode.commands.registerCommand('tds-dito.afterInsert', async (response: Completion) => {
-            vscode.commands.executeCommand("tds-dito.logCompletionFeedback", {completion: response, textBefore: textBeforeCursor, textAfter: textAfterCursor});
+        const afterInsert = vscode.commands.registerCommand('tds-gaia.afterInsert', async (response: Completion) => {
+            vscode.commands.executeCommand("tds-gaia.logCompletionFeedback", {completion: response, textBefore: textBeforeCursor, textAfter: textAfterCursor});
         });
         
-        const logCompletionFeedback = vscode.commands.registerCommand('tds-dito.logCompletionFeedback', async (response: {completion: Completion, textBefore: string, textAfter: string}) => {
+        const logCompletionFeedback = vscode.commands.registerCommand('tds-gaia.logCompletionFeedback', async (response: {completion: Completion, textBefore: string, textAfter: string}) => {
             iaApi.logCompletionFeedback(response);
         });
 
@@ -58,11 +58,11 @@ export class InlineCompletionItemProvider implements vscode.InlineCompletionItem
     }
 
     async provideInlineCompletionItems(document: vscode.TextDocument, position: vscode.Position, context: vscode.InlineCompletionContext, token: vscode.CancellationToken): Promise<vscode.InlineCompletionItem[]> {
-        // if (context.workspaceState.get("tds-dito.readyFoUse") === false) {
+        // if (context.workspaceState.get("tds-gaia.readyFoUse") === false) {
         //     return;
         // }
 
-        const config = getDitoConfiguration();
+        const config = getGaiaConfiguration();
         const autoSuggest = config.enableAutoSuggest;
         const requestDelay = config.requestDelay;
 
@@ -105,7 +105,7 @@ export class InlineCompletionItemProvider implements vscode.InlineCompletionItem
                         range: new vscode.Range(position, position),
                         command: {
                             title: 'afterInsert',
-                            command: 'tds-dito.afterInsert',
+                            command: 'tds-gaia.afterInsert',
                             arguments: [completion],
                         }
                     });

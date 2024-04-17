@@ -1,8 +1,8 @@
 import * as vscode from 'vscode'
-import { TDitoConfig, getDitoConfiguration } from './config'
-// import { getEditor } from '../../editor/active-editor'
+import { TGaiaConfig, getGaiaConfiguration } from './config'
+// import { getEditor } from '../../egaiar/active-egaiar'
 // import { isValidTestFile } from '../utils/test-commands'
-// import { getDocumentSections } from '../../editor/utils/document-sections'
+// import { getDocumentSections } from '../../egaiar/utils/document-sections'
 // import { telemetryService } from '../../services/telemetry'
 // import { telemetryRecorder } from '../../services/telemetry-v2'
 
@@ -14,7 +14,7 @@ interface EditorCodeLens {
 /**
  * Adds Code lenses for triggering Command Menu
  */
-export class DitoCodeLensProvider implements vscode.CodeLensProvider {
+export class GaiaCodeLensProvider implements vscode.CodeLensProvider {
     private isEnabled = false
 
     private _disposables: vscode.Disposable[] = []
@@ -25,7 +25,7 @@ export class DitoCodeLensProvider implements vscode.CodeLensProvider {
         this.updateConfig()
 
         vscode.workspace.onDidChangeConfiguration(e => {
-            if (e.affectsConfiguration('tds-dito')) {
+            if (e.affectsConfiguration('tds-gaia')) {
                 this.updateConfig()
             }
         })
@@ -40,7 +40,7 @@ export class DitoCodeLensProvider implements vscode.CodeLensProvider {
         }
         this._disposables.push(vscode.languages.registerCodeLensProvider({ scheme: 'file' }, this))
         this._disposables.push(
-            vscode.commands.registerCommand('cody.editor.codelens.click', async lens => {
+            vscode.commands.registerCommand('cody.egaiar.codelens.click', async lens => {
                 // telemetryService.log('CodyVSCodeExtension:command:codelens:clicked')
                 // telemetryRecorder.recordEvent('cody.command.codelens', 'clicked')
                 const clickedLens = lens as EditorCodeLens
@@ -58,7 +58,7 @@ export class DitoCodeLensProvider implements vscode.CodeLensProvider {
      * Update the configurations
      */
     private updateConfig(): void {
-        const config: TDitoConfig = getDitoConfiguration();
+        const config: TGaiaConfig = getGaiaConfiguration();
         this.isEnabled = config.enable || true;
 
         if (this.isEnabled && !this._disposables.length) {
@@ -80,8 +80,8 @@ export class DitoCodeLensProvider implements vscode.CodeLensProvider {
         }
 
         token.onCancellationRequested(() => [])
-        const editor = vscode.window.activeTextEditor
-        if (editor?.document !== document || document.languageId === 'json') {
+        const egaiar = vscode.window.activeTextEditor
+        if (egaiar?.document !== document || document.languageId === 'json') {
             return []
         }
 
@@ -151,7 +151,7 @@ export class DitoCodeLensProvider implements vscode.CodeLensProvider {
      * Handle the code lens click event
      */
     private async onCodeLensClick(lens: EditorCodeLens): Promise<void> {
-        // Update selection in active editor to the selection of the clicked code lens
+        // Update selection in active egaiar to the selection of the clicked code lens
         const activeEditor = vscode.window.activeTextEditor;
         if (activeEditor) {
             activeEditor.selection = lens.selection
@@ -187,12 +187,12 @@ export class DitoCodeLensProvider implements vscode.CodeLensProvider {
 const commandLenses = {
     cody: {
         title: '$(cody-logo) Cody',
-        command: 'cody.editor.codelens.click',
+        command: 'cody.egaiar.codelens.click',
         tooltip: 'Open command menu',
     },
     test: {
         title: '$(cody-logo) Add More Tests',
-        command: 'cody.editor.codelens.click',
+        command: 'cody.egaiar.codelens.click',
         tooltip: 'Generate new test cases',
     },
 }

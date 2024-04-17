@@ -22,7 +22,7 @@ import { TMessageModel } from '../model/messageModel';
 import { TFieldErrors } from '../model/abstractMode';
 import { chatApi } from '../extension';
 import { TQueueMessages } from '../api/chatApi';
-import { getDitoUser } from '../config';
+import { getGaiaUser } from '../config';
 import { logger } from '../logger';
 import { highlightCode } from '../decoration';
 
@@ -51,12 +51,12 @@ type ChatCommand = CommonCommandFromWebViewEnum & ChatCommandEnum;
  */
 export class ChatViewProvider implements vscode.WebviewViewProvider {
 
-  public static readonly viewType = 'tds-dito-view';
+  public static readonly viewType = 'tds-gaia-view';
 
   private _view?: vscode.WebviewView;
   private chatModel: TChatModel = {
     lastPublication: new Date(),
-    loggedUser: getDitoUser()?.displayName || "<Not logged>",
+    loggedUser: getGaiaUser()?.displayName || "<Not logged>",
     newMessage: "",
     messages: []
   };
@@ -109,10 +109,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     //   localResourceRoots: [this._extensionUri]
     // };
 
-    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-dito-vscode');
+    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-gaia-vscode');
     const extensionUri: vscode.Uri = ext!.extensionUri;
 
-    webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView", { title: "Dito: Chat" });
+    webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView", { title: "Gaia: Chat" });
     webviewView.webview.onDidReceiveMessage(this._getWebviewMessageListener(webviewView.webview));
   }
 
@@ -208,7 +208,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                 if (!ok) {
                   const msg: string = vscode.l10n.t("invalid link in MouseOver: {0}", data.command);
 
-                  chatApi.dito([
+                  chatApi.gaia([
                     "Sorry.I didn't understand this command.",
                     `\`${msg}\``,
                     vscode.l10n.t("Please open a {0}. That way I can investigate this issue better.", chatApi.commandText("open_issue"))
@@ -228,7 +228,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {
     let messagesToSend: TMessageModel[] = [];
 
-    //model.loggedUser = getDitoUser()!.displayName || "<Not logged>";
+    //model.loggedUser = getGaiaUser()!.displayName || "<Not logged>";
     model.newMessage = "";
 
     if (this.chatModel.messages.length > 0) {

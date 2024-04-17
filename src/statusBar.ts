@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import * as vscode from "vscode";
-import { LoggedUser, UserOrganization, getDitoUser, isDitoLogged } from "./config";
+import { LoggedUser, UserOrganization, getGaiaUser, isGaiaLogged } from "./config";
 
 let statusBarItem: vscode.StatusBarItem;
 const priorityStatusBarItem: number = 200;
@@ -52,17 +52,17 @@ function initStatusBarItem(): vscode.StatusBarItem {
 }
 
 function updateStatusBarItem(): void {
-  statusBarItem.text = "TDS-Dito: ";
+  statusBarItem.text = "TDS-Gaia: ";
 
-  if (isDitoLogged()) {
-    const user: LoggedUser | undefined = getDitoUser();
+  if (isGaiaLogged()) {
+    const user: LoggedUser | undefined = getGaiaUser();
 
     statusBarItem.text += `$(account) ${user!.displayName} `;
-    statusBarItem.command = "tds-dito.logout";
+    statusBarItem.command = "tds-gaia.logout";
     statusBarItem.tooltip = buildTooltip(user!);
   } else {
     statusBarItem.text += vscode.l10n.t("Need login");
-    statusBarItem.command = "tds-dito.login";
+    statusBarItem.command = "tds-gaia.login";
     statusBarItem.tooltip = vscode.l10n.t("Trigger to make the identification");
   }
 

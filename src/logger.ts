@@ -18,11 +18,11 @@ import * as vscode from 'vscode';
 import * as fse from 'fs-extra';
 import winston = require('winston');
 import Transport = require('winston-transport');
-import { getDitoLogLevel } from './config';
+import { getGaiaLogLevel } from './config';
 
-const outputChannel: vscode.LogOutputChannel = vscode.window.createOutputChannel('TDS-Dito', { log: true });
-export const PREFIX_DITO = "[TDS-Dito]";
-const LABEL_DITO = "tds-dito";
+const outputChannel: vscode.LogOutputChannel = vscode.window.createOutputChannel('TDS-Gaia', { log: true });
+export const PREFIX_GAIA = "[TDS-Gaia]";
+const LABEL_GAIA = "tds-gaia";
 
 /**
  * Custom Winston transport that logs messages to the extension's output channel. 
@@ -46,11 +46,11 @@ class OutputChannelTransport extends Transport {
             if (((this.level || "") == "verbose") || ((this.level || "") == "debug")) {
                 outputChannel.error(`Cause: ${info.cause}\n\tStack: ${info.stack}`);
             }
-            vscode.window.showErrorMessage(`${PREFIX_DITO}${info.message}`);
+            vscode.window.showErrorMessage(`${PREFIX_GAIA}${info.message}`);
             outputChannel.show();
         } else if (info.level === 'warn') {
             outputChannel.warn(info.message);
-            vscode.window.showInformationMessage(`${PREFIX_DITO}${info.message}`);
+            vscode.window.showInformationMessage(`${PREFIX_GAIA}${info.message}`);
         } else if (info.level === 'verbose') {
             outputChannel.debug(info.message);
         } else if (info.level === 'debug') {
@@ -80,13 +80,13 @@ class OutputChannelTransport extends Transport {
 };
 
 const userHome: string = process.env.USERPROFILE || process.env.HOME || process.env.HOMEPATH || '.';
-const logDir: string = userHome + '/.tds-dito/logs';
+const logDir: string = userHome + '/.tds-gaia/logs';
 fse.ensureDirSync(logDir);
 const now: Date = new Date();
 const logSuffix: string = `${now.getFullYear()}-${(now.getMonth() + 1) < 10 ? "0" : ""}${now.getMonth() + 1}-${now.getDate()}` +
     `-${now.toTimeString().substring(0, 5).replace(":", "_")}`;
 ;
-const logFilename: string = `${logDir}/tds-dito-${logSuffix}.log`;
+const logFilename: string = `${logDir}/tds-gaia-${logSuffix}.log`;
 
 if (fse.existsSync(logFilename)) {
     fse.removeSync(logFilename);
@@ -140,7 +140,7 @@ const myFormat = winston.format.printf((info: winston.Logform.TransformableInfo)
  * The logger will log to the console and to a dated log file.
  */
 export const logger: winston.Logger = winston.createLogger({
-    level: getDitoLogLevel(),
+    level: getGaiaLogLevel(),
     format: winston.format.combine(
         winston.format.errors({ stack: true }),
         winston.format.splat(),
@@ -148,10 +148,10 @@ export const logger: winston.Logger = winston.createLogger({
         winston.format.simple(),
         //winston.format.prettyPrint()
     ),
-    defaultMeta: { service: 'tds-dito' },
+    defaultMeta: { service: 'tds-gaia' },
     transports: [
         new OutputChannelTransport({
-            //level: getDitoConfiguration().logLevel,
+            //level: getGaiaConfiguration().logLevel,
             format: winston.format.combine(
                 winston.format.errors({ stack: true }),
                 winston.format.splat(),
@@ -166,7 +166,7 @@ export const logger: winston.Logger = winston.createLogger({
             format: winston.format.combine(
                 winston.format.splat(),
                 winston.format.timestamp({ format: 'YY-MM-DD HH:mm:ss' }),
-                winston.format.label({ label: LABEL_DITO }),
+                winston.format.label({ label: LABEL_GAIA }),
                 //winston.format.prettyPrint(),
                 myFormat
             )
@@ -185,11 +185,11 @@ if (process.env.NODE_ENV !== 'production') {
             winston.format.colorize(),
             winston.format.splat(),
             winston.format.timestamp(),
-            winston.format.label({ label: LABEL_DITO }),
+            winston.format.label({ label: LABEL_GAIA }),
             //winston.format.simple()
             winston.format.prettyPrint(),
         )
     }));
 }
 
-outputChannel.appendLine(`TDS-Dito logger initialized at ${new Date().toDateString()} and file writes in ${logDir}`);
+outputChannel.appendLine(`TDS-Gaia logger initialized at ${new Date().toDateString()} and file writes in ${logDir}`);

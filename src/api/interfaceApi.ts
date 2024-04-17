@@ -16,7 +16,7 @@ limitations under the License.
 
 import { ExtensionContext } from "vscode";
 import { logger } from "../logger";
-import { TDitoConfig, getDitoConfiguration } from "../config";
+import { TGaiaConfig, getGaiaConfiguration } from "../config";
 import { ChatApi } from "./chatApi";
 
 let execBeginTime: Date;

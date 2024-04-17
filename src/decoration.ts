@@ -19,16 +19,16 @@ import * as vscode from 'vscode';
 let currentTheme: string = vscode.workspace.getConfiguration().get('workbench.colorTheme') || "";
 let processCodeDecorationType: vscode.TextEditorDecorationType = vscode.window.createTextEditorDecorationType({
     // Propriedades de estilo baseadas no tema
-    backgroundColor: new vscode.ThemeColor("editor.selectionBackground"),
+    backgroundColor: new vscode.ThemeColor("egaiar.selectionBackground"),
     overviewRulerColor: 'blue',
     overviewRulerLane: vscode.OverviewRulerLane.Left,
 });
 
 /**
- * Highlights the given range of code in the active text editor, if it matches the provided file name.
+ * Highlights the given range of code in the active text egaiar, if it matches the provided file name.
  * Creates a decoration with the given message that highlights the specified range.
  * 
- * @param source - The file name to match against the active editor's document.
+ * @param source - The file name to match against the active egaiar's document.
  * @param startLine - The start line of the range to highlight.
  * @param startChar - The start character of the range to highlight. 
  * @param endLine - The end line of the range to highlight.
@@ -36,16 +36,16 @@ let processCodeDecorationType: vscode.TextEditorDecorationType = vscode.window.c
  * @returns The decoration type used to highlight the code.
  */
 export function highlightCode(source: string, startLine: number, startChar: number, endLine: number, endChar: number): vscode.TextEditorDecorationType {
-    const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+    const egaiar: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
 
-    if (editor && (editor.document.fileName === source)) {
+    if (egaiar && (egaiar.document.fileName === source)) {
         let startPosition: vscode.Position | undefined = undefined;
         let endPosition: vscode.Position | undefined = undefined;
 
         if (startChar === 0) {
             startLine = startLine - 1;
             endLine = startLine;
-            endChar = editor.document.lineAt(endLine).text.length;
+            endChar = egaiar.document.lineAt(endLine).text.length;
         } else {
             startLine = startLine - 1;
             startChar = startChar - 1;
@@ -53,14 +53,14 @@ export function highlightCode(source: string, startLine: number, startChar: numb
             endChar = endChar - 1;
         }
 
-        startPosition = editor.document.validatePosition(new vscode.Position(startLine, startChar));
-        endPosition = editor.document.validatePosition(new vscode.Position(endLine, endChar));
+        startPosition = egaiar.document.validatePosition(new vscode.Position(startLine, startChar));
+        endPosition = egaiar.document.validatePosition(new vscode.Position(endLine, endChar));
 
         if (startPosition && endPosition) {
             const range: vscode.Range = new vscode.Range(startPosition, endPosition);
             const decorations: vscode.DecorationOptions[] = [{ range: range, hoverMessage: "Process block!" }];
 
-            editor.setDecorations(processCodeDecorationType, decorations);
+            egaiar.setDecorations(processCodeDecorationType, decorations);
         }
     }
 

@@ -275,7 +275,7 @@ AQ1        AQ1_QTDLIB N       9                      Qtd.Liberada
 AQ1        AQ1_SEQUEN C       9                      Num. Seq.   
 AQ1        AQ1_STATUS C       1                      Status      
 AQ1        AQ1_ORIGEM C       15                     Origem      
-AQ1        AQ1_BLQCRD C       2                      Bloq.Credito
+AQ1        AQ1_BLQCRD C       2                      Bloq.Cregaia
 AQ1        AQ1_BLQEST C       2                      Bloq.Estoque
 AQ1        AQ1_DETBLQ C       200                    Detalhe Bloq
 AQ1        AQ1_DATA   D       8                      Data Log    
@@ -1369,10 +1369,10 @@ CQ7        CQ7_DEBITO N       16                     Deb na Data
 CQ7        CQ7_CREDIT N       16                     Crd na Data 
 CQ8        CQ8_CODIGO C       20                     Codigo      
 CQ8        CQ8_DEBITO N       16                     Sld Debito  
-CQ8        CQ8_CREDIT N       16                     Sld Credito 
+CQ8        CQ8_CREDIT N       16                     Sld Cregaia 
 CQ9        CQ9_CODIGO C       20                     Codigo      
 CQ9        CQ9_DEBITO N       16                     Sld Debito  
-CQ9        CQ9_CREDIT N       16                     Sld Credito 
+CQ9        CQ9_CREDIT N       16                     Sld Cregaia 
 CQB        CQB_DEBITO N       16                     Val Déb dt  
 CQB        CQB_CREDIT N       16                     Val Créd dt 
 CQB        CQB_VARIAC N       16                     Val Var Camb
@@ -1420,7 +1420,7 @@ CSE        CSE_FUNVLR N       16                     Vl Moed Fun
 CSE        CSE_FUNINI N       16                     Sld Ini Fun 
 CSE        CSE_FUNFIM N       16                     Sld Fun Fun 
 CSE        CSE_VALDEB N       14                     Valor Deb.  
-CSE        CSE_VALCRE N       14                     Vlr. Credito
+CSE        CSE_VALCRE N       14                     Vlr. Cregaia
 CSG        CSG_VALINI N       14                     Vl Inicial  
 CSG        CSG_VALDEB N       14                     Valor Deb.  
 CSG        CSG_VALCRE N       14                     VL CREDT    
@@ -1437,7 +1437,7 @@ CSG        CSG_ADDCRE N       16                     Cred Per Nac
 CSG        CSG_ADDMOV N       16                     Movimen Naci
 CSG        CSG_ADDFIN N       16                     Sld Fin Naci
 CSK        CSK_VALDEB N       16                     Valor Deb.  
-CSK        CSK_VALCRE N       16                     Vlr.Credito 
+CSK        CSK_VALCRE N       16                     Vlr.Cregaia 
 CSK        CSK_VALINI N       16                     Vl Inicial  
 CSK        CSK_VALFIN N       16                     Vl Final    
 CSL        CSL_VLPART N       16                     Vlr.Partida 
@@ -1502,7 +1502,7 @@ CT2        CT2_VALOR  N       14                     Valor
 CT2        CT2_CCD    C       9                      C Custo Deb 
 CT2        CT2_CCC    C       9                      C Custo Crd 
 CT2        CT2_ITEMD  C       9                      Item Debito 
-CT2        CT2_ITEMC  C       9                      Item Credito
+CT2        CT2_ITEMC  C       9                      Item Cregaia
 CT2        CT2_CLVLDB C       9                      Cl Vlr Deb  
 CT2        CT2_CLVLCR C       9                      Cl Vlr Cred 
 CT2        CT2_VALR02 N       14                     Valor Moeda2
@@ -1546,13 +1546,13 @@ CT2        CT2_CODFOR C       6                      Cód. Fornec.
 CT2        CT2_INCDET M       10                     Det. Incons.
 CT2        CT2_PROCES C       32                     Cod Processo
 CT3        CT3_DEBITO N       16                     Sld Debito  
-CT3        CT3_CREDIT N       16                     Sld Credito 
+CT3        CT3_CREDIT N       16                     Sld Cregaia 
 CT3        CT3_ATUDEB N       16                     Sld Atu Deb 
 CT3        CT3_ATUCRD N       16                     Sld Atu Crd 
 CT3        CT3_ANTDEB N       16                     Sld Ant Deb 
 CT3        CT3_ANTCRD N       16                     Sld Ant Crd 
 CT3        CT3_LPDEB  N       16                     LP Debito   
-CT3        CT3_LPCRD  N       16                     LP Credito  
+CT3        CT3_LPCRD  N       16                     LP Cregaia  
 CT4        CT4_DEBITO N       16                     Deb na Data 
 CT4        CT4_CREDIT N       16                     Crd na Data 
 CT4        CT4_ATUDEB N       16                     Sld Atu Deb 
@@ -1560,7 +1560,7 @@ CT4        CT4_ATUCRD N       16                     Sld Atu Crd
 CT4        CT4_ANTDEB N       16                     Sld Ant Deb 
 CT4        CT4_ANTCRD N       16                     Sld Ant Crd 
 CT4        CT4_LPDEB  N       16                     LP Debito   
-CT4        CT4_LPCRD  N       16                     LP Credito  
+CT4        CT4_LPCRD  N       16                     LP Cregaia  
 CT5        CT5_STATUS C       1                      Status      
 CT5        CT5_MOEDAS C       5                      Lcto Moedas 
 CT5        CT5_VLR02  C       200                    Vlr Moeda 2 
@@ -1571,7 +1571,7 @@ CT5        CT5_CCD    C       200                    C Custo Deb
 CT5        CT5_CCC    C       200                    C Custo Crd 
 CT5        CT5_ORIGEM C       100                    Origem Lcto 
 CT5        CT5_ITEMD  C       200                    Item Debito 
-CT5        CT5_ITEMC  C       200                    Item Credito
+CT5        CT5_ITEMC  C       200                    Item Cregaia
 CT5        CT5_CLVLDB C       200                    Cl Vlr Deb  
 CT5        CT5_CLVLCR C       200                    Cl Vlr Crd  
 CT5        CT5_ATIVDE C       200                    Outr Inf Deb
@@ -1601,7 +1601,7 @@ CT5        CT5_AT03DB C       100                    Ativ.03 DB
 CT5        CT5_CTRLSD C       1                      Control.Sald
 CT5        CT5_CODPAR C       6                      Cod.Partic. 
 CT6        CT6_INF    N       16                     Sld Inform  
-CT6        CT6_CREDIT N       16                     Sld Credito 
+CT6        CT6_CREDIT N       16                     Sld Cregaia 
 CT6        CT6_DIG    N       16                     Sld Digitado
 CT6        CT6_DEBITO N       16                     Sld Debito  
 CT7        CT7_DEBITO N       16                     Deb na Data 
@@ -1611,7 +1611,7 @@ CT7        CT7_ATUCRD N       16                     Sld Atu Crd
 CT7        CT7_ANTDEB N       16                     Sld Ant Deb 
 CT7        CT7_ANTCRD N       16                     Sld Ant Crd 
 CT7        CT7_LPDEB  N       16                     LP Debito   
-CT7        CT7_LPCRD  N       16                     LP Credito  
+CT7        CT7_LPCRD  N       16                     LP Cregaia  
 CT9        CT9_VLR01  N       14                     Valor       
 CTC        CTC_DEBITO N       14                     Vlr Lanc Deb
 CTC        CTC_CREDIT N       14                     Vlr Lanc Crd
@@ -1625,7 +1625,7 @@ CTI        CTI_ATUCRD N       16                     Sld Atu Crd
 CTI        CTI_ANTDEB N       16                     Sld Ant Deb 
 CTI        CTI_ANTCRD N       16                     Sld Ant Crd 
 CTI        CTI_LPDEB  N       16                     Debito LP   
-CTI        CTI_LPCRD  N       16                     Credito LP  
+CTI        CTI_LPCRD  N       16                     Cregaia LP  
 CTJ        CTJ_VALOR  N       14                     Valor Rateio
 CTK        CTK_VLR01  N       14                     Vlr Moeda 1 
 CTK        CTK_VLR02  N       14                     Vlr Moeda 2 
@@ -1634,9 +1634,9 @@ CTK        CTK_VLR04  N       14                     Vlr Moeda 4
 CTK        CTK_VLR05  N       14                     Vlr Moeda 5 
 CTK        CTK_MOEDAS C       5                      Moedas Lcto 
 CTK        CTK_CCD    C       9                      C C Debito  
-CTK        CTK_CCC    C       9                      C C Credito 
+CTK        CTK_CCC    C       9                      C C Cregaia 
 CTK        CTK_ITEMD  C       9                      Item Debito 
-CTK        CTK_ITEMC  C       9                      Item Credito
+CTK        CTK_ITEMC  C       9                      Item Cregaia
 CTK        CTK_INTERC C       1                      Intercompany
 CTK        CTK_LP     C       3                      Lcto Padrao 
 CTK        CTK_LPSEQ  C       3                      Seq Lcto    
@@ -1644,7 +1644,7 @@ CTK        CTK_CLVLDB C       9                      Cl Vlr Deb
 CTK        CTK_CLVLCR C       9                      Cl Vlr Cred 
 CTK        CTK_ORIGEM C       100                    Origem      
 CTK        CTK_ATIVDE C       40                     Ativ Debito 
-CTK        CTK_ATIVCR C       40                     Ativ Credito
+CTK        CTK_ATIVCR C       40                     Ativ Cregaia
 CTK        CTK_DTVENC D       8                      Data Vencim 
 CTK        CTK_HAGLUT C       40                     H. Aglut.   
 CTK        CTK_NODIA  C       10                     Nro Diario  
@@ -1665,45 +1665,45 @@ CTT        CTT_VALFAT N       14                     Vlr.Fatura
 CTT        CTT_RETIDO N       14                     Vlr.Retido  
 CTT        CTT_CPART  C       6                      Cód. Resp.  
 CTU        CTU_DEBITO N       16                     Sld Debito  
-CTU        CTU_CREDIT N       16                     Sld Credito 
+CTU        CTU_CREDIT N       16                     Sld Cregaia 
 CTU        CTU_ATUDEB N       16                     Sld Atu Deb 
 CTU        CTU_ATUCRD N       16                     Sld Atu Crd 
 CTU        CTU_ANTDEB N       16                     Sld Ant Deb 
 CTU        CTU_ANTCRD N       16                     Sld Ant Crd 
 CTU        CTU_LPDEB  N       16                     LP Debito   
-CTU        CTU_LPCRD  N       16                     LP Credito  
+CTU        CTU_LPCRD  N       16                     LP Cregaia  
 CTV        CTV_DEBITO N       16                     Sld Debito  
-CTV        CTV_CREDIT N       16                     Sld Credito 
+CTV        CTV_CREDIT N       16                     Sld Cregaia 
 CTV        CTV_ATUDEB N       16                     Sld Atu Deb 
 CTV        CTV_ATUCRD N       16                     Sld Atu Crd 
 CTV        CTV_ANTDEB N       16                     Sld Ant Deb 
 CTV        CTV_ANTCRD N       16                     Sld Ant Crd 
 CTV        CTV_LPDEB  N       16                     LP Debito   
-CTV        CTV_LPCRD  N       16                     LP Credito  
+CTV        CTV_LPCRD  N       16                     LP Cregaia  
 CTW        CTW_DEBITO N       16                     Sld Debito  
-CTW        CTW_CREDIT N       16                     Sld Credito 
+CTW        CTW_CREDIT N       16                     Sld Cregaia 
 CTW        CTW_ATUDEB N       16                     Sld Atu Deb 
 CTW        CTW_ATUCRD N       16                     Sld Atu Crd 
 CTW        CTW_ANTDEB N       16                     Sld Ant Deb 
 CTW        CTW_ANTCRD N       16                     Sld Ant Crd 
 CTW        CTW_LPDEB  N       16                     LP Debito   
-CTW        CTW_LPCRD  N       16                     LP Credito  
+CTW        CTW_LPCRD  N       16                     LP Cregaia  
 CTX        CTX_DEBITO N       16                     Sld Debito  
-CTX        CTX_CREDIT N       16                     Sld Credito 
+CTX        CTX_CREDIT N       16                     Sld Cregaia 
 CTX        CTX_ATUDEB N       16                     Sld Atu Deb 
 CTX        CTX_ATUCRD N       16                     Sld Atu Crd 
 CTX        CTX_ANTDEB N       16                     Sld Ant Deb 
 CTX        CTX_ANTCRD N       16                     Sld Ant Crd 
 CTX        CTX_LPDEB  N       16                     LP Debito   
-CTX        CTX_LPCRD  N       16                     LP Credito  
+CTX        CTX_LPCRD  N       16                     LP Cregaia  
 CTY        CTY_DEBITO N       16                     Sld Debito  
-CTY        CTY_CREDIT N       16                     Sld Credito 
+CTY        CTY_CREDIT N       16                     Sld Cregaia 
 CTY        CTY_ATUDEB N       16                     Sld Atu Deb 
 CTY        CTY_ATUCRD N       16                     Sld Atu Crd 
 CTY        CTY_ANTDEB N       16                     Sld Ant Deb 
 CTY        CTY_ANTCRD N       16                     Sld Ant Crd 
 CTY        CTY_LPDEB  N       16                     LP Debito   
-CTY        CTY_LPCRD  N       16                     LP Credito  
+CTY        CTY_LPCRD  N       16                     LP Cregaia  
 CTZ        CTZ_VLRDEB N       16                     Deb. na Data
 CTZ        CTZ_VLRCRD N       16                     Crd na Data 
 CUO        CUO_PAGDIV C       1                      Pag. Per Apu
@@ -1716,9 +1716,9 @@ CV1        CV1_CALEND C       3                      Calendario
 CV1        CV1_VALOR  N       14                     Valor Orcado
 CV3        CV3_VLR01  N       14                     Vlr Moeda 1 
 CV3        CV3_CCD    C       9                      CC Debito   
-CV3        CV3_CCC    C       9                      CC Credito  
+CV3        CV3_CCC    C       9                      CC Cregaia  
 CV3        CV3_ITEMD  C       9                      Item Debito 
-CV3        CV3_ITEMC  C       9                      Item Credito
+CV3        CV3_ITEMC  C       9                      Item Cregaia
 CV3        CV3_CLVLDB C       9                      Cl Vlr Debit
 CV3        CV3_CLVLCR C       9                      Cl Vlr Credi
 CV3        CV3_VLR02  N       14                     Vlr Moeda 2 

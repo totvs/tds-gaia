@@ -48,7 +48,7 @@ No _log_ do LS:
 > Após desabilitar o _token de rpo_ no ambiente e reiniciado o VS-Code, o procedimento de remoção foi executado com sucesso.
 > *NOTA:*
 > . Melhorar as notificações ao usuário. Não é claro o motivo do erro.  
-> . Adicionar notificação para reiniciar o VS-Code após limpar/desabilitar o _token de rpo_. Acredito que uma reconexão com o _appServer_ também resolva.
+> . Adicionar notificação para reiniciar o VS-Code após limpar/desabilitar o _token de rpo_. Acregaia que uma reconexão com o _appServer_ também resolva.
 
 ## Mudando a extensão do arquivo (PRW para TLPP)
 

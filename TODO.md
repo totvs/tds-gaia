@@ -1,4 +1,4 @@
-# TDS-Dito: Ideias e coisas a fazer na extensão
+# TDS-Gaia: Ideias e coisas a fazer na extensão
 
 > **Legendas**:
 > :white_check_mark: Pronto
@@ -30,7 +30,7 @@
 - :walking: API para a inteligência artificial.
 
 - :white_square_button: Mensagens associadas a processamento.
-  Encapsular o processamento e passar como _callback_ para ChatApi.Dito e esse passa a tratar o retorno da mensagem (`messageId`).
+  Encapsular o processamento e passar como _callback_ para ChatApi.Gaia e esse passa a tratar o retorno da mensagem (`messageId`).
 
 - :white_check_mark: No caso de erro 504 e com informação de tempo para nova tentativa, agendar nova tentativa.
   Mensagem com tempo: ``The server encountered a temporary error and could not complete your request. Please try again in 30 seconds.``
@@ -79,6 +79,6 @@
 
 - :alarm_clock: Definir controle de acesso.
 
-- :white_square_button: Abrir DitoChat no painel secundário
+- :white_square_button: Abrir GaiaChat no painel secundário
 
-- :white_check_mark: Extensão não ativa corretamente caso a visão do DitoChat tenha sido fechada anteriormente
+- :white_check_mark: Extensão não ativa corretamente caso a visão do GaiaChat tenha sido fechada anteriormente

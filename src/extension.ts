@@ -16,13 +16,13 @@ limitations under the License.
 
 import * as vscode from 'vscode';
 import { initStatusBarItems, updateStatusBarItems } from './statusBar';
-import { getDitoLogLevel, isDitoLogged, isDitoShowBanner } from './config';
+import { getGaiaLogLevel, isGaiaLogged, isGaiaShowBanner } from './config';
 import { IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
 import { ChatViewProvider } from './panels/chatViewProvider';
 import { ChatApi } from './api/chatApi';
-//import { DitoCodeLensProvider } from './codeLens';
-import { PREFIX_DITO, logger } from './logger';
+//import { GaiaCodeLensProvider } from './codeLens';
+import { PREFIX_GAIA, logger } from './logger';
 import { InlineCompletionItemProvider } from './completionItemProvider';
 import { registerIaCommands } from './commands/IA/index';
 import { registerChatCommands } from './commands/chat';
@@ -38,7 +38,7 @@ export const iaApi: IaApiInterface = new CarolApi(chatApi);
 */
 export function activate(context: vscode.ExtensionContext) {
 	logger.info(
-		vscode.l10n.t('Congratulations, your extension "{0}" is now active!', PREFIX_DITO)
+		vscode.l10n.t('Congratulations, your extension "{0}" is now active!', PREFIX_GAIA)
 	);
 
 	// Get the TS extension
@@ -70,23 +70,23 @@ export function activate(context: vscode.ExtensionContext) {
 
 	InlineCompletionItemProvider.register(context);
 
-	// Register TDS-Dito CodeLens provider
+	// Register TDS-Gaia CodeLens provider
 	// let codeLensProviderDisposable = vscode.languages.registerCodeLensProvider(
 	// 	{
 	// 		language: "advpl",
 	// 		scheme: "file"
 	// 	},
-	// 	new DitoCodeLensProvider()
+	// 	new GaiaCodeLensProvider()
 	// );
 	// ctx.subscriptions.push(codeLensProviderDisposable);
 
-	//Chat DITO
+	//Chat DIGaiaTO
 	const chat: ChatViewProvider = new ChatViewProvider(context.extensionUri);
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(ChatViewProvider.viewType, chat));
 
 	//aciona a verificação do serviço no ar e posterior login
-	vscode.commands.executeCommand("tds-dito.health", false);
+	vscode.commands.executeCommand("tds-gaia.health", false);
 }
 
 /**
@@ -104,20 +104,20 @@ export function deactivate() {
  * @param value - The new value for the context key.
  */
 export function updateContextKey(key: string, value: boolean | string | number) {
-	vscode.commands.executeCommand('setContext', `tds-dito.${key}`, value);
+	vscode.commands.executeCommand('setContext', `tds-gaia.${key}`, value);
 }
 
 function handleConfigChange(context: vscode.ExtensionContext) {
 	const listener: vscode.Disposable = vscode.workspace.onDidChangeConfiguration(async event => {
-		if (event.affectsConfiguration('tds-dito')) {
-			updateContextKey("logged", isDitoLogged());
-			logger.level = getDitoLogLevel();
+		if (event.affectsConfiguration('tds-gaia')) {
+			updateContextKey("logged", isGaiaLogged());
+			logger.level = getGaiaLogLevel();
 
 			updateStatusBarItems();
 		}
 	});
 
-	updateContextKey("logged", isDitoLogged());
+	updateContextKey("logged", isGaiaLogged());
 
 	context.subscriptions.push(listener);
 }
@@ -127,20 +127,20 @@ function handleConfigChange(context: vscode.ExtensionContext) {
  * The banner contains the extension name, version, info, and link to the repo.
  */
 function showBanner(force: boolean = false): void {
-	const showBanner: boolean = isDitoShowBanner();
+	const showBanner: boolean = isGaiaShowBanner();
 
 	if (showBanner || force) {
-		let ext = vscode.extensions.getExtension("TOTVS.tds-dito-vscode");
+		let ext = vscode.extensions.getExtension("TOTVS.tds-gaia-vscode");
 		// prettier-ignore
 		{
 			const lines: string[] = [
 				"",
 				"--------------------------------v---------------------------------------------",
-				"     ////    //  //////  ////// |  TDS-Dito, your partner in AdvPL programming",
+				"     ////    //  //////  ////// |  TDS-Gaia, your partner in AdvPL programming",
 				`    //  //        //    //  //  |  Version ${ext?.packageJSON["version"]} (EXPERIMENTAL)`,
 				`   //  //  //    //    //  //   |  TOTVS Technology`,
 				"  //  //  //    //    //  //    |",
-				" ////    //    //    //////     |  https://github.com/totvs/tds-dito",
+				" ////    //    //    //////     |  https://github.com/totvs/tds-gaia",
 				"--------------------------------^----------------------------------------------",
 			];
 

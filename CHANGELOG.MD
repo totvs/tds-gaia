@@ -1,6 +1,6 @@
-# TDS-Dito, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
+# TDS-Gaia, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
 
-## TDS-Dito 0.0.NEXT
+## TDS-Gaia 0.0.NEXT
 
 ### Melhorias
 
@@ -11,7 +11,7 @@
 - Indicação visualmente entre mensagem de resposta e a mensagem de solicitação (comando).
   Ao efetuar  `MouseOver` sobre a mensagem de resposta ou de solicitação, as duas são destacadas.
 
-## TDS-Dito 0.0.5
+## TDS-Gaia 0.0.5
 
 ### Melhorias
 
@@ -20,14 +20,14 @@
 - Melhoria na interface visual do bate-papo.
 - Adicionado ligação com evento `MouseOver`. Passar o _mouse_ sobre uma ligação de posição.
 
-## TDS-Dito 0.0.4
+## TDS-Gaia 0.0.4
 
 ### Melhorias
 
 - Melhoria na interface visual do bate-papo.
 - Tratamento de erros de requisição com o serviço de IA.
 
-## TDS-Dito 0.0.3
+## TDS-Gaia 0.0.3
 
 ### Melhorias
 
@@ -35,12 +35,12 @@
 
 - Adicionado menu de contexto ao bate-papo.
 - Adicionado na configuração as chaves:
-  . tds-dito.clearBeforeExplain: false
+  . tds-gaia.clearBeforeExplain: false
     Limpa as mensagens existentes no bate-papo, antes de apresentar a explicação.
-  . tds-dito.clearBeforeTypify: false
+  . tds-gaia.clearBeforeTypify: false
     Limpa as mensagens existentes no bate-papo, antes de apresentar a tipificação.
 
-## TDS-Dito 0.0.2
+## TDS-Gaia 0.0.2
 
 Liberação inicial.
 
@@ -50,4 +50,4 @@ Liberação inicial.
 >
 > No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
 
-Favor ler [GUIA RÁPIDO](https://github.com/brodao2/tds-dito/blob/main/README.md#guia-ultra-r%C3%A1pido).
+Favor ler [GUIA RÁPIDO](https://github.com/brodao2/tds-gaia/blob/main/README.md#guia-ultra-r%C3%A1pido).

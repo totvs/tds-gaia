@@ -1,18 +1,18 @@
 import * as vscode from "vscode";
 
-import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoUser } from "../config";
+import { TGaiaConfig, getGaiaConfiguration, getGaiaUser, setGaiaUser } from "../config";
 import { fetch, Response } from "undici";
 import { capitalize } from "../util";
 import { Completion, CompletionResponse, IaAbstractApi, IaApiInterface, InferTypeResponse } from "./interfaceApi";
-import { PREFIX_DITO, logger } from "../logger";
+import { PREFIX_GAIA, logger } from "../logger";
 import { ChatViewProvider } from "../panels/chatViewProvider";
 
 export class CarolApi extends IaAbstractApi implements IaApiInterface {
     // prefixo _ indica envolvidas com a API CAROL
     private _requestId: number = 0;
     private _token: string = "";
-    private _endPoint: string = getDitoConfiguration().endPoint;
-    private _apiVersion: string = getDitoConfiguration().apiVersion;
+    private _endPoint: string = getGaiaConfiguration().endPoint;
+    private _apiVersion: string = getGaiaConfiguration().apiVersion;
     private _urlRequest: string = `${this._endPoint}`;
     private _apiRequest: string = `${this._urlRequest}/api/${this._apiVersion}`;
 
@@ -32,7 +32,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         await vscode.window.withProgress({
             location: { viewId: ChatViewProvider.viewType },
             cancellable: false,
-            title: vscode.l10n.t("{0}: requesting data...", PREFIX_DITO)
+            title: vscode.l10n.t("{0}: requesting data...", PREFIX_GAIA)
         }, async (progress, token) => {
             token.onCancellationRequested(() => {
                 result = new Error();
@@ -138,7 +138,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     }
 
     /**
-     * Logs in the user and sets the Dito user information.
+     * Logs in the user and sets the Gaia user information.
      *
      * @returns {Promise<boolean>} A promise that resolves to `true` if the login was successful, or `false` otherwise.
      */
@@ -158,7 +158,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             }
             parts[1] = parts[1] || "";
 
-            setDitoUser({
+            setGaiaUser({
                 id: `ID:${this._token}`,
                 email: `${this._token}`,
                 name: capitalize(parts[0]),
@@ -169,7 +169,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
                 expiresAt: new Date(2024, 11, 31, 23, 59, 59, 999),
             });
         } else {
-            setDitoUser({
+            setGaiaUser({
                 id: `ID:${this._token}`,
                 email: `${this._token}`,
                 name: this._token,
@@ -181,7 +181,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             });
         }
 
-        let message: string = vscode.l10n.t("Logged in as {0}", getDitoUser()?.displayName || vscode.l10n.t("<unknown>"));
+        let message: string = vscode.l10n.t("Logged in as {0}", getGaiaUser()?.displayName || vscode.l10n.t("<unknown>"));
         logger.info(message);
 
         result = true;
@@ -193,7 +193,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     logout(): Promise<boolean> {
         logger.info(vscode.l10n.t("Logging out..."));
         this._token = "";
-        setDitoUser(undefined);
+        setGaiaUser(undefined);
 
         return Promise.resolve(true);
     }
@@ -213,7 +213,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         logger.profile("getCompletions");
         logger.info(vscode.l10n.t("Code completions..."));
 
-        const config: TDitoConfig = getDitoConfiguration();
+        const config: TGaiaConfig = getGaiaConfiguration();
         const body: {} = {
             "prefix": textBeforeCursor,
             "suffix": textAfterCursor,

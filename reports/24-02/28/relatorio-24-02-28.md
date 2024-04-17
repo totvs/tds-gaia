@@ -228,7 +228,7 @@ Retornou (\[#] remete a comentário meu mais abaixo):
 
 \[6] No contexto dessa função, dizer que o 2º parâmetro é opcional esta correto. Normalmente não há como saber, formalmente, se o parâmetro é opcional ou não em funções não binárias. Pode-se dizer que todos os parâmetros são opcionais e fica a cargo da função verificá-los.
 
-\[7] Correto, mas acredito que podemos controlar melhor o detalhamento.
+\[7] Correto, mas acregaia que podemos controlar melhor o detalhamento.
 
 ### Função substr
 

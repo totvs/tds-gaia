@@ -16,7 +16,7 @@ limitations under the License.
 
 import * as vscode from 'vscode';
 
-let customConfig: TDitoCustomConfig = {};
+let customConfig: TGaiaCustomConfig = {};
 
 /**
  * Interface for a logged in user. 
@@ -38,12 +38,12 @@ export type LoggedUser = {
 export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
 
 /**
- * Interface for TDito configuration options.
+ * Interface for TGaia configuration options.
  
  * Must be a mirror of what is defined in package.json
- * Other settings, preferably non-persistent, must be made in TDitoCustomConfig
+ * Other settings, preferably non-persistent, must be made in TGaiaCustomConfig
 */
-export type TDitoConfig = {
+export type TGaiaConfig = {
   enable: boolean;
   clearBeforeExplain: boolean;
   clearBeforeInfer: boolean;
@@ -72,112 +72,112 @@ export type TDitoConfig = {
   top_k: number;
 }
 
-export type TDitoCustomConfig = {
+export type TGaiaCustomConfig = {
   currentUser?: LoggedUser
   ready?: boolean;
 }
 
 /**
- * Gets the TDito configuration from the VS Code workspace.
+ * Gets the TGaia configuration from the VS Code workspace.
  *
- * @returns The TDito configuration object.
+ * @returns The TGaia configuration object.
  */
-export function getDitoConfiguration(): TDitoConfig {
-  const config: any = vscode.workspace.getConfiguration("tds-dito");
+export function getGaiaConfiguration(): TGaiaConfig {
+  const config: any = vscode.workspace.getConfiguration("tds-gaia");
 
   return config;
 }
 
-//Enter key without prefix 'tds-dito'
-function setDitoConfiguration(key: keyof TDitoConfig, newValue: string | boolean | number | []): void {
-  const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("tds-dito");
+//Enter key without prefix 'tds-gaia'
+function setGaiaConfiguration(key: keyof TGaiaConfig, newValue: string | boolean | number | []): void {
+  const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("tds-gaia");
 
   config.update(key, newValue);//, vscode.ConfigurationTarget.Global);
 
   return;
 }
 
-function setDitoCustomConfiguration(key: keyof TDitoCustomConfig, newValue: any): void {
+function setGaiaCustomConfiguration(key: keyof TGaiaCustomConfig, newValue: any): void {
   customConfig[key] = newValue;
 }
 
 /**
- * Sets the current user in the TDito custom configuration 
- * and updates the last login time in the TDito configuration.
+ * Sets the current user in the TGaia custom configuration 
+ * and updates the last login time in the TGaia configuration.
  */
-export function setDitoUser(user: LoggedUser | undefined) {
+export function setGaiaUser(user: LoggedUser | undefined) {
 
-  setDitoCustomConfiguration("currentUser", user);
-  setDitoConfiguration("lastLogin", new Date().toUTCString()); //forçar modificação em settings.json
+  setGaiaCustomConfiguration("currentUser", user);
+  setGaiaConfiguration("lastLogin", new Date().toUTCString()); //forçar modificação em settings.json
 }
 
 /**
- * Gets the current logged in user from the TDito custom configuration.
+ * Gets the current logged in user from the TGaia custom configuration.
  * 
  * @returns The current logged in user, or undefined if no user is logged in.
  */
-export function getDitoUser(): LoggedUser | undefined {
+export function getGaiaUser(): LoggedUser | undefined {
 
   return customConfig["currentUser"]; //|| EMPTY_USER;
 }
 
 /**
- * Checks if there is a user currently logged in to TDito.
+ * Checks if there is a user currently logged in to TGaia.
  * 
  * @returns True if a user is logged in, false otherwise.
  */
-export function isDitoLogged(): boolean {
+export function isGaiaLogged(): boolean {
 
-  return getDitoUser() !== undefined;
+  return getGaiaUser() !== undefined;
 }
 
 /**
- * Checks if this is the first time TDito has been used by checking 
+ * Checks if this is the first time TGaia has been used by checking 
  * if there is a last login date set in the configuration.
  * 
- * @returns True if this is the first time TDito is being used, false otherwise.
+ * @returns True if this is the first time TGaia is being used, false otherwise.
  */
-export function isDitoFirstUse(): boolean {
-  return getDitoConfiguration().lastLogin.length == 0;
+export function isGaiaFirstUse(): boolean {
+  return getGaiaConfiguration().lastLogin.length == 0;
 }
 
 /**
- * Checks if the banner is enabled in the TDito configuration.
+ * Checks if the banner is enabled in the TGaia configuration.
  * 
  * @returns True if the banner is enabled, false otherwise.
  */
-export function isDitoShowBanner(): boolean {
+export function isGaiaShowBanner(): boolean {
 
-  return getDitoConfiguration().showBanner;
+  return getGaiaConfiguration().showBanner;
 }
 
 /**
- * Gets the log level from the TDito configuration.
+ * Gets the log level from the TGaia configuration.
  * 
  * @returns The configured log level.
  */
-export function getDitoLogLevel(): string {
+export function getGaiaLogLevel(): string {
 
-  return getDitoConfiguration().logLevel;
+  return getGaiaConfiguration().logLevel;
 }
 
 /**
- * Checks if TDito is ready by looking at the "ready" value in the custom configuration.
+ * Checks if TGaia is ready by looking at the "ready" value in the custom configuration.
  * 
- * @returns True if TDito is ready, false otherwise.
+ * @returns True if TGaia is ready, false otherwise.
  */
-export function isDitoReady(): boolean {
+export function isGaiaReady(): boolean {
 
   return customConfig["ready"] || false;
 }
 
 /**
- * Sets the "ready" value in the TDito custom configuration to indicate
- * if TDito is ready for use.
+ * Sets the "ready" value in the TGaia custom configuration to indicate
+ * if TGaia is ready for use.
  * 
  * @param ready - The ready state to set.
  */
-export function setDitoReady(ready: boolean) {
+export function setGaiaReady(ready: boolean) {
 
-  setDitoCustomConfiguration("ready", ready);
+  setGaiaCustomConfiguration("ready", ready);
 }

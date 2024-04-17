@@ -146,7 +146,7 @@ revisar
 
 span.tds-required::after {
 	content: "*";
-	color: var(--vscode-editorError-foreground);
+	color: var(--vscode-egaiarError-foreground);
 }
 
 vscode-data-grid-cell {

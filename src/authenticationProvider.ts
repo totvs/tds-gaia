@@ -21,8 +21,8 @@ import { Disposable } from "vscode";
 import { PromiseAdapter, promiseFromEvent } from "./util";
 //import fetch from 'node-fetch';
 
-const AUTH_TYPE: string = "auth-dito0";
-const AUTH_NAME: string = "Dito Authentication";
+const AUTH_TYPE: string = "auth-gaia0";
+const AUTH_NAME: string = "Gaia Authentication";
 const CLIENT_ID: string = "3GUryQ7ldAeKEuD2obYnppsnmj58eP5u";
 const AUTH0_DOMAIN = "totvs.fluigidentity.com/cloudpass";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`
@@ -33,7 +33,7 @@ class UriEventHandler extends vscode.EventEmitter<vscode.Uri> implements vscode.
     }
 }
 
-export class DitoAuthenticationProvider implements vscode.AuthenticationProvider, Disposable {
+export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider, Disposable {
     static AUTH_TYPE: string = AUTH_TYPE;
 
     private _sessionChangeEmitter = new vscode.EventEmitter<vscode.AuthenticationProviderAuthenticationSessionsChangeEvent>();
@@ -246,7 +246,7 @@ export function registerAuthentication(context: vscode.ExtensionContext) {
     const subscriptions = context.subscriptions;
 
     subscriptions.push(
-        new DitoAuthenticationProvider(context)
+        new GaiaAuthenticationProvider(context)
     );
 
     // getSession();

@@ -16,7 +16,7 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import * as path from "path";
-import { getDitoUser, isDitoFirstUse, isDitoLogged, isDitoReady } from "../config";
+import { getGaiaUser, isGaiaFirstUse, isGaiaLogged, isGaiaReady } from "../config";
 import { Queue } from "../queue";
 import { TMessageActionModel, TMessageModel } from "../model/messageModel";
 import { exit } from "process";
@@ -91,26 +91,26 @@ const commandsMap: Record<string, TCommand> = {
         command: "logout",
         regex: LOGOUT_RE,
         alias: ["logoff", "exit", "bye"],
-        commandId: "tds-dito.logout",
+        commandId: "tds-gaia.logout",
         process: (chat: ChatApi, command: string) => doLogout(chat)
     },
     "login": {
         command: "login",
         regex: LOGIN_RE,
         alias: ["logon", "hy", "hello"],
-        commandId: "tds-dito.login",
+        commandId: "tds-gaia.login",
     },
     "manual": {
         command: "manual",
         regex: MANUAL_RE,
         alias: ["man", "m"],
-        commandId: "tds-dito.open-manual",
+        commandId: "tds-gaia.open-manual",
     },
     "health": {
         command: "health",
         regex: HEALTH_RE,
         alias: ["det", "d"],
-        commandId: "tds-dito.health",
+        commandId: "tds-gaia.health",
     },
     "clear": {
         caption: vscode.l10n.t("Clear"),
@@ -123,25 +123,25 @@ const commandsMap: Record<string, TCommand> = {
         command: "explain",
         regex: EXPLAIN_RE,
         alias: ["ex", "e"],
-        commandId: "tds-dito.explain",
+        commandId: "tds-gaia.explain",
     },
     "explain-world": {
         command: "explain-word",
         regex: EXPLAIN_WORD_RE,
         alias: ["ew"],
-        commandId: "tds-dito.explain-word",
+        commandId: "tds-gaia.explain-word",
     },
     "infer": {
         command: "infer",
         regex: INFER_TYPE_RE,
         alias: ["ty", "t"],
-        commandId: "tds-dito.infer",
+        commandId: "tds-gaia.infer",
     },
     "update": {
         caption: vscode.l10n.t("Update Typified Variables"),
         command: "update",
         regex: UPDATE_RE,
-        commandId: "tds-dito.updateTypify",
+        commandId: "tds-gaia.updateTypify",
     }
 };
 
@@ -216,7 +216,7 @@ export class ChatApi {
      * @param answeringId - (Optional) The ID of the message this is answering.
      * @returns The ID of the sent message.
      */
-    dito(message: string | string[], answeringId: string | undefined = undefined): string {
+    gaia(message: string | string[], answeringId: string | undefined = undefined): string {
         let workMessage: string = typeof message == "string"
             ? message
             : message.join("\n\n");
@@ -229,22 +229,22 @@ export class ChatApi {
             answering: answeringId || "",
             inProcess: (answeringId === undefined),
             timeStamp: new Date(),
-            author: "Dito",
+            author: "Gaia",
             message: workMessage
         });
 
         return id;
     }
 
-    ditoInfo(message: string | string[]): void {
+    gaiaInfo(message: string | string[]): void {
         let workMessage: string | string[] = typeof message == "string"
             ? message
             : message.map((line: string) => `> ${line}`);
 
-        this.dito(workMessage, "");
+        this.gaia(workMessage, "");
     }
 
-    ditoWarning(message: string | string[]): void {
+    gaiaWarning(message: string | string[]): void {
         let workMessage: string | string[] = typeof message == "string"
             ? `[WARN] ${message}`
             : message.map((line: string, index: number) => {
@@ -255,7 +255,7 @@ export class ChatApi {
                 return line;
             });
 
-        this.dito(workMessage, "");
+        this.gaia(workMessage, "");
     }
 
     private extractActions(message: string): TMessageActionModel[] {
@@ -281,32 +281,32 @@ export class ChatApi {
     }
 
     checkUser(answeringId: string) {
-        if (isDitoReady()) {
-            if (!isDitoLogged()) {
-                if (isDitoFirstUse()) {
-                    this.dito([
+        if (isGaiaReady()) {
+            if (!isGaiaLogged()) {
+                if (isGaiaFirstUse()) {
+                    this.gaia([
                         vscode.l10n.t("It seems like this is the first time we've met."),
                         vscode.l10n.t("Want to know how to interact with me? {0}", this.commandText("hint_1"))
                     ], answeringId);
                 }
-                this.dito([
+                this.gaia([
                     vscode.l10n.t("To start, I need to know you."),
                     vscode.l10n.t("Please, identify yourself with the command {0}", this.commandText("login"))
                 ], answeringId);
             } else {
-                this.dito([
-                    vscode.l10n.t("Hello, **{0}**.", getDitoUser()?.displayName || "<unknown>"),
+                this.gaia([
+                    vscode.l10n.t("Hello, **{0}**.", getGaiaUser()?.displayName || "<unknown>"),
                     vscode.l10n.t("I'm ready to help you in any way possible!"),
                 ], answeringId);
             }
         } else {
-            vscode.commands.executeCommand("tds-dito.health");
+            vscode.commands.executeCommand("tds-gaia.health");
         }
     }
 
     logout() {
-        this.dito([
-            vscode.l10n.t("**{0}**, thank you for working with me!", getDitoUser()?.displayName || "<unknown>"),
+        this.gaia([
+            vscode.l10n.t("**{0}**, thank you for working with me!", getGaiaUser()?.displayName || "<unknown>"),
             vscode.l10n.t("See you soon!"),
         ], "");
     }
@@ -323,7 +323,7 @@ export class ChatApi {
                 answering: "",
                 inProcess: false,
                 timeStamp: new Date(),
-                author: getDitoUser()?.displayName || "<unknown>",
+                author: getGaiaUser()?.displayName || "<unknown>",
                 message: message == undefined ? "???" : message,
             });
 
@@ -342,9 +342,9 @@ export class ChatApi {
         commands.push(`${this.commandText("manual")}`);
         commands.push(`${this.commandText("clear")}`);
 
-        if (!isDitoReady()) {
+        if (!isGaiaReady()) {
             commands.push(`${this.commandText("details")}`);
-        } else if (isDitoLogged()) {
+        } else if (isGaiaLogged()) {
             commands.push(`${this.commandText("logout")}`);
             commands.push(`${this.commandText("explain")}`);
             commands.push(`${this.commandText("explain-world")}`);
@@ -410,10 +410,10 @@ export class ChatApi {
             if (processResult && command.commandId) {
                 vscode.commands.executeCommand(command.commandId);
             } else {
-                //this.dito(`Funcionalidade não implementada.Por favor, entre em contato com o desenvolvedor.`);
+                //this.gaia(`Funcionalidade não implementada.Por favor, entre em contato com o desenvolvedor.`);
             }
         } else {
-            this.dito(vscode.l10n.t("I didn't understand. You can type {0} to see available commands.", this.commandText("help")), "");
+            this.gaia(vscode.l10n.t("I didn't understand. You can type {0} to see available commands.", this.commandText("help")), "");
         }
     }
 }
@@ -430,10 +430,10 @@ function doHelp(chat: ChatApi, message: string): boolean {
     if (matches = message.match(commandsMap["help"].regex)) {
         if (matches[2]) {
             if (matches[2].trim() == "hint_1") {
-                chat.dito([
+                chat.gaia([
                     vscode.l10n.t("To interact with me, you will use commands that can be triggered by one of these modes:"),
                     vscode.l10n.t("- A shortcut;"),
-                    vscode.l10n.t("- By the command panel (`ctrl + shift - p` or` f1`), filtering by \"tds-dito\";"),
+                    vscode.l10n.t("- By the command panel (`ctrl + shift - p` or` f1`), filtering by \"tds-gaia\";"),
                     vscode.l10n.t("- By a link presented in this chat;"),
                     vscode.l10n.t("- Typing the command in the prompt chat;"),
                     vscode.l10n.t("- Context menu of the chat or source in edition."),
@@ -441,14 +441,14 @@ function doHelp(chat: ChatApi, message: string): boolean {
                     vscode.l10n.t("To know the commands, type `{0}` or `{0} command`.", chat.commandText("help"))
                 ], "");
             } else if (matches[2].trim() == "hint_2") {
-                const messageId: string = chat.dito(vscode.l10n.t("Opening Quick Guide from **TDS-Dito**."));
+                const messageId: string = chat.gaia(vscode.l10n.t("Opening Quick Guide from **TDS-Gaia**."));
 
-                vscode.commands.executeCommand("tds-dito.open-manual", "README.md#guia-r%C3%A1pido", vscode.l10n.t("Quick Guide"), messageId);
+                vscode.commands.executeCommand("tds-gaia.open-manual", "README.md#guia-r%C3%A1pido", vscode.l10n.t("Quick Guide"), messageId);
             } else {
-                chat.dito(vscode.l10n.t("Command aid {0}.", matches[2]));
+                chat.gaia(vscode.l10n.t("Command aid {0}.", matches[2]));
             }
         } else {
-            chat.dito([
+            chat.gaia([
                 vscode.l10n.t("The commands available at the moment are: {0}.", chat.commandList()),
                 vscode.l10n.t("If you are familiar with **VS-Code**, see {0}, if you do not or want more details, {1} (will open on your default browser).", chat.commandText("hint_2"), chat.commandText("manual")),
             ], "");
