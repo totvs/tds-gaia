@@ -125,7 +125,7 @@
           "when": "webviewId == 'tds-dito-view'"
         },
         {
-          "command": "tds-dito.typify",
+          "command": "tds-dito.infer",
           "when": "webviewId == 'tds-dito-view' && tds-dito.logged"
         }
       ]
@@ -192,9 +192,9 @@
         "category": "TDS-Dito"
       },
       {
-        "command": "tds-dito.typify",
-        "title": "Typify variables",
-        "shortTitle": "typify",
+        "command": "tds-dito.infer",
+        "title": "Infer variables",
+        "shortTitle": "Infer",
         "category": "TDS-Dito"
       },
       {
@@ -275,10 +275,10 @@
             "default": false,
             "description": "Clear messages before explain"
           },
-          "tds-dito.clearBeforeTypify": {
+          "tds-dito.clearBeforeInfer": {
             "type": "boolean",
             "default": false,
-            "description": "Clear messages before typify"
+            "description": "Clear messages before infer"
           },
           "tds-dito.logLevel": {
             "type": "string",
@@ -336,38 +336,51 @@
     "keybindings": [
       {
         "key": "Ctrl+D Ctrl+L",
+        "mac": "Cmd+D Cmd+L",
         "command": "tds-dito.login"
       },
       {
         "key": "Ctrl+D Ctrl+B",
+        "mac": "Cmd+D Cmd+B",
         "command": "tds-dito.logout"
       },
       {
         "key": "Ctrl+D Ctrl+T",
-        "command": "tds-dito.typify"
+        "mac": "Cmd+D Cmd+T",
+        "command": "tds-dito.infer",
+        "when": "editorTextFocus"
       },
       {
-        "key": "cmd+shift+l",
-        "command": "editor.action.inlineSuggest.trigger"
+        "key": "Ctrl+shift+l",
+        "mac": "Cmd+shift+l",
+        "command": "editor.action.inlineSuggest.trigger",
+        "when": "editorTextFocus"
       },
       {
         "key": "Ctrl+D Ctrl+C",
+        "mac": "Cmd+D Cmd+C",
         "command": "tds-dito.clear"
       },
       {
         "key": "Ctrl+D Ctrl+E",
-        "command": "tds-dito.explain"
+        "mac": "Cmd+D Cmd+E",
+        "command": "tds-dito.explain",
+        "when": "editorTextFocus"
       },
       {
         "key": "Ctrl+D Ctrl+W",
-        "command": "tds-dito.explain-word"
+        "mac": "Cmd+D Cmd+W",
+        "command": "tds-dito.explain-word",
+        "when": "editorTextFocus"
       },
       {
         "key": "Ctrl+D Ctrl+G",
+        "mac": "Cmd+D Cmd+G",
         "command": "tds-dito.generate-code"
       },
       {
         "key": "Ctrl+D Ctrl+M",
+        "mac": "Cmd+D Cmd+M",
         "command": "tds-dito.open-manual"
       }
     ]
