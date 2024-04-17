@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoUser } from "../config";
 import { fetch, Response } from "undici";
 import { capitalize } from "../util";
-import { Completion, CompletionResponse, IaAbstractApi, IaApiInterface, TypifyResponse } from "./interfaceApi";
+import { Completion, CompletionResponse, IaAbstractApi, IaApiInterface, InferTypeResponse } from "./interfaceApi";
 import { PREFIX_DITO, logger } from "../logger";
 import { ChatViewProvider } from "../panels/chatViewProvider";
 
@@ -286,13 +286,13 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
     }
 
     /**
-     * Typifies the provided code and returns the resulting types.
+     * Analyzes the provided code and infer the variable types.
      *
-     * @param code - The code to be typified.
-     * @returns A promise that resolves to a `TypifyResponse` object containing the inferred types.
+     * @param code - The code to be infer.
+     * @returns A promise that resolves to a `InferTypeResponse` object containing the inferred types.
      */
-    async typify(code: string): Promise<TypifyResponse> {
-        logger.profile("typify");
+    async inferType(code: string): Promise<InferTypeResponse> {
+        logger.profile("inferType");
         logger.info(vscode.l10n.t("Code typify..."));
 
         const body: {} = {
@@ -303,14 +303,14 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
 
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage(vscode.l10n.t("No code found in the stack"));
-            logger.profile("typify");
+            logger.profile("innerType");
             return { types: [] };
         }
 
         logger.debug(vscode.l10n.t("Code typify end with {0} size", json.length));
         logger.debug(JSON.stringify(json, undefined, 2));;
 
-        logger.profile("typify");
+        logger.profile("innerType");
 
         return json;
     }

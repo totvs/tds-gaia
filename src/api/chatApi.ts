@@ -40,7 +40,7 @@ const HEALTH_RE = /^health$/i;
 const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
 const EXPLAIN_WORD_RE = /^explain\sword\s(source)?$/i;
-const TYPIFY_RE = /^typify\s(source)?$/i;
+const INFER_TYPE_RE = /^infer\s(source)?$/i;
 const UPDATE_RE = /^updatetypify\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
@@ -131,11 +131,11 @@ const commandsMap: Record<string, TCommand> = {
         alias: ["ew"],
         commandId: "tds-dito.explain-word",
     },
-    "typify": {
-        command: "typify",
-        regex: TYPIFY_RE,
+    "infer": {
+        command: "infer",
+        regex: INFER_TYPE_RE,
         alias: ["ty", "t"],
-        commandId: "tds-dito.typify",
+        commandId: "tds-dito.infer",
     },
     "update": {
         caption: vscode.l10n.t("Update Typified Variables"),
@@ -348,7 +348,7 @@ export class ChatApi {
             commands.push(`${this.commandText("logout")}`);
             commands.push(`${this.commandText("explain")}`);
             commands.push(`${this.commandText("explain-world")}`);
-            commands.push(`${this.commandText("typify")}`);
+            commands.push(`${this.commandText("infer")}`);
         } else {
             commands.push(`${this.commandText("login")}`);
         }

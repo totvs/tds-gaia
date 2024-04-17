@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { IaApiInterface } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
-import { registerTypify } from './cmdTypify';
+import { registerInfer } from './cmdInferType';
 import { registerExplain } from './cmdExplain';
 import { registerHealth } from "./cmdHealth";
 import { registerLogin } from "./cmLogin";
@@ -11,7 +11,7 @@ import { registerGenerateCode } from "./cmdGenerateCode";
 
 export function registerIaCommands(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
 
-    registerTypify(context, iaApi, chatApi);
+    registerInfer(context, iaApi, chatApi);
     registerExplain(context, iaApi, chatApi);
     registerHealth(context, iaApi, chatApi);
     registerLogin(context, iaApi, chatApi);

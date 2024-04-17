@@ -39,19 +39,14 @@ export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
 
 /**
  * Interface for TDito configuration options.
- * Contains various settings like clearBeforeExplain, 
- * clearBeforeTypify, showBanner, log levels, endpoints, 
- * API versions, document filters, auto suggest settings, 
- * request delays, max lines/suggestions, tracing, 
- * and OpenAI API settings.
-
+ 
  * Must be a mirror of what is defined in package.json
  * Other settings, preferably non-persistent, must be made in TDitoCustomConfig
 */
 export type TDitoConfig = {
   enable: boolean;
   clearBeforeExplain: boolean;
-  clearBeforeTypify: boolean;
+  clearBeforeInfer: boolean;
   showBanner: boolean;
   logLevel: "off" | "error" | "warn" | "info" | "http" | "verbose" | "debug";
   endPoint: string;

@@ -47,10 +47,10 @@ interface Type {
 }
 
 /**
- * Interface defining the shape of typify response. 
+ * Interface defining the shape of infer type response. 
  * Contains request ID and array of Type objects.
  */
-export interface TypifyResponse {
+export interface InferTypeResponse {
     request_id?: String,
     types: Type[],
 }
@@ -70,9 +70,9 @@ export interface IaApiInterface {
     generateCode(text: string): Promise<string[]>;
     getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse>
     explainCode(code: string): Promise<string>;
-    typify(code: string): Promise<TypifyResponse>;
+    inferType(code: string): Promise<InferTypeResponse>;
 
-    logCompletionFeedback(completions: {completion: Completion, textBefore: string, textAfter: string}): void;
+    logCompletionFeedback(completions: { completion: Completion, textBefore: string, textAfter: string }): void;
 }
 
 /**

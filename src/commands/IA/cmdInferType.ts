@@ -1,18 +1,18 @@
 import * as vscode from "vscode";
-import { IaApiInterface, TypifyResponse } from '../../api/interfaceApi';
+import { IaApiInterface, InferTypeResponse } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
-import { TDitoConfig, getDitoConfiguration, getDitoUser, setDitoReady, setDitoUser } from "../../config";
+import { getDitoConfiguration } from "../../config";
 
 
-export function registerTypify(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
+export function registerInfer(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
     /**
      * Registers a command to infer types for a selected function in the active text editor. 
      * Finds the enclosing function based on the cursor position, extracts the function code, and sends it to an API to infer types.
      * Displays the inferred types in the chat window.
     */
-    context.subscriptions.push(vscode.commands.registerCommand('tds-dito.typify', async (...args) => {
+    context.subscriptions.push(vscode.commands.registerCommand('tds-dito.infer', async (...args) => {
         const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
-        let codeToTypify: string = "";
+        let codeToAnalyze: string = "";
 
         if (editor !== undefined) {
             if (getDitoConfiguration().clearBeforeExplain) {
@@ -23,7 +23,7 @@ export function registerTypify(context: vscode.ExtensionContext, iaApi: IaApiInt
             const function_re: RegExp = /(function|method(...)class)\s*(\w+)/i
             const return_re: RegExp = /^\s*(Return|EndClass)/i
             const curPos: vscode.Position = selection.start;
-            let whatTypify: string = "";
+            let whatAnalyze: string = "";
             let curLine = curPos.line;
             let startFunction: vscode.Position | undefined = undefined;
             let endFunction: vscode.Position | undefined = undefined;
@@ -65,31 +65,33 @@ export function registerTypify(context: vscode.ExtensionContext, iaApi: IaApiInt
                     endFunction = new vscode.Position(editor.document.lineCount - 1, 0);
                 }
 
-                const rangeForTypify = new vscode.Range(startFunction, endFunction);
-                codeToTypify = editor.document.getText(rangeForTypify);
+                const rangeForAnalyze = new vscode.Range(startFunction, endFunction);
+                codeToAnalyze = editor.document.getText(rangeForAnalyze);
 
-                if (codeToTypify.length > 0) {
+                if (codeToAnalyze.length > 0) {
                     const rangeBlock = new vscode.Range(startFunction, endFunction);
 
-                    whatTypify = chatApi.linkToSource(editor.document.uri, rangeBlock);
+                    whatAnalyze = chatApi.linkToSource(editor.document.uri, rangeBlock);
 
                     const messageId: string = chatApi.dito(
-                        vscode.l10n.t("Typifying the block {0} ", whatTypify)
+                        vscode.l10n.t("Typifying the block {0} ", whatAnalyze)
                     );
 
-                    return iaApi.typify(codeToTypify).then((response: TypifyResponse) => {
+                    return iaApi.inferType(codeToAnalyze).then((response: InferTypeResponse) => {
                         let text: string[] = [];
 
                         if (response !== undefined && response.types !== undefined && response.types.length) {
                             for (const varType of response.types) {
+                                //if (varType.type !== "function") {
                                 text.push(vscode.l10n.t("- **{0}** as **{1}**", varType.var, varType.type));
+                                //}
                             }
                             text.push(`${chatApi.commandText("tds-dito.updateTypify")}`);
                             chatApi.dito(text.join("\n"), messageId);
 
                             const ss: vscode.SnippetString = new vscode.SnippetString;
                             ss.appendText("TEST");
-                            editor.insertSnippet(ss, rangeForTypify);
+                            editor.insertSnippet(ss, rangeForAnalyze);
 
                         } else {
                             chatApi.dito(vscode.l10n.t("Sorry, I couldn't make the typification because of an internal problem."), messageId);
@@ -98,7 +100,7 @@ export function registerTypify(context: vscode.ExtensionContext, iaApi: IaApiInt
                 }
             } else {
                 chatApi.ditoWarning([
-                    vscode.l10n.t("I could not identify a function/method for typifying."),
+                    vscode.l10n.t("I could not identify a function/method for analyzing."),
                     vscode.l10n.t("Try positioning the cursor in another line of implementation.")
                 ]);
             }
