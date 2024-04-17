@@ -72,7 +72,7 @@
   "To start, I need to know you.": "Para começar, preciso conhecê-lo.",
   "Trigger to make the identification": "Gatilho para fazer a identificação",
   "Try positioning the cursor in another line of implementation.": "Tente posicionar o cursor em outra linha da implementação.",
-  "Typifying the block {0} ": "Tipificando o bloco {0} ",
+  "Analyzing the code block for infer. {0} ": "Tipificando o bloco {0} ",
   "Update Typified Variables": "Atualizar tipificação das variáveis",
   "User Cancelled": "Usuário cancelado",
   "Verificando disponibilidade em {0} segundos. ({1}/{2})": "Verificando disponibilidade em {0} segundos. ({1}/{2})",
