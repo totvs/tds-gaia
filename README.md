@@ -46,8 +46,8 @@ A extensão **TDS-Gaia** é uma extensão para o [Visual Studio Code](https://co
 >
 > - [User Interface](https://code.visualstudio.com/docs/getstarted/userinterface)
 > - [Settings](https://code.visualstudio.com/docs/getstarted/settings)
-> - [Basic Edition](https://code.visualstudio.com/docs/egaiar/codebasics)
-> - [Marketplace](https://code.visualstudio.com/docs/egaiar/extension-gallery)
+> - [Basic Edition](https://code.visualstudio.com/docs/editor/codebasics)
+> - [Marketplace](https://code.visualstudio.com/docs/editor/extension-gallery)
 > - [Instalação](README.md#instalação).
 
 Após a instalação da extensão **TDS-Gaia**. Uma verificação de disponibilidade do serviço de IA é efetuada. 
@@ -191,3 +191,7 @@ Stack: TypeError: fetch failed
 Entre em contato com o suporte de segurança de sua empresa/organização para que ele libere o acesso a URL `https://advpl.ds.dta.totvs.ai` ou outro _endpoint_ indicado.
 
 Dependendo de configurações de seu sistema operacional/ambiente de trabalho, você mesmo pode liberar o acesso, desde que tenha os conhecimentos de como fazê-las.
+
+## Extensões com incompatibilidade
+
+Outras extensões que usam recursos de inteligência artificial para apoio a desenvolvedores, podem interferir no funcionamento do **TDS-Gaia**. Se possível, [desabilite-a](https://code.visualstudio.com/docs/editor/extension-marketplace#_disable-an-extension) para áreas de trabalho com fontes AdvPL ou configure-a para ignorar esses fontes (veja documentação da extensão).

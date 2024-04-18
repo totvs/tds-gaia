@@ -44,7 +44,7 @@ Explicação correta, mas devido a injeção de código, a explicação ficou co
 >
 > If you want more information about how to use the TDialog class, please visit <https://tdn.totvs.com/display/tec/TDialog+Class>.
 >
-> Please note that there's no need to install any software or download anything to run this example. Just copy-paste it into your favorite text egaiar and execute it by pressing Ctrl + R.
+> Please note that there's no need to install any software or download anything to run this example. Just copy-paste it into your favorite text editor and execute it by pressing Ctrl + R.
 >
 
 Indicação de ligações, o ideal é fazer por uma marcação, preferencialmente MD. Assim posso tratar e efetuar correto direcionamento. A indicação de execução de procedimentos, acho temerário e que devemos evitar. No caso, ``Ctrl+R`` não executa programas AdvPL/TLPP, salvo se o usuário reconfigurar atalhos. Mesmo os atalhos padrão, acregaia que não devem ser citados.

@@ -20,8 +20,8 @@ Esta pasta contém a parte visual da extensão [**TDS-Gaia**](https://github.com
 >
 > - [User Interface](https://code.visualstudio.com/docs/getstarted/userinterface)
 > - [Settings](https://code.visualstudio.com/docs/getstarted/settings)
-> - [Basic Edition](https://code.visualstudio.com/docs/egaiar/codebasics)
-> - [Marketplace](https://code.visualstudio.com/docs/egaiar/extension-gallery)
+> - [Basic Edition](https://code.visualstudio.com/docs/editor/codebasics)
+> - [Marketplace](https://code.visualstudio.com/docs/editor/extension-gallery)
 > - [Instalação](README.md#instalação).
 
 ![Gaia: Chat](images/chat.png)

@@ -12,7 +12,7 @@
 
   - Sistema de retroalimentação para que usuários possam avaliar a qualidade das retornos recebidos e assim melhorar o modelo. Algo simples, como positivo ou negativo e opcionalmente adição de comentários. Uma API para registrar essa opinião de forma textual poderia ser útil.
 
-- Eliminar a frase ``Explaining the code:....`` dos retornos de ``explain``. Não agrega informação útil.
+- Eliminar a frase ``Analyzing the code for explain:....`` dos retornos de ``explain``. Não agrega informação útil.
 
 - Adicionar atributo de tempo de processamento para todas as chamadas de API´s.
 
