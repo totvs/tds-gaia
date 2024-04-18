@@ -16,21 +16,16 @@ limitations under the License.
 
 import "./chatView.css";
 import React from "react";
-import { Control, FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { CommonCommandFromPanelEnum, ReceiveMessage, sendSave } from "../utilities/common-command-webview";
 import { VSCodeButton, VSCodeLink } from "@vscode/webview-ui-toolkit/react";
 import { IFormAction, TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
-import { sendExecute, sendLinkMouseOver } from "./sendCommand";
+import { sendLinkMouseOver } from "./sendCommand";
 
 enum ReceiveCommandEnum {
 }
 
 type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
-
-type TMessageActionModel = {
-  caption: string;
-  command: string;
-}
 
 type TMessageModel = {
   _id: string; //utilizado pelo React.UseArray;
@@ -40,7 +35,6 @@ type TMessageModel = {
   timeStamp: Date;
   author: string;
   message: string;
-  actions?: TMessageActionModel[];
 }
 
 type TFields = {
@@ -52,7 +46,7 @@ type TFields = {
 
 const PARAGRAPH_RE = /\n\n/i
 const PHRASE_RE = /\n/i
-const LINK_COMMAND_RE = /\[([^\]]+)\]\(command:([^\)]+)\)/i
+const LINK_COMMAND_RE = /\[([^\]]+)\]\((command:[^\)]+)\)/i
 const LINK_SOURCE_RE = /\[([^\]]+)\]\(link:([^\)]+)\)/i
 
 type InlineTagName = "code" | "bold" | "italic" | "link" | "blockquote";
@@ -100,7 +94,7 @@ function mdToHtml(text: string): any[] {
     const part: string = parts[index];
 
     if (part) {
-      //A ordem de teste deve ser:  Code, Link e demais tags (cuidado ao alterar)
+      //A ordem de teste deve ser: Code, Link e demais tags (cuidado ao alterar)
       if (part.match(mdTags.code)) {
         index++;
         children.push(<code key={spanSeq++}>{parts[index]}</code>);
@@ -112,25 +106,26 @@ function mdToHtml(text: string): any[] {
         let matchesLink: any;  //RegExpMatchArray | null;
         if (matchesLink = link.match(LINK_COMMAND_RE)) {
           children.push(
-            <VSCodeLink key={spanSeq++}
+            <VSCodeLink key={spanSeq++} href={matchesLink[2]}
               onClick={() => {
                 (document.getElementsByName("newMessage")[0] as any).control.value = caption;
-                sendExecute(matchesLink!.input);
               }
               }>{matchesLink[1]}
-            </VSCodeLink>);
+            </VSCodeLink>
+          );
         } else if (matchesLink = link.match(LINK_SOURCE_RE)) {
+          console.log(matchesLink);
+
           children.push(
             <span key={spanSeq++}
               onMouseOver={(e) => {
+                console.log(matchesLink!.input);
                 sendLinkMouseOver(matchesLink!.input);
               }}>
-              <VSCodeLink key={spanSeq++}
+              <VSCodeLink key={spanSeq++} href={matchesLink[2]}
                 onClick={() => {
                   (document.getElementsByName("newMessage")[0] as any).control.value = caption;
-                  sendExecute(matchesLink!.input);
-                }
-                }>{matchesLink[1]}
+                }}>{matchesLink[1]}
               </VSCodeLink>
             </span>);
         } else {
@@ -251,6 +246,15 @@ function flashMessage(row: TMessageModel, messages: TMessageModel[]) {
   }
 }
 
+function findLastIndex<T>(array: T[], predicate: (value: T) => boolean): number {
+  for (let i = array.length - 1; i >= 0; i--) {
+    if (predicate(array[i])) {
+      return i
+    }
+  }
+  return -1
+}
+
 /**
  * ChatView renders the chat interface. 
  * 
@@ -277,8 +281,15 @@ export default function ChatView() {
   React.useEffect(() => {
     if (model.messages.length > 0) {
       const lastMessage: TMessageModel = model.messages[model.messages.length - 1];
+      //const lastMessageIndex: number = findLastIndex(model.messages, 
+      //  (message: TMessageModel) => message.author !== "Gaia");
 
       //document.getElementById(lastMessage.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      //scrollIntoView({
+      //  behavior: 'auto',
+      //  block: 'start',
+      //  inline: 'nearest',
+      //})
 
       flashMessage(lastMessage, model.messages);
     }
@@ -299,8 +310,8 @@ export default function ChatView() {
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
 
-          console.log("************************");
-          console.dir(model);
+          //console.log("************************");
+          //console.dir(model);
 
           setDataModel<TFields>(methods.setValue, model);
           setErrorModel(methods.setError, errors);
@@ -326,19 +337,19 @@ export default function ChatView() {
     id: 0,
     caption: "Clear",
     type: "link",
+    href: "command:tds-gaia.clear",
     onClick: (sender: any) => {
       (document.getElementsByName("newMessage")[0] as any).control.value = "Clear";
-      sendExecute("[Clear](command:clear)");
     }
   });
   actions.push({
     id: 1,
     caption: "Help",
     type: "link",
+    href: "command:tds-gaia.help",
     onClick: (sender: any) => {
       model.newMessage = "Help";
       (document.getElementsByName("newMessage")[0] as any).control.value = "Help";
-      sendExecute("[Help](command:help)");
     }
   });
 

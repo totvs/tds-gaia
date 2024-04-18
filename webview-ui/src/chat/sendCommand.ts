@@ -18,22 +18,6 @@ import { CommonCommandToPanelEnum } from "../utilities/common-command-webview";
 import { vscode } from "../utilities/vscodeWrapper";
 
 /**
- * Sends a command to the webview panel to execute the given command string.
- * 
- * @param command - The command string to execute.
- */
-export function sendExecute(command: string) {
-	vscode.postMessage({
-		command: CommonCommandToPanelEnum.Execute,
-		data: {
-			model: undefined,
-			messageId: "",
-			command: command
-		}
-	});
-}
-
-/**
  * Sends a link mouse over event to the webview panel.
  * 
  * @param command - The command string associated with the link mouse over event.
@@ -48,4 +32,4 @@ export function sendLinkMouseOver(command: string) {
 		}
 	});
 }
-	
+

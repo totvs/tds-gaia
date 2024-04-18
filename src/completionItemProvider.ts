@@ -31,7 +31,7 @@ let textAfterCursor: string = "";
  * Returns InlineCompletionList with completion items.
  * Handles errors and cancellation.
 */
-//acionamento manual: F1 + egaiar.action.inlineSuggest.trigger
+//acionamento manual: F1 + editor.action.inlineSuggest.trigger
 export class InlineCompletionItemProvider implements vscode.InlineCompletionItemProvider {
 
     /**
@@ -46,10 +46,10 @@ export class InlineCompletionItemProvider implements vscode.InlineCompletionItem
         context.subscriptions.push(inlineRegister);
 
         const afterInsert = vscode.commands.registerCommand('tds-gaia.afterInsert', async (response: Completion) => {
-            vscode.commands.executeCommand("tds-gaia.logCompletionFeedback", {completion: response, textBefore: textBeforeCursor, textAfter: textAfterCursor});
+            vscode.commands.executeCommand("tds-gaia.logCompletionFeedback", { completion: response, textBefore: textBeforeCursor, textAfter: textAfterCursor });
         });
-        
-        const logCompletionFeedback = vscode.commands.registerCommand('tds-gaia.logCompletionFeedback', async (response: {completion: Completion, textBefore: string, textAfter: string}) => {
+
+        const logCompletionFeedback = vscode.commands.registerCommand('tds-gaia.logCompletionFeedback', async (response: { completion: Completion, textBefore: string, textAfter: string }) => {
             iaApi.logCompletionFeedback(response);
         });
 

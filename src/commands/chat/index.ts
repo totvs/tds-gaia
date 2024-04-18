@@ -2,12 +2,14 @@ import * as vscode from "vscode";
 import { ChatApi, TCommand } from '../../api/chatApi';
 import { registerClear } from "./cmdClear";
 import { registerOpenManual } from "./cmdOpenManual";
+import { registerHelp } from "./cmdHelp";
 
 export function registerChatCommands(context: vscode.ExtensionContext, chatApi: ChatApi): void {
 
     completeCommandsMap(context.extension);
     registerClear(context, chatApi);
     registerOpenManual(context, chatApi);
+    registerHelp(context, chatApi);
 }
 
 /**

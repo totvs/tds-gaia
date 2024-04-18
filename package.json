@@ -6,7 +6,7 @@
   "publisher": "TOTVS",
   "preview": true,
   "author": {
-  "name": "TOTVS",
+    "name": "TOTVS",
     "email": "tecnologia@totvs.com.br"
   },
   "license": "Apache-2.0",
@@ -87,11 +87,18 @@
       "view/title": [
         {
           "command": "tds-gaia.clear",
-          "when": "webviewId == 'tds-gaia-view'",
-          "group": "navigation"
+          "when": "webviewId == 'tds-gaia-view'"
         }
       ],
       "webview/context": [
+        {
+          "command": "tds-gaia.help",
+          "when": "webviewId == 'tds-gaia-view'"
+        },
+        {
+          "command": "tds-gaia.showHint",
+          "when": "webviewId == 'tds-gaia-view'"
+        },
         {
           "command": "tds-gaia.login",
           "when": "webviewId == 'tds-gaia-view' && !tds-gaia.logged"
@@ -105,11 +112,11 @@
           "when": "webviewId == 'tds-gaia-view' && !tds-gaia.logged"
         },
         {
-          "command": "tds-gaia.open-manual",
+          "command": "tds-gaia.external-open",
           "when": "webviewId == 'tds-gaia-view'"
         },
         {
-          "command": "tds-gaia.generate-code",
+          "command": "tds-gaia.generateCode",
           "when": "webviewId == 'tds-gaia-view' && tds-gaia.logged"
         },
         {
@@ -132,20 +139,13 @@
     },
     "commands": [
       {
-        "command": "tds-gaia.afterInsert",
-        "title": "After Insert",
+        "command": "tds-gaia.help",
+        "title": "Help",
         "category": "TDS-Gaia"
       },
       {
-        "command": "tds-gaia.health",
-        "title": "Health Service",
-        "shortTitle": "Health",
-        "category": "TDS-Gaia"
-      },
-      {
-        "command": "tds-gaia.open-manual",
-        "title": "Open Manual",
-        "shortTitle": "Manual",
+        "command": "tds-gaia.hint",
+        "title": "Show Hint",
         "category": "TDS-Gaia"
       },
       {
@@ -169,9 +169,21 @@
         }
       },
       {
-        "command": "tds-gaia.generate-code",
-        "title": "Generate Code",
-        "shortTitle": "Generate",
+        "command": "tds-gaia.external-open",
+        "title": "Open Manual",
+        "shortTitle": "Manual",
+        "category": "TDS-Gaia"
+      },
+      {
+        "command": "tds-gaia.health",
+        "title": "Health Service",
+        "shortTitle": "Health",
+        "category": "TDS-Gaia"
+      },
+      {
+        "command": "tds-gaia.clear",
+        "title": "Clear messages in chat",
+        "shortTitle": "Clear",
         "category": "TDS-Gaia"
       },
       {
@@ -186,12 +198,6 @@
         "category": "TDS-Gaia"
       },
       {
-        "command": "tds-gaia.clear",
-        "title": "Clear messages in chat",
-        "shortTitle": "Clear",
-        "category": "TDS-Gaia"
-      },
-      {
         "command": "tds-gaia.infer",
         "title": "Infer variables",
         "shortTitle": "Infer",
@@ -201,6 +207,23 @@
         "command": "tds-gaia.updateTypify",
         "title": "Update Typified variables",
         "shortTitle": "Update",
+        "category": "TDS-Gaia"
+      },
+      {
+        "command": "tds-gaia.showHint",
+        "title": "Show Hint",
+        "shortTitle": "Hint",
+        "category": "TDS-Gaia"
+      },
+      {
+        "command": "tds-gaia.afterInsert",
+        "title": "After Insert",
+        "category": "TDS-Gaia"
+      },
+      {
+        "command": "tds-gaia.generateCode",
+        "title": "Generate Code",
+        "shortTitle": "Generate",
         "category": "TDS-Gaia"
       }
     ],
@@ -348,13 +371,13 @@
         "key": "Ctrl+D Ctrl+T",
         "mac": "Cmd+D Cmd+T",
         "command": "tds-gaia.infer",
-        "when": "egaiarTextFocus"
+        "when": "editorTextFocus"
       },
       {
         "key": "Ctrl+shift+l",
         "mac": "Cmd+shift+l",
-        "command": "egaiar.action.inlineSuggest.trigger",
-        "when": "egaiarTextFocus"
+        "command": "editor.action.inlineSuggest.trigger",
+        "when": "editorTextFocus"
       },
       {
         "key": "Ctrl+D Ctrl+C",
@@ -365,23 +388,18 @@
         "key": "Ctrl+D Ctrl+E",
         "mac": "Cmd+D Cmd+E",
         "command": "tds-gaia.explain",
-        "when": "egaiarTextFocus"
+        "when": "editorTextFocus"
       },
       {
         "key": "Ctrl+D Ctrl+W",
         "mac": "Cmd+D Cmd+W",
         "command": "tds-gaia.explain-word",
-        "when": "egaiarTextFocus"
+        "when": "editorTextFocus"
       },
       {
         "key": "Ctrl+D Ctrl+G",
         "mac": "Cmd+D Cmd+G",
-        "command": "tds-gaia.generate-code"
-      },
-      {
-        "key": "Ctrl+D Ctrl+M",
-        "mac": "Cmd+D Cmd+M",
-        "command": "tds-gaia.open-manual"
+        "command": "tds-gaia.generateCode"
       }
     ]
   },

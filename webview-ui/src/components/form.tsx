@@ -98,6 +98,7 @@ export interface IFormAction {
 	isProcessRing?: boolean
 	type?: "submit" | "reset" | "button" | "link";
 	appearance?: ButtonAppearance;
+	href?: string;
 }
 
 /**
@@ -260,7 +261,9 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 						}
 
 						return (action.type == "link" ?
-							<VSCodeLink key={action.id} onClick={(sender) => action.onClick(sender)}>{action.caption}</VSCodeLink>
+							<VSCodeLink key={action.id}
+								href={action.href}>{action.caption}
+							</VSCodeLink>
 							: <VSCodeButton
 								className={`tds-button-button ${visible}`}
 								{...propsField} >

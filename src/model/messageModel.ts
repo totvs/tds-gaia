@@ -17,17 +17,6 @@ limitations under the License.
 import { TAbstractModel } from "./abstractMode";
 
 /**
- * Defines the shape of the message action model.
- * 
- * @property caption - The caption to display for the message action.
- * @property command - The command to execute when the message action is triggered.
- */
-export type TMessageActionModel = {
-  caption: string;
-  command: string;
-}
-
-/**
  * Defines the shape of the message model, extending TAbstractModel.
  * Contains properties like id, author, message text, timestamp, etc.
  * Can optionally contain an array of action models.
@@ -39,6 +28,5 @@ export type TMessageModel = TAbstractModel & {
   timeStamp: Date;
   author: string;
   message: string;
-  actions?: TMessageActionModel[];
 }
 

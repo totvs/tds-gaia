@@ -1,8 +1,8 @@
 import * as vscode from 'vscode'
 import { TGaiaConfig, getGaiaConfiguration } from './config'
-// import { getEditor } from '../../egaiar/active-egaiar'
+// import { getEditor } from '../../editor/active-editor'
 // import { isValidTestFile } from '../utils/test-commands'
-// import { getDocumentSections } from '../../egaiar/utils/document-sections'
+// import { getDocumentSections } from '../../editor/utils/document-sections'
 // import { telemetryService } from '../../services/telemetry'
 // import { telemetryRecorder } from '../../services/telemetry-v2'
 
@@ -40,7 +40,7 @@ export class GaiaCodeLensProvider implements vscode.CodeLensProvider {
         }
         this._disposables.push(vscode.languages.registerCodeLensProvider({ scheme: 'file' }, this))
         this._disposables.push(
-            vscode.commands.registerCommand('cody.egaiar.codelens.click', async lens => {
+            vscode.commands.registerCommand('cody.editor.codelens.click', async lens => {
                 // telemetryService.log('CodyVSCodeExtension:command:codelens:clicked')
                 // telemetryRecorder.recordEvent('cody.command.codelens', 'clicked')
                 const clickedLens = lens as EditorCodeLens
@@ -80,8 +80,8 @@ export class GaiaCodeLensProvider implements vscode.CodeLensProvider {
         }
 
         token.onCancellationRequested(() => [])
-        const egaiar = vscode.window.activeTextEditor
-        if (egaiar?.document !== document || document.languageId === 'json') {
+        const editor = vscode.window.activeTextEditor
+        if (editor?.document !== document || document.languageId === 'json') {
             return []
         }
 
@@ -151,7 +151,7 @@ export class GaiaCodeLensProvider implements vscode.CodeLensProvider {
      * Handle the code lens click event
      */
     private async onCodeLensClick(lens: EditorCodeLens): Promise<void> {
-        // Update selection in active egaiar to the selection of the clicked code lens
+        // Update selection in active editor to the selection of the clicked code lens
         const activeEditor = vscode.window.activeTextEditor;
         if (activeEditor) {
             activeEditor.selection = lens.selection
@@ -187,12 +187,12 @@ export class GaiaCodeLensProvider implements vscode.CodeLensProvider {
 const commandLenses = {
     cody: {
         title: '$(cody-logo) Cody',
-        command: 'cody.egaiar.codelens.click',
+        command: 'cody.editor.codelens.click',
         tooltip: 'Open command menu',
     },
     test: {
         title: '$(cody-logo) Add More Tests',
-        command: 'cody.egaiar.codelens.click',
+        command: 'cody.editor.codelens.click',
         tooltip: 'Generate new test cases',
     },
 }

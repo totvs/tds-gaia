@@ -24,7 +24,6 @@ export enum CommonCommandFromWebViewEnum {
 	Reset = "RESET",
 	Save = "SAVE",
 	SaveAndClose = "SAVE_AND_CLOSE",
-	Execute = "EXECUTE",
 	LinkMouseOver = "LINK_MOUSE_OVER"
 }
 

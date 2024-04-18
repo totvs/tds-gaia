@@ -54,7 +54,6 @@ export enum CommonCommandToPanelEnum {
 	Save = "SAVE",
 	SaveAndClose = "SAVE_AND_CLOSE",
 	Close = "CLOSE",
-	Execute = "EXECUTE",
 	Ready = "READY",
 	Reset = "RESET",
 	Validate = "VALIDATE",

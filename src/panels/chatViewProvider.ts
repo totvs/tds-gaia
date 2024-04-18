@@ -34,7 +34,7 @@ enum ChatCommandEnum {
  * Regular expressions to match chat message formatting for links.
  * 
  */
-const LINK_COMMAND_RE = /\[([^\]]+)\]\(command:([^\)]+)\)/i
+//const LINK_COMMAND_RE = /\[([^\]]+)\]\(command:([^\)]+)\)/i
 const LINK_SOURCE_RE = /\[([^\]]+)\]\(link:([^\)]+)\)/i
 const LINK_POSITION_RE = /([^&]+)&(\d+)(:(\d+)?(\-(\d+):(\d+)))?/i
 
@@ -102,12 +102,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this._view = webviewView;
 
-    webviewView.webview.options = getExtraPanelConfigurations(this._extensionUri);
-    // {
-    //   // Allow scripts in the webview
-    //   enableScripts: true,
-    //   localResourceRoots: [this._extensionUri]
-    // };
+    webviewView.webview.options = { 
+      ...getExtraPanelConfigurations(this._extensionUri),
+      enableCommandUris: true
+    };
 
     const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-gaia-vscode');
     const extensionUri: vscode.Uri = ext!.extensionUri;
@@ -140,44 +138,6 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             if (data.model.newMessage.trim() !== "") {
               chatApi.user(data.model.newMessage, true);
               data.model.newMessage = "";
-            }
-
-            break;
-          case CommonCommandFromWebViewEnum.Execute:
-            matches = data.command.match(LINK_COMMAND_RE);
-
-            if (matches && matches.length > 1) {
-              chatApi.user(matches[2], true);
-            } else {
-              matches = data.command.match(LINK_SOURCE_RE);
-
-              if (matches && matches.length > 1) {
-                const positionMatches: RegExpMatchArray | null = matches[2].match(LINK_POSITION_RE);
-
-                if (positionMatches) {
-                  const fileName: string = positionMatches[1];
-
-                  vscode.workspace.openTextDocument(fileName).then(d => {
-                    const startLine: number = parseInt(positionMatches[2]);
-                    const startColumn: number = parseInt(positionMatches[4] || "0");
-                    const position: vscode.Position = new vscode.Position(startLine - 1, startColumn - 1);
-
-                    if (!d) {
-                      if (vscode.window.activeTextEditor !== undefined) {
-                        vscode.window.activeTextEditor.revealRange(
-                          new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
-                        vscode.window.activeTextEditor.selection = new vscode.Selection(position, position);
-                      }
-                    } else {
-                      vscode.window.showTextDocument(d, undefined, false).then((e: vscode.TextEditor) => {
-                        e.revealRange(
-                          new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
-                        e.selection = new vscode.Selection(position, position);
-                      });
-                    }
-                  });
-                }
-              }
             }
 
             break;
@@ -228,7 +188,6 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {
     let messagesToSend: TMessageModel[] = [];
 
-    //model.loggedUser = getGaiaUser()!.displayName || "<Not logged>";
     model.newMessage = "";
 
     if (this.chatModel.messages.length > 0) {
