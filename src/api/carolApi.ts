@@ -300,15 +300,17 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         };
 
         let json: any = await this.jsonRequest("POST", `${this._apiRequest}/infer_type`, body);
+        let types: any[] = [];
 
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage(vscode.l10n.t("No code found in the stack"));
             logger.profile("innerType");
-            return { types: [] };
+        } else if (json.types) {
+            types = json.types;
         }
 
-        logger.debug(vscode.l10n.t("Code typify end with {0} size", json.length));
-        logger.debug(JSON.stringify(json, undefined, 2));;
+        logger.debug(vscode.l10n.t("Code infer end with {0} suggestions", types.length));
+        logger.debug(JSON.stringify(types, undefined, 2));;
 
         logger.profile("innerType");
 

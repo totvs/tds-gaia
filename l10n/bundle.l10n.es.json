@@ -20,7 +20,7 @@
   "Code completions...": "Finalización del código...",
   "Code explain end with {0} size": "El código explica el final con el tamaño {0}",
   "Code explain...": "Código explicar...",
-  "Code typify end with {0} size": "El código Typify Fin con {0} tamaño",
+  "Code infer end with {0} size": "El código Typify Fin con {0} tamaño",
   "Code typify...": "El código tipifica...",
   "Command aid {0}.": "Ayuda dominio {0}.",
   "Congratulations, your extension \"{0}\" is now active!": "Felicitaciones, su extensión \"{0}\" ahora está activa!",

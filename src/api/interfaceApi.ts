@@ -99,10 +99,14 @@ export class IaAbstractApi {
      * Writes the request body as a JSON string and object to the log file, 
      * along with the request start time.
      */
-    protected logRequest(url: string, method: string, headers: {}, body: string) {
+    protected logRequest(url: string, method: string, headers: {}, body: string | object) {
         execBeginTime = new Date();
 
-        logger.http("%s: %s", method, url, { headers: headers, body: body });
+        if (typeof (body) == "string") {
+            logger.http("%s: %s", method, url, { headers: headers, body: body });
+        } else {
+            logger.http("%s: %s", method, url, { headers: headers, body: JSON.stringify(body) });
+        }
     }
 
     /**

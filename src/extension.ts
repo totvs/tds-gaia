@@ -80,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// );
 	// ctx.subscriptions.push(codeLensProviderDisposable);
 
-	//Chat DIGaiaTO
+	//Chat Gaia
 	const chat: ChatViewProvider = new ChatViewProvider(context.extensionUri);
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(ChatViewProvider.viewType, chat));

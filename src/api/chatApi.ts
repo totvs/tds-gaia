@@ -41,7 +41,7 @@ const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
 const EXPLAIN_WORD_RE = /^explain\sword\s(source)?$/i;
 const INFER_TYPE_RE = /^infer\s(source)?$/i;
-const UPDATE_RE = /^updatetypify\s(source)?$/i;
+const UPDATE_TYPE_RE = /^updatetypify\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
 const OPEN_QUICK_GUIDE = /^(open )?(quick guide)$/i;
@@ -90,7 +90,7 @@ const commandsMap: Record<string, TCommand> = {
         regex: OPEN_QUICK_GUIDE,
         commandId: "tds-gaia.external-open",
         commandArgs: {
-            target: "README.md#Guia-rápido",
+            target: "README.md#guia-rápido",
             title: vscode.l10n.t("Quick guide")
         }
     },
@@ -152,19 +152,19 @@ const commandsMap: Record<string, TCommand> = {
     "updateTypeAll": {
         caption: vscode.l10n.t("Update All Typified Variables"),
         command: "update",
-        regex: UPDATE_RE,
+        regex: UPDATE_TYPE_RE,
         commandId: "tds-gaia.updateTypify",
     },
     "updateType": {
         //caption: vscode.l10n.t("Update Typified Variables"),
         command: "update",
-        regex: UPDATE_RE,
+        regex: UPDATE_TYPE_RE,
         commandId: "tds-gaia.updateTypify",
     },
     "generateCode": {
         //caption: vscode.l10n.t("Generate Code"),
         command: "generate",
-        regex: UPDATE_RE,
+        regex: UPDATE_TYPE_RE,
         commandId: "tds-gaia.generateCode",
     }
 };
@@ -270,6 +270,20 @@ export class ChatApi {
             : message.map((line: string, index: number) => {
                 if (index == 0) {
                     return `[WARN] ${line}`;
+                }
+
+                return line;
+            });
+
+        this.gaia(workMessage, "");
+    }
+
+    gaiaError(message: string | string[]): void {
+        let workMessage: string | string[] = typeof message == "string"
+            ? `[ERR] ${message}`
+            : message.map((line: string, index: number) => {
+                if (index == 0) {
+                    return `[ERR] ${line}`;
                 }
 
                 return line;

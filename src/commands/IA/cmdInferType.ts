@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { IaApiInterface, InferTypeResponse } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
 import { getGaiaConfiguration } from "../../config";
-
+import { dataCache, InferData } from "../../dataCache";
 
 /**
 * Registers a command to infer types for a selected function in the active text editor.
@@ -93,14 +93,33 @@ export function registerInfer(context: vscode.ExtensionContext, iaApi: IaApiInte
                         let text: string[] = [];
 
                         if (response !== undefined && response.types !== undefined && response.types.length) {
+                            const makeLocation = (range: vscode.Range) => {
+                                return {
+                                    uri: editor.document.uri,
+                                    start: range.start,
+                                    end: range.end
+                                }
+                            }
+
+                            const inferData: InferData = {
+                                location: makeLocation(rangeForAnalyze),
+                                types: []
+                            }
+
+                            dataCache.set(messageId, inferData);
+
                             text.push(vscode.l10n.t("The following variables were inferred:"));
                             text.push("");
                             for (const varType of response.types) {
                                 //if (varType.type !== "function") {
+                                inferData.types.push({
+                                    varName: varType.var,
+                                    type: varType.type
+                                })
                                 let command: string = chatApi.commandText("updateType",
                                     {
-                                        variable: varType.var,
-                                        type: varType.type
+                                        cacheId: messageId,
+                                        varName: varType.var,
                                     })
                                     .replace(/\[.*\]/, `[${varType.var}]`);
 
@@ -109,7 +128,10 @@ export function registerInfer(context: vscode.ExtensionContext, iaApi: IaApiInte
                             }
                             text.push("");
                             text.push(vscode.l10n.t("{0} or click on variable name.",
-                                `${chatApi.commandText("updateTypeAll", response.types)}`));
+                                `${chatApi.commandText("updateTypeAll", {
+                                    cacheId: messageId,
+                                    varName: "*"
+                                })}`));
 
                             chatApi.gaia(text.join("\n"), messageId);
                         } else {
