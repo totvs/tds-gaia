@@ -41,6 +41,7 @@ const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
 const EXPLAIN_WORD_RE = /^explain\sword\s(source)?$/i;
 const INFER_TYPE_RE = /^infer\s(source)?$/i;
+const UPDATE_ALL_TYPE_RE = /^updatealltypify\s(source)?$/i;
 const UPDATE_TYPE_RE = /^updatetypify\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
@@ -150,10 +151,10 @@ const commandsMap: Record<string, TCommand> = {
         commandId: "tds-gaia.infer",
     },
     "updateTypeAll": {
-        caption: vscode.l10n.t("Update All Typified Variables"),
+        //caption: vscode.l10n.t("Update All Typified Variables"),
         command: "update",
         regex: UPDATE_TYPE_RE,
-        commandId: "tds-gaia.updateTypify",
+        commandId: "tds-gaia.updateTypifyAll",
     },
     "updateType": {
         //caption: vscode.l10n.t("Update Typified Variables"),
@@ -422,6 +423,27 @@ export class ChatApi {
         }
 
         return vscode.l10n.t("Workspace of \`{0}\` not found.", source.fsPath);
+    }
+
+    /**
+    * Generates a link to a specific range within a source file.
+    * 
+    * @param source - The URI of the source file.
+    * @param range - The range within the source file, specified as either a `vscode.Range` object or a line number.
+    * @returns A formatted string representing a link to the specified range in the source file.
+    */
+    linkToRange(source: vscode.Uri, range: vscode.Range | number): string {
+        let position: string = "";
+
+        if ((range instanceof vscode.Range)) {
+            const workRange: vscode.Range = (range as vscode.Range);
+            position = `${workRange.start.line + 1}:${workRange.start.character + 1}`;
+            position += `-${workRange.end.line + 1}:${workRange.end.character + 1}`;
+        } else {
+            position = `${(range as number) + 1}`;
+        }
+
+        return `[(${position})](link:${source.fsPath}&${position})`;
     }
 
     private processMessage(message: string) {

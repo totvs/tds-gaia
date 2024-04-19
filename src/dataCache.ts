@@ -16,11 +16,8 @@ limitations under the License.
 import * as vscode from "vscode";
 
 export type InferData = {
-    location: {
-        uri: vscode.Uri,
-        start: vscode.Position;
-        end: vscode.Position;
-    };
+    documentUri: vscode.Uri,
+    range: vscode.Range,
     types: {
         varName: string,
         type: string

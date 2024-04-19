@@ -204,8 +204,13 @@
         "category": "TDS-Gaia"
       },
       {
+        "command": "tds-gaia.updateTypifyAll",
+        "title": "Update All Inferred Type Variables",
+        "category": "TDS-Gaia"
+      },
+      {
         "command": "tds-gaia.updateTypify",
-        "title": "Update Typified variables",
+        "title": "Update Inferred Type Variable",
         "shortTitle": "Update",
         "category": "TDS-Gaia"
       },
@@ -400,6 +405,11 @@
         "key": "Ctrl+D Ctrl+G",
         "mac": "Cmd+D Cmd+G",
         "command": "tds-gaia.generateCode"
+      },
+      {
+        "key": "Alt+A",
+        "mac": "Option+A",
+        "command": "tds-gaia.updateTypifyAll"
       }
     ]
   },

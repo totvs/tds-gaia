@@ -1,8 +1,25 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from "vscode";
 import { IaApiInterface, InferTypeResponse } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
 import { getGaiaConfiguration } from "../../config";
 import { dataCache, InferData } from "../../dataCache";
+import { getSymbols } from "../utilCommands";
 
 /**
 * Registers a command to infer types for a selected function in the active text editor.
@@ -89,7 +106,7 @@ export function registerInfer(context: vscode.ExtensionContext, iaApi: IaApiInte
                         vscode.l10n.t("Analyzing the code for infer type variables. {0} ", whatAnalyze)
                     );
 
-                    return iaApi.inferType(codeToAnalyze).then((response: InferTypeResponse) => {
+                    return iaApi.inferType(codeToAnalyze).then(async (response: InferTypeResponse) => {
                         let text: string[] = [];
 
                         if (response !== undefined && response.types !== undefined && response.types.length) {
@@ -102,37 +119,55 @@ export function registerInfer(context: vscode.ExtensionContext, iaApi: IaApiInte
                             }
 
                             const inferData: InferData = {
-                                location: makeLocation(rangeForAnalyze),
+                                documentUri: editor.document.uri,
+                                range: rangeForAnalyze,
                                 types: []
                             }
-
+                            const documentSymbols: vscode.DocumentSymbol[] | undefined = await getSymbols(inferData.documentUri, inferData.range);
+                            let someTipped: boolean = false;
                             dataCache.set(messageId, inferData);
 
                             text.push(vscode.l10n.t("The following variables were inferred:"));
                             text.push("");
+
                             for (const varType of response.types) {
                                 //if (varType.type !== "function") {
+                                const documentSymbol: vscode.DocumentSymbol | undefined = documentSymbols?.find((symbol) => {
+                                    return (symbol.name === varType.var) &&
+                                        (symbol.kind === vscode.SymbolKind.Variable);
+                                });
+                                const alreadyTipped: boolean = documentSymbol?.detail.includes(`as ${varType.type}`) || false;
+
                                 inferData.types.push({
                                     varName: varType.var,
                                     type: varType.type
                                 })
-                                let command: string = chatApi.commandText("updateType",
-                                    {
-                                        cacheId: messageId,
-                                        varName: varType.var,
-                                    })
-                                    .replace(/\[.*\]/, `[${varType.var}]`);
 
-                                text.push(vscode.l10n.t("- {0} as **{1}**", command, varType.type));
+                                someTipped = someTipped || !alreadyTipped;
+                                const command: string = alreadyTipped ?
+                                    `**${varType.var}**`
+                                    : chatApi.commandText("updateType",
+                                        {
+                                            cacheId: messageId,
+                                            varName: varType.var,
+                                        })
+                                        .replace(/\[.*\]/, `[${varType.var}]`);
+                                const link: string = chatApi.linkToRange(editor.document.uri,
+                                    documentSymbol?.selectionRange || new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0))
+                                );
+
+                                text.push(vscode.l10n.t("- {0} as **{1}** {2}", command, varType.type, link));
                                 //}
                             }
                             text.push("");
-                            text.push(vscode.l10n.t("{0} or click on variable name.",
-                                `${chatApi.commandText("updateTypeAll", {
-                                    cacheId: messageId,
-                                    varName: "*"
-                                })}`));
-
+                            if (someTipped) {
+                                text.push(vscode.l10n.t("{0} or click on variable name.",
+                                    `${chatApi.commandText("updateTypeAll", {
+                                        cacheId: messageId
+                                    })}`));
+                            } else {
+                                text.push(vscode.l10n.t("All variables are already typed."));
+                            }
                             chatApi.gaia(text.join("\n"), messageId);
                         } else {
                             chatApi.gaia(vscode.l10n.t("Sorry, I couldn't make the typification because of an internal problem."), messageId);
