@@ -1,7 +1,53 @@
 #include "protheus.ch"
 
-user function escolheNum(replay, replayPath, numbers)
-	local n, cResp := "", cMsg := ""
+//Fonte: https://tdn.totvs.com/display/tec/Tipagem+de+Dados
+static function primitive()
+	local n1 as numeric
+	local c1 as character //char
+	local d1 as date
+	local b1 as codeblock //block
+	local m1 as memo //não documentado, mas existe em tabelas
+	local l1 as logical //boolean
+	local a1 as array
+	local o1 as object
+	local u1 //undefined, contem NIL
+
+	conout(n1)
+	conout(c1)
+	conout(d1)
+	conout(b1)
+	conout(m1)
+	conout(l1)
+	conout(a1)
+	conout(o1)
+	conout(u1)
+Return
+
+//Fonte: https://tdn.totvs.com/display/tec/Tipagem+de+Dados
+static function inferPrimitive()
+	local n1  := 0
+	local c1  := ""
+	local d1   := date()
+	local b1   := {||}
+	//local m1 as memo //não documentado, mas existe em tabelas
+	local l1   := .t.
+	local a1   := []
+	local o1   := object():new()
+	local u1  := NIL
+
+	conout(n1)
+	conout(c1)
+	conout(d1)
+	conout(b1)
+	conout(m1)
+	conout(l1)
+	conout(a1)
+	conout(o1)
+	conout(u1)
+Return
+
+user function _escolheNum(replay, replayPath, numbers)
+	local n, cResp  := "", cMsg := ""
 	local aOpcoes := {}
 	private cOpcao
 	private ondeEstou := "escolheNum"
@@ -108,3 +154,15 @@ static function tela(aaOpcoes)
 //oDlg:Activate()
 
 Return cOpcao
+
+
+static Function TAF012()
+	Local oBrowse := Nil
+	local cCadastro := "Cadastro de Eventos R-4030"
+
+	oBrowse := FWMBrowse():New()
+	oBrowse:SetAlias("C8E")
+	oBrowse:SetDescription("Eventos R-4030")
+
+	oBrowse:Activate()
+Return Ni

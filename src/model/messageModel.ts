@@ -17,16 +17,32 @@ limitations under the License.
 import { TAbstractModel } from "./abstractMode";
 
 /**
+* Defines the possible operations that can be performed on a message.
+* - Add: Indicates a new message is being created.
+* - Update: Indicates an existing message is being updated.
+* - Remove: Indicates an existing message is being deleted.
+* 
+* As the operation the attributes can be ignored. See {@link TMessageModel}.
+*/
+export enum MessageOperationEnum {
+  Add,
+  Update,
+  Remove
+}
+
+/**
  * Defines the shape of the message model, extending TAbstractModel.
  * Contains properties like id, author, message text, timestamp, etc.
  * Can optionally contain an array of action models.
+ * 
+ * UNMARKED attributes are ignored in the operation.
  */
 export type TMessageModel = TAbstractModel & {
-  messageId: string;
-  answering: string;
-  inProcess: boolean;
-  timeStamp: Date;
-  author: string;
-  message: string;
+  operation: MessageOperationEnum, // Add | Update | Delete
+  messageId: string;               //  X  |   X    |   X
+  answering: string;               //  X  |        |   
+  inProcess: boolean;              //  X  |        |   
+  timeStamp: Date;                 //  X  |        |   
+  author: string;                  //  X  |        |   
+  message: string;                 //  X  |   X    |   
 }
-

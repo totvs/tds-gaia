@@ -18,13 +18,14 @@ import * as vscode from 'vscode';
 import { CommonCommandFromWebViewEnum, CommonCommandToWebViewEnum, ReceiveMessage } from './utilities/common-command-panel';
 import { TChatModel } from '../model/chatModel';
 import { getExtraPanelConfigurations, getWebviewContent } from './utilities/webview-utils';
-import { TMessageModel } from '../model/messageModel';
+import { MessageOperationEnum, TMessageModel } from '../model/messageModel';
 import { TFieldErrors } from '../model/abstractMode';
 import { chatApi } from '../extension';
 import { TQueueMessages } from '../api/chatApi';
 import { getGaiaUser } from '../config';
 import { logger } from '../logger';
 import { highlightCode } from '../decoration';
+import { dataCache } from '../dataCache';
 
 enum ChatCommandEnum {
 
@@ -92,9 +93,24 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
         if (message.message == "clear") {
           this.chatModel.messages = [];
+          dataCache.clear();
         }
 
-        this.chatModel.messages.push(message);
+        if (message.operation === MessageOperationEnum.Add) {
+          this.chatModel.messages.push(message);
+        } else {
+          const index: number = this.chatModel.messages.findIndex(m => m.messageId === message.messageId);
+
+          if (index !== -1) {
+            if (message.operation === MessageOperationEnum.Update) {
+              this.chatModel.messages[index] = message;
+            } else {
+              this.chatModel.messages.splice(index, 1);
+            }
+          } else {
+            logger.error(`ChatViewProvider.onMessage=> Message not found: ${message.messageId}`);
+          }
+        }
       }
 
       this.sendUpdateModel(this.chatModel, undefined);
@@ -102,7 +118,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this._view = webviewView;
 
-    webviewView.webview.options = { 
+    webviewView.webview.options = {
       ...getExtraPanelConfigurations(this._extensionUri),
       enableCommandUris: true
     };

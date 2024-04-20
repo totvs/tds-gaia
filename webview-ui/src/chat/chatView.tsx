@@ -27,8 +27,15 @@ enum ReceiveCommandEnum {
 
 type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
 
+enum MessageOperationEnum {
+  Add,
+  Update,
+  Remove
+}
+
 type TMessageModel = {
   _id: string; //utilizado pelo React.UseArray;
+  operation: MessageOperationEnum;
   messageId: string;
   answering: string;
   inProcess: boolean;
@@ -207,8 +214,11 @@ function MessageRow(row: TMessageModel, messages: TMessageModel[]): any {
     children.push(
       <div className="tds-message-author" key={spanSeq++}>
         <span key={spanSeq++} id="author">{row.author}</span>
-        {row.inProcess && <span id="inProcess" key={spanSeq++}>Processing..</span>}
-        <span id="timeStamp">{timeStamp}</span>
+        {row.inProcess && <span id="inProcess" key={spanSeq++}>Processing...</span>}
+        <span id="timeStamp">
+          {row.operation == MessageOperationEnum.Update && <span id="operation" key={spanSeq++}>Updated at </span>}
+          {timeStamp}
+        </span>
       </div>
     )
   }

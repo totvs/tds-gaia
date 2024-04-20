@@ -41,9 +41,10 @@ export interface CompletionResponse {
  * Interface defining the shape of type information.
  * Contains a type name and variable name.
  */
-interface Type {
+export interface InferType {
     var: string;
     type: string;
+    active: boolean;
 }
 
 /**
@@ -52,7 +53,7 @@ interface Type {
  */
 export interface InferTypeResponse {
     request_id?: String,
-    types: Type[],
+    types: InferType[],
 }
 
 /**

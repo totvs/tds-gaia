@@ -18,9 +18,8 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { getGaiaUser, isGaiaFirstUse, isGaiaLogged, isGaiaReady } from "../config";
 import { Queue } from "../queue";
-import { TMessageModel } from "../model/messageModel";
+import { MessageOperationEnum, TMessageModel } from "../model/messageModel";
 import { exit } from "process";
-import { logger } from "../logger";
 
 /**
  * Defines the queue message type for chat messages.
@@ -246,6 +245,7 @@ export class ChatApi {
         const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
 
         this.sendMessage({
+            operation: MessageOperationEnum.Add,
             messageId: id,
             answering: answeringId || "",
             inProcess: (answeringId === undefined),
@@ -257,6 +257,36 @@ export class ChatApi {
         return id;
     }
 
+    /**
+    * Updates an existing message in the Gaia chat interface.
+    *
+    * @param messageId - The unique identifier of the message to update.
+    * @param message - The updated message content, either as a single string or an array of strings. If an array, the lines will be joined with a newline.
+    * @returns The message ID of the updated message.
+    */
+    gaiaUpdateMessage(messageId: string, message: string | string[]): string {
+        let workMessage: string = typeof message == "string"
+            ? message
+            : message.join("\n\n");
+
+        this.sendMessage({
+            operation: MessageOperationEnum.Update,
+            messageId: messageId,
+            answering: "",
+            inProcess: false,
+            timeStamp: new Date(),
+            author: "Gaia",
+            message: workMessage
+        });
+
+        return messageId;
+    }
+
+    /**
+    * Sends an informational message to the Gaia chat interface.
+    *
+    * @param message - The informational message to send, either as a single string or an array of strings. If an array, each line will be prefixed with '> '.
+    */
     gaiaInfo(message: string | string[]): void {
         let workMessage: string | string[] = typeof message == "string"
             ? message
@@ -265,6 +295,11 @@ export class ChatApi {
         this.gaia(workMessage, "");
     }
 
+    /**
+    * Sends a warning message to the Gaia chat interface.
+    *
+    * @param message - The warning message to send, either as a single string or an array of strings.
+    */
     gaiaWarning(message: string | string[]): void {
         let workMessage: string | string[] = typeof message == "string"
             ? `[WARN] ${message}`
@@ -279,6 +314,11 @@ export class ChatApi {
         this.gaia(workMessage, "");
     }
 
+    /**
+    * Sends an error message to the Gaia chat interface.
+    *
+    * @param message - The error message to send, either as a single string or an array of strings.
+    */
     gaiaError(message: string | string[]): void {
         let workMessage: string | string[] = typeof message == "string"
             ? `[ERR] ${message}`
@@ -293,6 +333,13 @@ export class ChatApi {
         this.gaia(workMessage, "");
     }
 
+    /**
+    * Checks the user's login state and provides appropriate responses based on the Gaia system's readiness 
+    * and the user's login status.
+    *
+    * @param answeringId - The ID of the message being answered.
+    * @returns Void
+    */
     checkUser(answeringId: string) {
         if (isGaiaReady()) {
             if (!isGaiaLogged()) {
@@ -324,6 +371,12 @@ export class ChatApi {
         ], "");
     }
 
+    /**
+    * Sends a message to the chat, optionally echoing it to the user interface.
+    *
+    * @param message - The message to send.
+    * @param echo - If true, the message will be displayed in the user interface.
+    */
     user(message: string, echo: boolean): void {
         if (echo) {
             //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
@@ -332,6 +385,7 @@ export class ChatApi {
             this.beginMessageGroup();
 
             this.sendMessage({
+                operation: MessageOperationEnum.Add,
                 messageId: id,
                 answering: "",
                 inProcess: false,
@@ -348,6 +402,14 @@ export class ChatApi {
         }
     }
 
+    /**
+    * Generates a list of formatted command text for various chat commands.
+    *
+    * The list of commands is generated based on the current state of the Gaia system, 
+    * such as whether it is ready and whether the user is logged in.
+    *
+    * @returns A comma-separated string of formatted command text that can be used to execute the commands.
+    */
     commandList(): string {
         let commands: string[] = [];
 
@@ -460,6 +522,16 @@ export class ChatApi {
         } else {
             this.gaia(vscode.l10n.t("I didn't understand. You can type {0} to see available commands.", this.commandText("help")), "");
         }
+    }
+
+    /**
+    * Return NEXT unique message ID for a chat message.
+    * The ID is a 6-character hexadecimal string starting with "FF0000".
+    * 
+    * @returns A next message ID.
+    */
+    nextMessageId(): string {
+        return `FF0000${(this.messageId).toString(16)}`.substring(-6);
     }
 }
 

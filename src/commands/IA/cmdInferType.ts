@@ -15,11 +15,10 @@ limitations under the License.
 */
 
 import * as vscode from "vscode";
-import { IaApiInterface, InferTypeResponse } from '../../api/interfaceApi';
-import { ChatApi } from '../../api/chatApi';
+import { InferTypeResponse } from '../../api/interfaceApi';
 import { getGaiaConfiguration } from "../../config";
-import { dataCache, InferData } from "../../dataCache";
-import { getSymbols } from "../utilCommands";
+import { chatApi, iaApi } from "../../extension";
+import { buildInferText } from "../buildInferText";
 
 /**
 * Registers a command to infer types for a selected function in the active text editor.
@@ -30,7 +29,7 @@ import { getSymbols } from "../utilCommands";
 * @param iaApi - The IA API interface.
 * @param chatApi - The chat API.
 */
-export function registerInfer(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
+export function registerInfer(context: vscode.ExtensionContext): void {
     /**
     * Registers a command to infer types for a selected function in the active text editor. 
     * Finds the enclosing function based on the cursor position, extracts the function code, and sends it to an API to infer types.
@@ -107,67 +106,10 @@ export function registerInfer(context: vscode.ExtensionContext, iaApi: IaApiInte
                     );
 
                     return iaApi.inferType(codeToAnalyze).then(async (response: InferTypeResponse) => {
-                        let text: string[] = [];
-
                         if (response !== undefined && response.types !== undefined && response.types.length) {
-                            const makeLocation = (range: vscode.Range) => {
-                                return {
-                                    uri: editor.document.uri,
-                                    start: range.start,
-                                    end: range.end
-                                }
-                            }
+                            const responseId: string = chatApi.nextMessageId();
+                            const text: string[] = await buildInferText(editor.document.uri, rangeForAnalyze, responseId, response.types);
 
-                            const inferData: InferData = {
-                                documentUri: editor.document.uri,
-                                range: rangeForAnalyze,
-                                types: []
-                            }
-                            const documentSymbols: vscode.DocumentSymbol[] | undefined = await getSymbols(inferData.documentUri, inferData.range);
-                            let someTipped: boolean = false;
-                            dataCache.set(messageId, inferData);
-
-                            text.push(vscode.l10n.t("The following variables were inferred:"));
-                            text.push("");
-
-                            for (const varType of response.types) {
-                                //if (varType.type !== "function") {
-                                const documentSymbol: vscode.DocumentSymbol | undefined = documentSymbols?.find((symbol) => {
-                                    return (symbol.name === varType.var) &&
-                                        (symbol.kind === vscode.SymbolKind.Variable);
-                                });
-                                const alreadyTipped: boolean = documentSymbol?.detail.includes(`as ${varType.type}`) || false;
-
-                                inferData.types.push({
-                                    varName: varType.var,
-                                    type: varType.type
-                                })
-
-                                someTipped = someTipped || !alreadyTipped;
-                                const command: string = alreadyTipped ?
-                                    `**${varType.var}**`
-                                    : chatApi.commandText("updateType",
-                                        {
-                                            cacheId: messageId,
-                                            varName: varType.var,
-                                        })
-                                        .replace(/\[.*\]/, `[${varType.var}]`);
-                                const link: string = chatApi.linkToRange(editor.document.uri,
-                                    documentSymbol?.selectionRange || new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0))
-                                );
-
-                                text.push(vscode.l10n.t("- {0} as **{1}** {2}", command, varType.type, link));
-                                //}
-                            }
-                            text.push("");
-                            if (someTipped) {
-                                text.push(vscode.l10n.t("{0} or click on variable name.",
-                                    `${chatApi.commandText("updateTypeAll", {
-                                        cacheId: messageId
-                                    })}`));
-                            } else {
-                                text.push(vscode.l10n.t("All variables are already typed."));
-                            }
                             chatApi.gaia(text.join("\n"), messageId);
                         } else {
                             chatApi.gaia(vscode.l10n.t("Sorry, I couldn't make the typification because of an internal problem."), messageId);
@@ -185,3 +127,4 @@ export function registerInfer(context: vscode.ExtensionContext, iaApi: IaApiInte
         }
     }));
 }
+

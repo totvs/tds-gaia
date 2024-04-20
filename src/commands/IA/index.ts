@@ -19,13 +19,13 @@ import { registerUpdateType } from "./cmdUpdateType";
 */
 export function registerIaCommands(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
 
-registerInfer(context, iaApi, chatApi);
-registerExplain(context, iaApi, chatApi);
-registerHealth(context, iaApi, chatApi);
-registerLogin(context, iaApi, chatApi);
-registerExplainWord(context, iaApi, chatApi);
-registerLogout(context, iaApi, chatApi);
-registerGenerateCode(context, iaApi, chatApi);
-registerUpdateType(context, iaApi, chatApi);
+    registerInfer(context);
+    registerUpdateType(context);
 
+    registerExplain(context, iaApi, chatApi);
+    registerHealth(context, iaApi, chatApi);
+    registerLogin(context, iaApi, chatApi);
+    registerExplainWord(context, iaApi, chatApi);
+    registerLogout(context, iaApi, chatApi);
+    registerGenerateCode(context, iaApi, chatApi);
 }

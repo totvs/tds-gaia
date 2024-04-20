@@ -76,7 +76,8 @@ section.tds-chat div.tds-message-row div.tds-message-author #author {
 	flex-grow: 1;
 }
 
-section.tds-chat div.tds-message-row div.tds-message-author #inProcess {
+section.tds-chat div.tds-message-row div.tds-message-author #inProcess,
+section.tds-chat div.tds-message-row div.tds-message-author #operation {
 	font-style: italic;
 	font-size: 80%;
 	flex-grow: 3;

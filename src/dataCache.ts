@@ -14,14 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import * as vscode from "vscode";
+import { InferType } from "./api/interfaceApi";
 
 export type InferData = {
     documentUri: vscode.Uri,
     range: vscode.Range,
-    types: {
-        varName: string,
-        type: string
-    }[];
+    types: InferType[];
 };
 
 /**
