@@ -25,15 +25,15 @@ Return
 
 //Fonte: https://tdn.totvs.com/display/tec/Tipagem+de+Dados
 static function inferPrimitive()
-	local n1  := 0
-	local c1  := ""
-	local d1   := date()
-	local b1   := {||}
+	local n1 as numeric  := 0
+	local c1 as character  := ""
+	local d1 as date   := date()
+	local b1 as block   := {||}
 	//local m1 as memo //não documentado, mas existe em tabelas
-	local l1   := .t.
-	local a1   := []
-	local o1   := object():new()
-	local u1  := NIL
+	local l1 as logical   := .t.
+	local a1 as array   := []
+	local o1 as object   := object():new()
+	local u1 as object  := NIL
 
 	conout(n1)
 	conout(c1)

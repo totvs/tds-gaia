@@ -61,21 +61,23 @@ async function updateType(inferData: InferData, targetSymbol: string | undefined
 
         if (documentSymbols && documentSymbols.length > 0) {
             editor.edit(editBuilder => {
-                documentSymbols.forEach(symbol => {
-                    inferData.types.forEach(infer => {
-                        if (!infer.active) {
-                            processVars.push(infer.var);
-                        } else if (infer.var === symbol.name) {
-                            const changeRange: vscode.Range = new vscode.Range(
-                                symbol.range.start.line,
-                                symbol.range.start.character,
-                                symbol.range.start.line,
-                                symbol.range.start.character + infer.var.length);
-                            editBuilder.replace(changeRange, `${infer.var} as ${infer.type}`);
+                inferData.types.forEach(infer => {
+                    if (!infer.active) {
+                        processVars.push(infer.var);
+                    } else {
+                        documentSymbols.forEach(symbol => {
+                            if (infer.var === symbol.name) {
+                                const changeRange: vscode.Range = new vscode.Range(
+                                    symbol.range.start.line,
+                                    symbol.range.start.character,
+                                    symbol.range.start.line,
+                                    symbol.range.start.character + infer.var.length);
+                                editBuilder.replace(changeRange, `${infer.var} as ${infer.type}`);
 
-                            processVars.push(infer.var);
-                        }
-                    });
+                                processVars.push(infer.var);
+                            }
+                        });
+                    }
                 });
             });
         } else {
