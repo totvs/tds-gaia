@@ -4,6 +4,7 @@ import { getSymbols } from "../utilCommands";
 import { chatApi } from "../../extension";
 import { buildInferText } from "../buildInferText";
 import { InferType } from "../../api/interfaceApi";
+import { TBuildInferTextReturn, TGetSymbolsReturn } from "../resultStruct";
 
 /**
 * Registers a command to update the variables type of the current document.
@@ -24,7 +25,8 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
                 active: !(processVars.includes(type.var))
             };
         });
-        const text: string[] = await buildInferText(inferData.documentUri, inferData.range, messageId, inferTypes);
+        const buildInferTextReturn: TBuildInferTextReturn = await buildInferText(inferData.documentUri, inferData.range, messageId, inferTypes);
+        const text: string[] = buildInferTextReturn.text;
 
         //inferData.types = inferData.types;
         dataCache.set(messageId, inferData);
@@ -44,9 +46,9 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
                 active: !(processVars.includes(type.var))
             };
         });
-        const text: string[] = await buildInferText(inferData.documentUri, inferData.range, messageId, inferTypes);
+        const buildInferTextReturn: TBuildInferTextReturn = await buildInferText(inferData.documentUri, inferData.range, messageId, inferTypes);
+        const text: string[] = buildInferTextReturn.text;
 
-        //inferData.types = inferData.types;
         dataCache.set(messageId, inferData);
         chatApi.gaiaUpdateMessage(messageId, text);
     }));
@@ -57,7 +59,8 @@ async function updateType(inferData: InferData, targetSymbol: string | undefined
     const processVars: string[] = [];
 
     if (editor !== undefined) {
-        const documentSymbols: vscode.DocumentSymbol[] | undefined = await getSymbols(inferData.documentUri, inferData.range, targetSymbol);
+        const getSymbolsReturn: TGetSymbolsReturn = await getSymbols(inferData.documentUri, inferData.range);
+        const documentSymbols: vscode.DocumentSymbol[] | undefined = getSymbolsReturn.symbols;
 
         if (documentSymbols && documentSymbols.length > 0) {
             editor.edit(editBuilder => {

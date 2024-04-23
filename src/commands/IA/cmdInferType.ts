@@ -19,6 +19,7 @@ import { InferTypeResponse } from '../../api/interfaceApi';
 import { getGaiaConfiguration } from "../../config";
 import { chatApi, iaApi } from "../../extension";
 import { buildInferText } from "../buildInferText";
+import { TBuildInferTextReturn } from "../resultStruct";
 
 /**
 * Registers a command to infer types for a selected function in the active text editor.
@@ -108,7 +109,8 @@ export function registerInfer(context: vscode.ExtensionContext): void {
                     return iaApi.inferType(codeToAnalyze).then(async (response: InferTypeResponse) => {
                         if (response !== undefined && response.types !== undefined && response.types.length) {
                             const responseId: string = chatApi.nextMessageId();
-                            const text: string[] = await buildInferText(editor.document.uri, rangeForAnalyze, responseId, response.types);
+                            const buildInferTextReturn: TBuildInferTextReturn = await buildInferText(editor.document.uri, rangeForAnalyze, responseId, response.types);
+                            const text: string[] = buildInferTextReturn.text;
 
                             chatApi.gaia(text.join("\n"), messageId);
                         } else {
