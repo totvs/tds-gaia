@@ -43,7 +43,10 @@ export function registerExplain(context: vscode.ExtensionContext, iaApi: IaApiIn
                     chatApi.gaia(value, messageId);
                 });
             } else {
-                chatApi.gaiaWarning("I couldn't identify a code to explain it. ");
+                chatApi.gaiaWarning([
+                    "I couldn't identify a code to explain it.", 
+                    "Try positioning the cursor in another line of implementation."
+                ]);
             }
         } else {
             chatApi.gaiaWarning("Current editor is not valid for this operation.");

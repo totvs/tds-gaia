@@ -251,7 +251,9 @@ export class ChatApi {
             inProcess: (answeringId === undefined),
             timeStamp: new Date(),
             author: "Gaia",
-            message: workMessage
+            message: workMessage,
+            className: "tds-message-gaia",
+            feedback: (answeringId || "").length > 0
         });
 
         return id;
@@ -276,7 +278,10 @@ export class ChatApi {
             inProcess: false,
             timeStamp: new Date(),
             author: "Gaia",
-            message: workMessage
+            message: workMessage,
+            className: "tds-message-gaia",
+            feedback: ("" || "").length > 0
+
         });
 
         return messageId;
@@ -392,6 +397,8 @@ export class ChatApi {
                 timeStamp: new Date(),
                 author: getGaiaUser()?.displayName || "<unknown>",
                 message: message == undefined ? "???" : message,
+                className: "tds-message-user",
+                feedback: false
             });
 
             this.processMessage(message);

@@ -1,11 +1,8 @@
-import React from "react";
-import { FormProvider, SubmitHandler, useController, useFieldArray, useForm, useFormContext } from "react-hook-form";
-import { CommonCommandFromPanelEnum, ReceiveMessage, sendSave } from "../utilities/common-command-webview";
-import { VSCodeButton, VSCodeLink } from "@vscode/webview-ui-toolkit/react";
-import { IFormAction, TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
-import { sendLinkMouseOver } from "./sendCommand";
+import { useController } from "react-hook-form";
+import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
+import { TdsTextField } from "../components/form";
 
-export function NewMessage(): JSX.Element {
+export default function NewMessage(): JSX.Element {
     const { field, fieldState } = useController({
         name: "newMessage",
         defaultValue: "",

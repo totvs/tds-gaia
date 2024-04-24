@@ -8,6 +8,7 @@ enum EventsFeedback {
     Login = "login",
 }
 
+//const END_POINT: string = "https://events.dta.totvs.ai/";
 const END_POINT: string = "https://logs.dta.totvs.ai/";
 
 export class FeedbackApi extends AbstractApi {

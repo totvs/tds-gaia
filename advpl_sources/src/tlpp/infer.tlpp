@@ -51,7 +51,7 @@ static function inferFromDB()
 	local conv := B1_CONV
 	local dtUltCalc := B1_UCALSTD
 	local descIngles := B1_VM_I
-
+	
 	conout(filial)
 	conout(cod)
 	conout(notExistFileld)
