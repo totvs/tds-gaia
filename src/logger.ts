@@ -95,19 +95,26 @@ if (fse.existsSync(logFilename)) {
 const formatCause = (cause: any, prefix: string = "\t"): string => {
     let text: string = "";
 
-    text += `${prefix}Cause: ${cause.message}\n`;
+    if (cause) {
+        console.log("********************************");
+        console.log("********************************");
+        console.log("********************************");
+        console.dir(cause);
 
-    if (cause.stack) {
-        text += `${prefix}Stack: ${cause.stack.replace(/\t/g, prefix + "\t")}\n`;
-    }
+        text += `${prefix}Cause: ${cause.message}\n`;
 
-    Object.keys(cause).forEach((key: string) => {
-        if (key == "cause") {
-            text += formatCause(cause.cause, prefix + "\t");
-        } else if ((key !== "message") && (key !== "level") && (key !== "service")) {
-            text += `${prefix}${key}: ${cause[key]}\n`;
+        if (cause.stack) {
+            text += `${prefix}Stack: ${cause.stack.replace(/\t/g, prefix + "\t")}\n`;
         }
-    })
+
+        Object.keys(cause).forEach((key: string) => {
+            if (key == "cause") {
+                text += formatCause(cause.cause, prefix + "\t");
+            } else if ((key !== "message") && (key !== "level") && (key !== "service")) {
+                text += `${prefix}${key}: ${cause[key]}\n`;
+            }
+        })
+    }
 
     return text;
 }
@@ -116,8 +123,8 @@ const myFormat = winston.format.printf((info: winston.Logform.TransformableInfo)
     if (info.level == "error") {
         return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}\n${formatCause(info.error)}`;
     }
-    
-    let text: string = `${info.timestamp} [${info.label}] ${info.level}: ${info.message || info.error.message || info}`;   
+
+    let text: string = `${info.timestamp} [${info.label}] ${info.level}: ${info.message || info.error.message || info}`;
 
     if (info.durationMs) {
         text += ` (${info.durationMs} ms)`;
