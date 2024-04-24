@@ -1,140 +1,38 @@
 import * as vscode from "vscode";
 
-import { TGaiaConfig, getGaiaConfiguration, getGaiaUser, setGaiaUser } from "../config";
-import { fetch, Response } from "undici";
+import { TGaiaConfig, getGaiaConfiguration, getGaiaUser, isGaiaLogged, setGaiaUser } from "../config";
 import { capitalize } from "../util";
-import { Completion, CompletionResponse, IaAbstractApi, IaApiInterface, InferTypeResponse } from "./interfaceApi";
-import { PREFIX_GAIA, logger } from "../logger";
-import { ChatViewProvider } from "../panels/chatViewProvider";
+import { Completion, CompletionResponse, AbstractApi, IaApiInterface, InferTypeResponse } from "./interfaceApi";
+import { logger } from "../logger";
+import { ChatApi } from "./chatApi";
 
-export class CarolApi extends IaAbstractApi implements IaApiInterface {
+export class CarolApi extends AbstractApi implements IaApiInterface {
     // prefixo _ indica envolvidas com a API CAROL
-    private _requestId: number = 0;
     private _token: string = "";
-    private _endPoint: string = getGaiaConfiguration().endPoint;
-    private _apiVersion: string = getGaiaConfiguration().apiVersion;
-    private _urlRequest: string = `${this._endPoint}`;
-    private _apiRequest: string = `${this._urlRequest}/api/${this._apiVersion}`;
+    protected chat: ChatApi;
 
-    async start(token: string): Promise<boolean> {
-        this._token = token;
+    /**
+     * Constructor for CarolAPI class.
+     * Initializes the IA API client.
+     * 
+     * @param chat - ChatApi client instance
+     */
+    constructor(chat: ChatApi) {
+        super(`${getGaiaConfiguration().endPoint}/api`, getGaiaConfiguration().apiVersion);
 
-        logger.info(vscode.l10n.t("Extension is using [{0}]", this._urlRequest));
+        this.chat = chat;
+    }
+
+    start(): Promise<boolean> {
+
+        logger.info(vscode.l10n.t("Extension is using [{0}]", this.apiRequest));
 
         return Promise.resolve(true)
     }
 
-    private async fetch(url: string, method: string, headers: Record<string, string>, data: any): Promise<string | {} | Error> {
-        logger.profile(`${url}-${this._requestId++}`);
-        logger.http(url, { method, headers, data });
+    stop(): Promise<boolean> {
 
-        let result: any;
-        await vscode.window.withProgress({
-            location: { viewId: ChatViewProvider.viewType },
-            cancellable: false,
-            title: vscode.l10n.t("{0}: requesting data...", PREFIX_GAIA)
-        }, async (progress, token) => {
-            token.onCancellationRequested(() => {
-                result = new Error();
-                result.message = "Cancelled";
-            });
-
-            try {
-                let resp: Response = await fetch(url, {
-                    method: method,
-                    body: typeof (data) == "string" ? data : JSON.stringify(data),
-                    headers: headers
-                });
-
-                logger.info(vscode.l10n.t("Status: {0}", resp.status));
-
-                const bodyResp: string = await resp.text();
-                if (!resp.ok) {
-                    let statusText = "";
-
-                    if (resp.status === 502) { //bad gateway
-                        const pos_s: number = bodyResp.indexOf("<h2>");
-                        const pos_e: number = bodyResp.indexOf("</h2>");
-
-                        statusText = "\n" + bodyResp.substring(pos_s + 4, pos_e).replace(/<p>/g, " ");
-                    }
-
-                    result = new Error();
-                    result.name = `REQUEST_${method.toUpperCase()}`;
-                    result.cause = vscode.l10n.t("Error requesting [type: {0}, url: {1}]", method, url);
-                    result.message = `${resp.status}: ${resp.statusText}${statusText}`;
-
-                    if (resp.headers.get("content-type") == "application/json") {
-                        const json = JSON.parse(bodyResp);
-                        if (json) {
-                            if (json.detail) {
-                                result.message += `\n ${vscode.l10n.t("Detail: {0}", json.detail)}`;
-                            }
-                        }
-                    } else {
-                        result.cause += `${result.cause}\n ${vscode.l10n.t("Detail: {0}", bodyResp)}`;
-
-                    }
-                    Error.captureStackTrace(result);
-                    this.logError(url, result, bodyResp);
-                } else {
-                    this.logResponse(url, bodyResp);
-                    if (resp.headers.get("content-type") == "application/json") {
-                        try {
-                            result = JSON.parse(bodyResp);
-                        } catch (error) {
-                            result = bodyResp.trim();
-                        }
-                    } else {
-                        result = bodyResp.trim();
-                    }
-                }
-            } catch (error: any) {
-                result = new Error();
-                result.message = "Unexpected error";
-                result.cause = error;
-                this.logError(url, error, "");
-            }
-
-            progress.report({ increment: 100 });
-        });
-
-        logger.profile(`${url}-${this._requestId++}`);
-        return result;
-    }
-
-    private async jsonRequest(method: "GET" | "POST", url: string, data: any = undefined): Promise<{} | Error> {
-        const headers: {} = {
-            "accept": "application/json",
-            "Content-Type": "application/json"
-        };
-        let result: {} | Error;
-        this.logRequest(url, method, headers || {}, data || "");
-
-        const resp: string | {} | Error = await this.fetch(url, method, headers, data);
-        result = resp;
-
-        return Promise.resolve(resp);
-    }
-
-    async checkHealth(detail: boolean): Promise<Error | undefined> {
-        let result: any = undefined
-        logger.info(vscode.l10n.t("Getting health check..."));
-
-        let resp: any = await this.jsonRequest("GET", `${this._apiRequest}/health_check`);
-
-        if (typeof (resp) === "object" && resp instanceof Error) {
-            result = resp
-        } else if (resp.message !== "Server is on.") {
-            result = new Error(vscode.l10n.t("Server is off-line or unreachable."));
-            result.cause = resp;
-            Error.captureStackTrace(result);
-            logger.error(result);
-        } else {
-            logger.info(vscode.l10n.t("IA Service on-line"));
-        }
-
-        return Promise.resolve(result);
+        return this.logout();
     }
 
     /**
@@ -142,44 +40,24 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
      *
      * @returns {Promise<boolean>} A promise that resolves to `true` if the login was successful, or `false` otherwise.
      */
-    login(): Promise<boolean> {
+    login(email: string, token: string): Promise<boolean> {
         logger.profile("login");
         logger.info(vscode.l10n.t("Logging in..."));
-
         let result: boolean = false;
+        const parts: string[] = email.split("@");
 
-        if (this._token.startsWith("@")) {
-            const parts: string[] = this._token.split(" ");
-
-            if (parts[0].length == 0) {
-                parts[0] = "@<uninformed>";
-            } else {
-                parts[0] = parts[0].substring(1);
-            }
-            parts[1] = parts[1] || "";
-
-            setGaiaUser({
-                id: `ID:${this._token}`,
-                email: `${this._token}`,
-                name: capitalize(parts[0]),
-                fullname: `${capitalize(parts[0])} ${capitalize(parts[1])}`,
-                displayName: capitalize(parts[0]),
-                avatarUrl: "",
-                expiration: new Date(2024, 0, 1, 0, 0, 0, 0),
-                expiresAt: new Date(2024, 11, 31, 23, 59, 59, 999),
-            });
-        } else {
-            setGaiaUser({
-                id: `ID:${this._token}`,
-                email: `${this._token}`,
-                name: this._token,
-                fullname: this._token,
-                displayName: this._token,
-                avatarUrl: "",
-                expiration: new Date(2024, 0, 1, 0, 0, 0, 0),
-                expiresAt: new Date(2024, 11, 31, 23, 59, 59, 999),
-            });
-        }
+        this._token = token;
+        //obter informações usuário 
+        setGaiaUser({
+            id: `ID:${this._token}`,
+            email: email,
+            name: parts[0],
+            fullname: `${capitalize(parts[0])} at ${parts.length > 1 ? capitalize(parts[1]): "<unknown>"}`,
+            displayName: capitalize(parts[0]),
+            avatarUrl: "",
+            expiration: new Date(2024, 0, 1, 0, 0, 0, 0),
+            expiresAt: new Date(2024, 11, 31, 23, 59, 59, 999),
+        });
 
         let message: string = vscode.l10n.t("Logged in as {0}", getGaiaUser()?.displayName || vscode.l10n.t("<unknown>"));
         logger.info(message);
@@ -190,15 +68,63 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         return Promise.resolve(result);
     }
 
+    /**
+    * Logs out the current user and clears the authentication token.
+    * If the user is logged into Gaia, their user session is also cleared.
+    *
+    * @returns A promise that resolves to `true` when the logout operation is complete.
+    */
     logout(): Promise<boolean> {
+        logger.profile("logout");
         logger.info(vscode.l10n.t("Logging out..."));
         this._token = "";
-        setGaiaUser(undefined);
 
+        if (isGaiaLogged()) {
+            setGaiaUser(undefined);
+        }
+
+        logger.profile("logout");
         return Promise.resolve(true);
     }
 
+    /**
+    * Checks the health of the Carol API service.
+    *
+    * @param detail - If true, returns more detailed health check information.
+    * @returns A promise that resolves to an `Error` object if the health check fails, or `undefined` if the health check is successful.
+    */
+    async checkHealth(detail: boolean): Promise<Error | undefined> {
+        logger.profile("checkHealth");
+        let result: any = undefined
+        logger.info(vscode.l10n.t("Getting health check..."));
+
+        let resp: any = await this.jsonRequest("GET", "health_check", {});
+
+        if (typeof (resp) === "object" && resp instanceof Error) {
+            result = resp
+        } else if (resp.message !== "Server is on.") {
+            result = new Error(vscode.l10n.t("Server is off-line or unreachable."));
+            result.cause = resp;
+            Error.captureStackTrace(result);
+            logger.error(result);
+        } else {
+            logger.info(vscode.l10n.t("Gaia IA Service on-line"));
+        }
+
+        logger.profile("checkHealth");
+        return Promise.resolve(result);
+    }
+
+    /**
+    * Generates code based on the provided text.
+    *
+    * @param text - The input text to generate code from.
+    * @returns A promise that resolves to an array of generated code strings.
+    */
     async generateCode(text: string): Promise<string[]> {
+        logger.profile("generateCode");
+        logger.profile("generateCode");
+
         throw new Error(vscode.l10n.t("Method not implemented."));
     }
 
@@ -223,7 +149,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             }
         };
 
-        let json: any = await this.jsonRequest("POST", `${this._apiRequest}/complete`, body);
+        let json: any = await this.jsonRequest("POST", "complete", body);
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage(vscode.l10n.t("No code found in the stack"));
             logger.profile("getCompletions");
@@ -247,7 +173,6 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         }
 
         logger.debug(vscode.l10n.t("Code completions end with {0} suggestions in {1} ms", response.completions.length, json.elapsed_time));
-        logger.debug(JSON.stringify(response.completions, undefined, 2));
         logger.profile("getCompletions");
 
         return response;
@@ -267,8 +192,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             "code": code,
         };
 
-        let response: any | Error = await this.jsonRequest("POST", `${this._apiRequest}/explain`, JSON.stringify(body));
-
+        let response: any | Error = await this.jsonRequest("POST", "explain", {}, JSON.stringify(body));
         if (typeof (response) === "object" && response instanceof Error) {
             return "";
         } else if (!response) {// } || response.length === 0) {
@@ -299,7 +223,7 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
             "code": code,
         };
 
-        let json: any = await this.jsonRequest("POST", `${this._apiRequest}/infer_type`, body);
+        let json: any = await this.jsonRequest("POST", "infer_type", body);
         let types: any[] = [];
 
         if (!json || json.length === 0) {
@@ -310,35 +234,9 @@ export class CarolApi extends IaAbstractApi implements IaApiInterface {
         }
 
         logger.debug(vscode.l10n.t("Code infer end with {0} suggestions", types.length));
-        logger.debug(JSON.stringify(types, undefined, 2));;
 
         logger.profile("innerType");
 
         return json;
-    }
-
-    stop(): Promise<boolean> {
-
-        return this.logout();
-    }
-
-    /**
-   * Registers commands for the extension.
-   * 
-   */
-    logCompletionFeedback(completions: { completion: Completion, textBefore: string, textAfter: string }): void {
-        logger.profile("logCompletionFeedback");
-        logger.debug("Logging completion feedback...");
-
-        if (completions !== undefined) {
-            if (completions.completion !== undefined) {
-                let generatedText = completions.completion.generated_text;
-            }
-            let textBefore = completions.textBefore;
-            let textAfter = completions.textAfter;
-        }
-
-        //Implementar a chamada para a API Rest para enviar feedback quando estiver disponível
-        logger.profile("logCompletionFeedback");
     }
 }

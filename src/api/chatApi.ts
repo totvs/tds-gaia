@@ -40,8 +40,8 @@ const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
 const EXPLAIN_WORD_RE = /^explain\sword\s(source)?$/i;
 const INFER_TYPE_RE = /^infer\s(source)?$/i;
-const UPDATE_ALL_TYPE_RE = /^updatealltypify\s(source)?$/i;
-const UPDATE_TYPE_RE = /^updatetypify\s(source)?$/i;
+const UPDATE_ALL_TYPE_RE = /^updateAllTypify\s(source)?$/i;
+const UPDATE_TYPE_RE = /^updateTypify\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
 const OPEN_QUICK_GUIDE = /^(open )?(quick guide)$/i;
@@ -448,7 +448,8 @@ export class ChatApi {
                 ...args,
                 ...command.commandArgs
             };
-            const encodeArgs: string = args ? `?${encodeURI(JSON.stringify(args))}` : "";
+            const argsString: string = JSON.stringify(args);
+            const encodeArgs: string = argsString.length > 2 ? `?${encodeURI(argsString)}` : "";
 
             return `[${command.caption}](command:${command.commandId}${encodeArgs})${command.key ? " `" + command.key + "`" : ""} `;
         }

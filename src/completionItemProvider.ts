@@ -18,7 +18,7 @@ import * as vscode from "vscode";
 import { delay } from "./util";
 import { TGaiaConfig, getGaiaConfiguration } from "./config";
 import { Completion, CompletionResponse } from "./api/interfaceApi";
-import { iaApi } from "./extension"
+import { feedback, iaApi } from "./extension"
 import { logger } from "./logger";
 
 let textBeforeCursor: string = "";
@@ -46,15 +46,10 @@ export class InlineCompletionItemProvider implements vscode.InlineCompletionItem
         context.subscriptions.push(inlineRegister);
 
         const afterInsert = vscode.commands.registerCommand('tds-gaia.afterInsert', async (response: Completion) => {
-            vscode.commands.executeCommand("tds-gaia.logCompletionFeedback", { completion: response, textBefore: textBeforeCursor, textAfter: textAfterCursor });
-        });
-
-        const logCompletionFeedback = vscode.commands.registerCommand('tds-gaia.logCompletionFeedback', async (response: { completion: Completion, textBefore: string, textAfter: string }) => {
-            iaApi.logCompletionFeedback(response);
+            feedback.eventCompletion({ completion: response, textBefore: textBeforeCursor, textAfter: textAfterCursor });
         });
 
         context.subscriptions.push(afterInsert);
-        context.subscriptions.push(logCompletionFeedback);
     }
 
     async provideInlineCompletionItems(document: vscode.TextDocument, position: vscode.Position, context: vscode.InlineCompletionContext, token: vscode.CancellationToken): Promise<vscode.InlineCompletionItem[]> {

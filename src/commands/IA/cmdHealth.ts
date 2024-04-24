@@ -2,9 +2,8 @@ import * as vscode from "vscode";
 import { IaApiInterface } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
 import { PREFIX_GAIA, logger } from "../../logger";
-import { updateContextKey } from "../../extension";
 import { getGaiaConfiguration, setGaiaReady } from "../../config";
-import { promiseFromEvent } from "../../util";
+import { promiseFromEvent, updateContextKey } from "../../util";
 
 export function registerHealth(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
 
@@ -39,18 +38,20 @@ export function registerHealth(context: vscode.ExtensionContext, iaApi: IaApiInt
                 setGaiaReady(error === undefined);
 
                 if (error !== undefined) {
-                    if (messageId != "") {
-                        const message: string = vscode.l10n.t("Sorry, I have technical difficulties. {0}", chatApi.commandText("health"));
-                        chatApi.gaia(message, messageId);
-                        vscode.window.showErrorMessage(`${PREFIX_GAIA} ${message}`);
-                    }
+                    let message: string[] = [
+                        vscode.l10n.t("Sorry, I have technical difficulties."),
+                        vscode.l10n.t("See console log for more details."),
+                    ];
+                    vscode.window.showErrorMessage(`${PREFIX_GAIA} ${message.join(" ")}`);
+                    logger.error(error);
 
                     if (error.message.includes("502: Bad Gateway")) {
                         const parts: string = error.message.split("\n");
                         const time: RegExpMatchArray | null = parts[1].match(/(\d+) seconds/i);
                         if (attempt == 1) {
-                            chatApi.gaiaInfo(parts[1]);
+                            message.push(`\'${parts[1]}\'`);
                         }
+                        chatApi.gaia(message);
 
                         if ((attempt <= totalAttempts) && (time !== null)) {
                             tryAgain(attempt, totalAttempts, Number.parseInt(time[1])).then(
@@ -65,16 +66,12 @@ export function registerHealth(context: vscode.ExtensionContext, iaApi: IaApiInt
                         } else if (totalAttempts != 0) {
                             chatApi.gaia([
                                 vscode.l10n.t("Sorry, even after **{0} attempts**, I still have technical difficulties.", totalAttempts),
-                                vscode.l10n.t("To restart the validation of the service, activate {0}.", chatApi.commandText("health"))
+                                vscode.l10n.t("To restart the validation of the service, execute {0}.", chatApi.commandText("health"))
                             ], messageId);
                         }
                     } else {
                         chatApi.gaia(vscode.l10n.t("Available service!"), messageId);
                         vscode.window.showInformationMessage(`${PREFIX_GAIA} Available service!`);
-                    }
-
-                    if (detail) {
-                        chatApi.gaiaInfo(JSON.stringify(error, undefined, 2));
                     }
                 } else {
                     vscode.commands.executeCommand("tds-gaia.login", true).then(() => {

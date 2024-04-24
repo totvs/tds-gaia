@@ -113,7 +113,11 @@ const formatCause = (cause: any, prefix: string = "\t"): string => {
 }
 
 const myFormat = winston.format.printf((info: winston.Logform.TransformableInfo) => {
-    let text: string = `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
+    if (info.level == "error") {
+        return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}\n${formatCause(info.error)}`;
+    }
+    
+    let text: string = `${info.timestamp} [${info.label}] ${info.level}: ${info.message || info.error.message || info}`;   
 
     if (info.durationMs) {
         text += ` (${info.durationMs} ms)`;

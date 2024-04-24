@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import { IaApiInterface } from '../../api/interfaceApi';
 import { ChatApi } from '../../api/chatApi';
 import { PREFIX_GAIA, logger } from "../../logger";
+import { GaiaAuthenticationProvider, getGaiaSession } from "../../authenticationProvider";
+import { feedback } from "../../extension";
 
 export function registerLogin(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
 
@@ -14,24 +16,23 @@ export function registerLogin(context: vscode.ExtensionContext, iaApi: IaApiInte
     * 
     * @param args - First arg is a boolean to skip auto-login if true.
     */
-    //TODO: Para identificação do usuário. Aguardando definição de processo externo
-    //const authProvider = new AuthProvider(initialConfig)
-    //await authProvider.init()
 
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.login', async (...args) => {
+        let session: vscode.AuthenticationSession | undefined = await getGaiaSession();
 
-        let apiToken = await context.secrets.get('apiToken');
+        if (session !== undefined) {
+            await iaApi.start();
+            if (await iaApi.login(session.account.id, session.accessToken)) {
+                logger.info(vscode.l10n.t('Logged in successfully'));
+                vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
+                const [_, publicKey, secretKey] = session.scopes[0].split(":");
+                feedback._start(publicKey, secretKey);
+            } else {
+                logger.error(vscode.l10n.t('Failed to login'));
+                vscode.window.showErrorMessage(vscode.l10n.t("{0} Failed to login", PREFIX_GAIA));
+            }
+        };
 
-        if (apiToken !== undefined) {
-            iaApi.start(apiToken).then(async (value: boolean) => {
-                if (await iaApi.login()) {
-                    logger.info(vscode.l10n.t('Logged in successfully'));
-                    vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
-
-                    return;
-                }
-            });
-        }
 
         if (args.length > 0) {
             if (args[0]) { //indica que login foi acionado automaticamente
@@ -39,26 +40,17 @@ export function registerLogin(context: vscode.ExtensionContext, iaApi: IaApiInte
             }
         }
 
-        const input = await vscode.window.showInputBox({
-            prompt: vscode.l10n.t('Please enter your API token or @your name):'),
-            placeHolder: vscode.l10n.t('Your token goes here...')
-        });
+        session = await vscode.authentication.getSession(GaiaAuthenticationProvider.AUTH_TYPE, [], { createIfNone: true });
+        console.log(session);
+        if (session !== undefined) {
 
-        if (input !== undefined) {
-            // const session: vscode.AuthenticationSession = await vscode.authentication.getSession(GaiaAuthenticationProvider.AUTH_TYPE, [], { createIfNone: true });
-            // console.log(session);
-
-            if (await iaApi.start(input)) {
-                if (await iaApi.login()) {
-                    await context.secrets.store('apiToken', input);
-                    vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
-                } else {
-                    await context.secrets.delete('apiToken');
-                    vscode.window.showInformationMessage(vscode.l10n.t("{0} Login failure", PREFIX_GAIA));
-                }
-
-                chatApi.checkUser("");
+            if (session.accessToken) {
+                vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
+            } else {
+                vscode.window.showInformationMessage(vscode.l10n.t("{0} Login failure", PREFIX_GAIA));
             }
+
+            chatApi.checkUser("");
         }
     }));
 }

@@ -440,6 +440,7 @@
     "@vscode/l10n-dev": "^0.0.31",
     "fs-extra": "^11.2.0",
     "undici": "^6.4.0",
+    "uuid": "^9.0.1",
     "vscode-languageclient": "^9.0.1",
     "winston": "^3.11.0"
   },
@@ -447,6 +448,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/mocha": "^10.0.6",
     "@types/node": "20.11.5",
+    "@types/uuid": "^9.0.8",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
