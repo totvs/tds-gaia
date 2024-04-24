@@ -8,7 +8,7 @@ import { ChatApi } from "./chatApi";
 
 export class CarolApi extends AbstractApi implements IaApiInterface {
     // prefixo _ indica envolvidas com a API CAROL
-    private _token: string = "";
+    private _authorization: string = "";
     protected chat: ChatApi;
 
     /**
@@ -36,20 +36,35 @@ export class CarolApi extends AbstractApi implements IaApiInterface {
     }
 
     /**
+    * Sends a JSON request to the specified URL using the provided method and data.
+    *
+    * @param method - The HTTP method to use for the request ("GET" or "POST").
+    * @param headers - The headers to include in the request.
+    * @param url - The URL to send the request to.
+    * @param data - The data to include in the request body (optional).
+    * @returns A Promise that resolves to the response JSON data format or an Error if the request fails.
+    */
+    protected async jsonRequest(method: "GET" | "POST", url: string, headers: Record<string, string>, data: any = undefined): Promise < {} | Error > {
+        headers["X-Auth"] = this._authorization;
+
+        return super.jsonRequest(method, url, headers, data);
+}
+
+    /**
      * Logs in the user and sets the Gaia user information.
      *
      * @returns {Promise<boolean>} A promise that resolves to `true` if the login was successful, or `false` otherwise.
      */
-    login(email: string, token: string): Promise<boolean> {
+    login(email: string, authorization: string): Promise<boolean> {
         logger.profile("login");
         logger.info(vscode.l10n.t("Logging in..."));
         let result: boolean = false;
         const parts: string[] = email.split("@");
 
-        this._token = token;
+        this._authorization = authorization;
         //obter informações usuário 
         setGaiaUser({
-            id: `ID:${this._token}`,
+            id: `ID:${this._authorization}`,
             email: email,
             name: parts[0],
             fullname: `${capitalize(parts[0])} at ${parts.length > 1 ? capitalize(parts[1]): "<unknown>"}`,
@@ -77,7 +92,7 @@ export class CarolApi extends AbstractApi implements IaApiInterface {
     logout(): Promise<boolean> {
         logger.profile("logout");
         logger.info(vscode.l10n.t("Logging out..."));
-        this._token = "";
+        this._authorization = "";
 
         if (isGaiaLogged()) {
             setGaiaUser(undefined);
@@ -149,7 +164,7 @@ export class CarolApi extends AbstractApi implements IaApiInterface {
             }
         };
 
-        let json: any = await this.jsonRequest("POST", "complete", body);
+        let json: any = await this.jsonRequest("POST", "complete", {}, body);
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage(vscode.l10n.t("No code found in the stack"));
             logger.profile("getCompletions");
@@ -223,7 +238,7 @@ export class CarolApi extends AbstractApi implements IaApiInterface {
             "code": code,
         };
 
-        let json: any = await this.jsonRequest("POST", "infer_type", body);
+        let json: any = await this.jsonRequest("POST", "infer_type", {}, body);
         let types: any[] = [];
 
         if (!json || json.length === 0) {
