@@ -1,10 +1,12 @@
 set SK=cGstbGYtYjE2MzNlM2MtYzAzOC00ZGJlLWFmNTUtODJiZjIxYmUwZmQ1
 set PK=c2stbGYtYmRhZDJhOGMtZjY0Ni00YWI2LTg4NmEtNjY0MDEwMzNjYzQ4
+rem set url=https://logs.dta.totvs.ai
+ set url=https://events.dta.totvs.ai/v1
 
 curl -X POST -H "Content-Type: application/json" ^
   --basic %SK%:%PK% ^
   --include ^
-  https://logs.dta.totvs.ai ^
+  %url%:443 ^
   -d '{ ^
   "batch": [ ^
     { ^

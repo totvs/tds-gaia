@@ -17,9 +17,7 @@ limitations under the License.
 import * as vscode from "vscode";
 import { Disposable } from "vscode";
 
-//import { v4 as uuid } from 'uuid';
 import { PromiseAdapter, promiseFromEvent } from "./util";
-//import fetch from 'node-fetch';
 
 const AUTH_TYPE: string = "auth-gaia0";
 const AUTH_NAME: string = "Gaia Authentication";

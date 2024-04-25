@@ -1,0 +1,26 @@
+{
+    "errors": [
+        {
+            "id": "trace_login_id_7f5b603d-264c-4fc4-a84a-c699e5ead279",
+            "status": 400,
+            "message": "Invalid request data",
+            "error":"[{
+                "code": "invalid_union_discriminator",
+                "options": [
+                    "trace-create",
+                    "score-create",
+                    "event-create",
+                    "span-create",
+                    "span-update",
+                    "generation-create",
+                    "generation-update",
+                    "sdk-log",
+                    "observation-create",
+                    "observation-update"
+                ],
+                "path": [
+                    "type"
+                ],
+                "message": "Invalid discriminator value. Expected 'trace-create' | 'score-create' | 'event-create' | 'span-create' | 'span-update' | 'generation-create' | 'generation-update' | 'sdk-log' | 'observation-create' | 'observation-update'"
+            }
+        ]"}],"successes":[]}"

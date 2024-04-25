@@ -1,5 +1,5 @@
 {
-  "name": "tds-gaia-vscode",
+  "name": "tds-gaia",
   "displayName": "TDS-Gaia, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Gaia will assist you in AdvPL programming",
   "version": "0.0.5",
@@ -32,10 +32,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/totvs/tds-gaia-vscode.git"
+    "url": "https://github.com/totvs/tds-gaia.git"
   },
   "bugs": {
-    "url": "https://github.com/totvs/tds-gaia-vscode.git"
+    "url": "https://github.com/totvs/tds-gaia.git"
   },
   "galleryBanner": {
     "color": "#100f11",
@@ -43,9 +43,9 @@
   },
   "badges": [
     {
-      "url": "https://img.shields.io/github/stars/totvs/tds-gaia-vscode?style=social",
-      "description": "Star tds-gaia-vscode on Github",
-      "href": "https://github.com/totvs/tds-gaia-vscode"
+      "url": "https://img.shields.io/github/stars/totvs/tds-gaia?style=social",
+      "description": "Star tds-gaia on Github",
+      "href": "https://github.com/totvs/tds-gaia"
     },
     {
       "url": "https://img.shields.io/twitter/follow/totvs?style=social",
@@ -53,7 +53,7 @@
       "href": "https://twitter.com/TOTVS"
     }
   ],
-  "homepage": "https://github.com/totvs/tds-gaia-vscode",
+  "homepage": "https://github.com/totvs/tds-gaia",
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -405,11 +405,6 @@
         "key": "Ctrl+D Ctrl+G",
         "mac": "Cmd+D Cmd+G",
         "command": "tds-gaia.generateCode"
-      },
-      {
-        "key": "Alt+A",
-        "mac": "Option+A",
-        "command": "tds-gaia.updateTypifyAll"
       }
     ]
   },
@@ -440,7 +435,6 @@
     "@vscode/l10n-dev": "^0.0.31",
     "fs-extra": "^11.2.0",
     "undici": "^6.4.0",
-    "uuid": "^9.0.1",
     "vscode-languageclient": "^9.0.1",
     "winston": "^3.11.0"
   },
@@ -448,7 +442,6 @@
     "@types/fs-extra": "^11.0.4",
     "@types/mocha": "^10.0.6",
     "@types/node": "20.11.5",
-    "@types/uuid": "^9.0.8",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",

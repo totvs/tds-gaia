@@ -161,7 +161,7 @@ export class AbstractApi {
     * @returns A Promise that resolves to the response text data or an Error object if the request fails.
     */
     private async fetch(partialUrl: string, method: string, headers: Record<string, string>, data: any): Promise<string | {} | Error> {
-        const url: string = `${this._apiRequest}/${partialUrl}`;
+        const url: string = `${this._apiRequest}${partialUrl.length > 0? "/" + partialUrl : ""}`;
         logger.profile(`${url}-${this._requestId++}`);
         logger.http(url, { method, headers, data });
         this.logRequest(url, method, headers, data);

@@ -4,7 +4,7 @@ import { ChatApi } from '../../api/chatApi';
 import { registerInfer } from './cmdInferType';
 import { registerExplain } from './cmdExplain';
 import { registerHealth } from "./cmdHealth";
-import { registerLogin } from "./cmLogin";
+import { registerLogin } from "./cmdLogin";
 import { registerExplainWord } from "./cmdExplainWord";
 import { registerLogout } from "./cmdLogout";
 import { registerGenerateCode } from "./cmdGenerateCode";

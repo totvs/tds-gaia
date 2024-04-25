@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { FeedbackApi } from "../../api/feedBackApi";
+
 /**
  * Enumeration of common commands that can be sent from a webview to its host panel.
  */
@@ -24,7 +26,8 @@ export enum CommonCommandFromWebViewEnum {
 	Reset = "RESET",
 	Save = "SAVE",
 	SaveAndClose = "SAVE_AND_CLOSE",
-	LinkMouseOver = "LINK_MOUSE_OVER"
+	LinkMouseOver = "LINK_MOUSE_OVER",
+	Feedback = "FEEDBACK"
 }
 
 export type CommonCommandFromWebView = CommonCommandFromWebViewEnum;

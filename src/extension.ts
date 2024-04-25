@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 import * as vscode from 'vscode';
-import { initStatusBarItems, updateStatusBarItems } from './statusBar';
 import { getGaiaLogLevel, isGaiaLogged, isGaiaShowBanner } from './config';
 import { IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
@@ -46,7 +45,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	ctx = context;
 	handleConfigChange(context);
-	context.subscriptions.push(...initStatusBarItems());
 
 	showBanner()
 
@@ -80,9 +78,9 @@ export function activate(context: vscode.ExtensionContext) {
  */
 export function deactivate() {
 
-	return new Promise((value: any) => {
-		iaApi.stop();
-		feedback.stop();
+	return new Promise(async (value: any) => {
+		await feedback.stop();
+		await iaApi.stop();
 	});
 }
 
@@ -92,8 +90,6 @@ function handleConfigChange(context: vscode.ExtensionContext) {
 		if (event.affectsConfiguration('tds-gaia')) {
 			updateContextKey("logged", isGaiaLogged());
 			logger.level = getGaiaLogLevel();
-
-			updateStatusBarItems();
 		}
 	});
 
@@ -110,7 +106,7 @@ function showBanner(force: boolean = false): void {
 	const showBanner: boolean = isGaiaShowBanner();
 
 	if (showBanner || force) {
-		let ext = vscode.extensions.getExtension("TOTVS.tds-gaia-vscode");
+		let ext = vscode.extensions.getExtension("TOTVS.tds-gaia");
 		// prettier-ignore
 		{
 			const lines: string[] = [

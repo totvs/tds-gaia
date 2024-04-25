@@ -20,7 +20,7 @@ import { TChatModel } from '../model/chatModel';
 import { getExtraPanelConfigurations, getWebviewContent } from './utilities/webview-utils';
 import { MessageOperationEnum, TMessageModel } from '../model/messageModel';
 import { TFieldErrors } from '../model/abstractMode';
-import { chatApi } from '../extension';
+import { chatApi, feedback } from '../extension';
 import { TQueueMessages } from '../api/chatApi';
 import { getGaiaUser } from '../config';
 import { logger } from '../logger';
@@ -123,7 +123,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       enableCommandUris: true
     };
 
-    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-gaia-vscode');
+    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-gaia');
     const extensionUri: vscode.Uri = ext!.extensionUri;
 
     webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView", { title: "Gaia: Chat" });
@@ -195,10 +195,21 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
               break;
             }
+          case CommonCommandFromWebViewEnum.Feedback:
+            console.log("Feedback");
+            console.dir(data)
+            this.chatModel.messages
+              .filter((msg: TMessageModel) => msg.messageId == data.messageId)
+              .forEach((msg: TMessageModel) => {
+                msg.feedback = false;
+                feedback.eventGeneric({ message: msg.message, ...data });
+              });
+
+            this.sendUpdateModel(this.chatModel, undefined);
+            break;
         }
       }
     );
-
   }
 
   protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {

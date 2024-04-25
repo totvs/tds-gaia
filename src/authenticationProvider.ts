@@ -16,16 +16,15 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { Disposable } from "vscode";
-import { v4 as uuid } from 'uuid';
 import { PromiseAdapter, promiseFromEvent } from "./util";
 import { feedback, iaApi } from "./extension";
 import { LoggedUser, getGaiaUser } from "./config";
-import { fileDownloadInfo } from "@huggingface/hub";
+import { randomUUID } from "crypto";
 
 const AUTH_TYPE: string = "auth-gaia";
 const AUTH_NAME: string = "Gaia";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`
-const SCOPES: string[] = ["feedBackPK", "feedBackSK"];
+const SCOPES: string[] = ["feedback"];
 
 export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider, Disposable {
     static AUTH_TYPE: string = AUTH_TYPE;
@@ -77,14 +76,16 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
             const userInfo: LoggedUser | undefined = getGaiaUser();
 
             const session: vscode.AuthenticationSession = {
-                id: uuid(),
+                id: randomUUID(),
                 accessToken: accessTokens,
                 account: {
                     label: userInfo?.name || userInfo?.email || "Unknown",
                     id: userInfo?.email || "unknown",
                 },
                 scopes: [
-                    `feedBack:${Buffer.from(feedBackPK).toString("base64")}:${Buffer.from(feedBackSK).toString("base64") }`
+                    //pk-lf-b1633e3c-c038-4dbe-af55-82bf21be0fd5
+                    //sk-lf-bdad2a8c-f646-4ab6-886a-66401033cc48
+                    `feedback:${Buffer.from(`pk-lf-${feedBackPK}:sk-lf-${feedBackSK}`).toString("base64")}}`
                 ]
             };
 
@@ -221,15 +222,12 @@ export function registerAuthentication(context: vscode.ExtensionContext) {
 
     subscriptions.push(
         vscode.authentication.onDidChangeSessions(async e => {
-            const event = e as unknown as vscode.AuthenticationProviderAuthenticationSessionsChangeEvent;
-            console.log('onDidChangeSessions', event);
-
             if (e.provider.id === AUTH_TYPE) {
                 const session: vscode.AuthenticationSession | undefined = await getGaiaSession();
-                
+
                 if (session) {
-                    const [_, publicKey, secretKey] = session.scopes[0].split(":");
-                    feedback._start(publicKey, secretKey);
+                    const [_, feedbackToken] = session.scopes[0].split(":");
+                    feedback.start(feedbackToken);
                     feedback.eventLogin();
                 } else {
                     vscode.commands.executeCommand('tds-gaia.logout');

@@ -2,7 +2,7 @@ import { useController } from "react-hook-form";
 import { MessageOperationEnum, TMessageModel } from "./chatModels";
 import { VSCodeDataGridCell, VSCodeDataGridRow, VSCodeLink } from "@vscode/webview-ui-toolkit/react";
 import { vsCodeDataGrid } from "@vscode/webview-ui-toolkit";
-import { sendLinkMouseOver } from "./sendCommand";
+import { sendFeedback, sendLinkMouseOver } from "./sendCommand";
 import { feedback } from './../../../src/extension';
 import Message from "./message";
 import Feedback from "./feedback";
@@ -169,33 +169,16 @@ export interface IMessageRowProps {
 
 export default function MessageRow(props: IMessageRowProps): any {
     const row: TMessageModel = props.message;
-    let children: any[] = [];
 
-    if (row.author.length > 0) {
-        let timeStamp: string = new Date(row.timeStamp).toTimeString().substring(0, 5);
-
-        children.push(
-        )
-    }
-
-    //children.push(ShowMessage(row));
-
-    //{ ...children }
     return (
         <VSCodeDataGridRow key={row.messageId.toString()} className={`tds-message-row ${row.className}`}>
             <VSCodeDataGridCell grid-column="1">
                 <>
                     <Message {...row} isHovering={false} />
-                    {row.feedback && <Feedback />}
+                    {row.feedback && <Feedback feedbacksOnSubmit={(text:string, value: string) => {
+                        sendFeedback(row.messageId, text, value, "");
+                    }} />}
                 </>
-                {
-                    // data - message - id= {row.messageId.toString()}
-                    // data - answering={ row.answering.toString() }
-                    // className = "tds-message-row"
-                    // onMouseOver = {(e) => flashMessage(row, messages)
-                }
-
-                {...children}
             </VSCodeDataGridCell>
         </VSCodeDataGridRow >
     )

@@ -66,8 +66,8 @@ section.tds-chat vscode-data-grid-row.tds-message-user {
 }
 
 section.tds-chat vscode-data-grid-row.tds-message-gaia+vscode-data-grid-row.tds-message-user {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
+	margin-top: var(--tds-ver-spacing);
+	margin-bottom: var(--tds-ver-spacing)
 }
 
 section.tds-chat vscode-data-grid-row.tds-message-gaia+vscode-data-grid-row.tds-message-gaia,
@@ -91,7 +91,7 @@ section.tds-chat vscode-data-grid-row.tds-message-row div.tds-message-author #op
 	font-style: italic;
 	font-size: 80%;
 	flex-grow: 3;
-	align-self: baseline;
+	/* align-self: baseline; */
 }
 
 section.tds-chat vscode-data-grid-row.tds-message-row div.tds-message-author #timeStamp {
@@ -107,7 +107,7 @@ div.tds-message {
 }
 
 div.tds-message+div.tds-message {
-	margin-top: 0.5em;
+	margin-top: var(--tds-ver-spacing)
 }
 
 div.tds-message p {
@@ -119,4 +119,22 @@ div.tds-message p {
 div.tds-message p+p {
 	margin-block-start: var(--tds-ver-spacing);
 	margin-block-end: 0;
+}
+
+div.tds-feedback {
+	display: flex;
+	flex-direction: row;
+	border-top: 1px dashed var(--vscode-editor-foreground);
+	margin-top: var(--tds-ver-spacing);
+	padding-top: var(--tds-ver-spacing);
+}
+
+div.tds-feedback #buttons {
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+div.tds-feedback #comment {
+	flex-grow: 0;
+	flex-shrink: 0;
 }

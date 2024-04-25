@@ -22,14 +22,16 @@ export function registerLogin(context: vscode.ExtensionContext, iaApi: IaApiInte
 
         if (session !== undefined) {
             await iaApi.start();
+
             if (await iaApi.login(session.account.id, session.accessToken)) {
                 logger.info(vscode.l10n.t('Logged in successfully'));
                 vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
-                const [_, publicKey, secretKey] = session.scopes[0].split(":");
-                feedback._start(publicKey, secretKey);
+                const [_, accessToken] = session.scopes[0].split(":");
+                feedback.start(accessToken);
+                feedback.eventLogin();
             } else {
-                logger.error(vscode.l10n.t('Failed to login'));
-                vscode.window.showErrorMessage(vscode.l10n.t("{0} Failed to login", PREFIX_GAIA));
+                logger.error(vscode.l10n.t('Failed to automatic login'));
+                vscode.window.showErrorMessage(vscode.l10n.t("{0} Failed to automatic login", PREFIX_GAIA));
             }
         };
 
