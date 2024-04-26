@@ -21,6 +21,13 @@ enum TypeFeedbackEnum {
 enum EventsFeedbackEnum {
     Login = "login",
     Logout = "logout",
+    Completion = "completion",
+    Score = "score",
+}
+
+enum ScoreEnum {
+    Negative = 0,
+    Positive = 5
 }
 
 const END_POINT: string = "https://events.dta.totvs.ai";
@@ -29,10 +36,14 @@ export class FeedbackApi extends AbstractApi {
     // prefixo _ indica envolvidas com a API CAROL
     private _authorization: string = "";
     private startDate: Date = new Date(); //apenas para evitar erro sintaxe, atribuído em #eventLogin
+    private traceId: string = "";
+    private user: LoggedUser | undefined = undefined;
 
-    private traceMap: Record<EventsFeedbackEnum, any> = {
-        "login": {},
-        "logout": {}
+    private _traceMap: Record<EventsFeedbackEnum, string> = {
+        "login": "",
+        "logout": "",
+        "completion": "",
+        "score": "",
     };
 
     /**
@@ -52,13 +63,13 @@ export class FeedbackApi extends AbstractApi {
         return vscode.env.sessionId;
     };
 
-    start(accessToken: string): Promise<boolean> {
+    async start(accessToken: string): Promise<boolean> {
         this._authorization = accessToken;
         this._authorization = Buffer.from("pk-lf-b1633e3c-c038-4dbe-af55-82bf21be0fd5:sk-lf-bdad2a8c-f646-4ab6-886a-66401033cc48").toString("base64");
 
         logger.info(vscode.l10n.t("Logging Service is using [{0}]", this.apiRequest));
 
-        return Promise.resolve(true)
+        return Promise.resolve(true);
     }
 
     async stop(): Promise<boolean> {
@@ -89,14 +100,18 @@ export class FeedbackApi extends AbstractApi {
     * @param data - Additional data to include in the feedback event.
     * @returns An object containing the batch information for the feedback event.
     */
-    private initBatchBody(type: TypeFeedbackEnum, event: EventsFeedbackEnum, data: { [key: string]: any }): { [key: string]: any } {
+    private initBatchBody(type: TypeFeedbackEnum, event: EventsFeedbackEnum, data: { [key: string]: any }, parentTrace?: string): { [key: string]: any } {
         data["sessionId"] = this.sessionId;
+
+        if (this.traceId !== "") {
+            data["traceId"] = parentTrace ? parentTrace : this.traceId;
+        }
 
         return {
             "batch": [
                 {
                     "type": type,
-                    "id": `${event}_id_${randomUUID()}`,
+                    "id": this.traceId !== "" ? `${event}_id_${randomUUID()}` : `trace_id_${randomUUID()}`,
                     "timestamp": new Date().toISOString(),
                     "body": data
                 }
@@ -104,33 +119,97 @@ export class FeedbackApi extends AbstractApi {
         }
     }
 
+    async createTrace(): Promise<boolean> {
+        logger.profile("createTrace");
+        let result: boolean = false;
+
+        if (this._authorization.length > 0) {
+            this.user = getGaiaUser();
+
+            if (this.user) {
+                this.startDate = new Date();
+
+                const gaiaExt: vscode.Extension<any> | undefined = vscode.extensions.getExtension("TOTVS.tds-gaia");
+                const tdsExt: vscode.Extension<any> | undefined = vscode.extensions.getExtension("TOTVS.tds-vscode");
+                let body: any = {
+                    "batch": [
+                        {
+                            "type": "trace-create",
+                            "id": `trace_id_${randomUUID()}`,
+                            "timestamp": "2024-15-04T02:20:00.000Z",
+                            "body": {
+                                "id": `trace_id_${randomUUID()}`,
+                                "sessionId": this.sessionId,
+                                "name": PREFIX_GAIA,
+                                "userId": this.user.email,
+                                // "input": "some input events",
+                                // "output": "some output events",
+                                "metadata": {
+                                    "email": this.user.email,
+                                    "company": this.user.orgs?.join(",") || "",
+                                    "gaiaVersion": gaiaExt?.packageJSON.version || "unavailable",
+                                    "tdsVersion": tdsExt?.packageJSON.version || "unavailable",
+                                },
+                            }
+                        }
+                    ]
+                }
+
+                const response: any = await this.jsonRequest("POST", "", {}, body);
+                if (response.errors.length > 0) {
+                    logger.error("createTrace: errors", response["errors"]);
+                } else if (response.successes) {
+                    this.traceId = response.successes[0].id;
+                    result = true;
+                } else {
+                    logger.error("createTrace: unexpected response");
+                    logger.error(response);
+                }
+                //});
+            } else {
+                logger.error("createTrace: user not found");
+            }
+        }
+
+        if (!result) {
+            this.traceId = "";
+            this._authorization = ""; //evita novas chamadas deste e demais eventos
+        }
+
+        logger.profile("createTrace");
+
+        return Promise.resolve(result);
+    }
+
     /**
     * Logs the user's login event to the feedback API.
     * @returns A Promise that resolves to a boolean indicating whether the login event was successfully logged.
     */
-    eventLogin(): Promise<boolean> {
-        return new Promise((resolve, reject) => {
+    async eventLogin(): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
             logger.profile("eventLogin");
             let result: boolean = false;
 
             if (this._authorization.length > 0) {
-                const user: LoggedUser | undefined = getGaiaUser();
+                if (this.traceId == "") {
+                    await this.createTrace();
+                }
 
-                if (user) {
+                if (this.user) {
                     this.startDate = new Date();
 
                     const gaiaExt: vscode.Extension<any> | undefined = vscode.extensions.getExtension("TOTVS.tds-gaia");
                     const tdsExt: vscode.Extension<any> | undefined = vscode.extensions.getExtension("TOTVS.tds-vscode");
-                    let body: any = this.initBatchBody(TypeFeedbackEnum.TraceCreate,
+                    let body: any = this.initBatchBody(TypeFeedbackEnum.EventCreate,
                         EventsFeedbackEnum.Login,
                         {
-                            "name": PREFIX_GAIA,
-                            "userId": user.email,
-                            // "input": "",
+                            "name": EventsFeedbackEnum.Login,
+                            "userId": this.user.email,
+                            // "input": this.user.email,
                             // "output": "",
                             "metadata": {
-                                "email": user.email,
-                                "company": user.orgs?.join(",") || "",
+                                "email": this.user.email,
+                                "company": this.user.orgs?.join(",") || "",
                                 "gaiaVersion": gaiaExt?.packageJSON.version || "unavailable",
                                 "tdsVersion": tdsExt?.packageJSON.version || "unavailable",
                             }
@@ -141,7 +220,7 @@ export class FeedbackApi extends AbstractApi {
                             logger.error("eventLogin: errors", response["errors"]);
                             reject(new Error("eventLogin: errors"));
                         } else if (response.successes) {
-                            this.traceMap[EventsFeedbackEnum.Login] = body.metadata;
+                            //this._traceMap[EventsFeedbackEnum.Login] = response.successes[0].id;
                             resolve(response.successes);
                         } else {
                             logger.error("eventLogin: unexpected response");
@@ -168,22 +247,18 @@ export class FeedbackApi extends AbstractApi {
             let result: boolean = false;
 
             if (this._authorization.length > 0) {
-                const user: LoggedUser | undefined = getGaiaUser();
-
-                if (user) {
+                if (this.user) {
                     const endDate: Date = new Date();
-
-                    console.log(this.traceMap[EventsFeedbackEnum.Login]);
 
                     let body: any = this.initBatchBody(TypeFeedbackEnum.EventCreate,
                         EventsFeedbackEnum.Logout,
                         {
                             "name": PREFIX_GAIA,
-                            "userId": user.email,
+                            "userId": this.user.email,
                             // "input": "",
                             // "output": "",
                             "metadata": {
-                                ...this.traceMap[EventsFeedbackEnum.Login],
+                                //...this.traceMap[EventsFeedbackEnum.Login],
                                 "start": this.startDate.toISOString(),
                                 "end": endDate.toISOString(),
                                 "duration": (endDate.getMilliseconds() - this.startDate.getMilliseconds()) / 1000 //segundos,
@@ -193,14 +268,11 @@ export class FeedbackApi extends AbstractApi {
                     //body.batch.id = this.traceMap[EventsFeedbackEnum.Login];
 
                     await this.jsonRequest("POST", "", {}, body).then((response: any) => {
-                        console.log("***********************************");
-                        console.dir(response);
-                        
                         if (response.errors.length > 0) {
-                            logger.error("eventLogin: errors", response["errors"]);
-                            reject(new Error("eventLogin: errors"));
+                            logger.error("eventLogout: errors", response["errors"]);
+                            reject(new Error("eventLogout: errors"));
                         } else if (response.successes) {
-                            this.traceMap[EventsFeedbackEnum.Login] = response.successes.id;
+                            //this.traceMap[EventsFeedbackEnum.Login] = response.successes.id;
                             resolve(response.successes);
                         } else {
                             logger.error("eventLogin: unexpected response");
@@ -209,28 +281,120 @@ export class FeedbackApi extends AbstractApi {
                         }
                     });
                 } else {
+                    logger.error("eventLogout: user not found");
+                    this._authorization = ""; //evita novas chamadas deste e demais eventos
+                    reject(new Error("eventLogin: user not found"));
+                }
+            }
+
+            this.user = undefined;
+            this.traceId = "";
+
+            logger.profile("eventLogout");
+            return result;
+        });
+    }
+
+    eventCompletion(argument: { selected: number, completions: Completion[]; textBefore: string; textAfter: string; }) {
+
+        return new Promise(async (resolve, reject) => {
+            logger.profile("eventCompletion");
+            let result: boolean = false;
+
+            if (this._authorization.length > 0) {
+                if (this.traceId == "") {
+                    await this.createTrace();
+                }
+
+                if (this.user) {
+                    let body: any = this.initBatchBody(TypeFeedbackEnum.TraceCreate,
+                        EventsFeedbackEnum.Completion,
+                        {
+                            "name": EventsFeedbackEnum.Completion,
+                            "userId": this.user.email,
+                            "input": JSON.stringify({
+                                textBefore: argument.textBefore,
+                                textAfter: argument.textAfter
+                            }, undefined, 2),
+                            "output": JSON.stringify({
+                                completions: argument.completions,
+                            }, undefined, 2),
+                            "metadata": {
+                                "selected": argument.selected,
+                            }
+                        });
+
+                    this._traceMap[EventsFeedbackEnum.Completion] = "";
+                    this.jsonRequest("POST", "", {}, body).then((response: any) => {
+                        if (response.errors.length > 0) {
+                            logger.error("eventCompletion: errors", response["errors"]);
+                            reject(new Error("eventCompletion: errors"));
+                        } else if (response.successes) {
+                            this._traceMap[EventsFeedbackEnum.Completion] = response.successes[0].id;
+                            this.createScore(
+                                this._traceMap[EventsFeedbackEnum.Completion],
+                                argument.selected == -1 ? ScoreEnum.Negative : ScoreEnum.Positive,
+                                argument.completions[argument.selected].generated_text || "<no suggestion>"
+                            );
+                            resolve(response.successes);
+                        } else {
+                            logger.error("eventLogin: unexpected response");
+                            logger.error(response);
+                            reject(new Error("Invalid response"));
+                        }
+                    });
+
+
+                    result = true;
+                } else {
                     logger.error("eventLogin: user not found");
                     this._authorization = ""; //evita novas chamadas deste e demais eventos
                     reject(new Error("eventLogin: user not found"));
                 }
             }
-            this._authorization = "";
 
-            logger.profile("eventLogin");
+            logger.profile("eventCompletion");
             return result;
         });
     }
 
-    eventCompletion(arg0: { completion: Completion; textBefore: string; textAfter: string; }) {
+    private createScore(traceId: string, score: number, comment: string): boolean {
         logger.profile("eventCompletion");
-        //if (completions !== undefined) {
-        //             if (completions.completion !== undefined) {
-        //                 let generatedText = completions.completion.generated_text;
-        //             }
-        //             let textBefore = completions.textBefore;
-        //             let textAfter = completions.textAfter;
-        //         }
-        logger.profile("eventCompletion");
+        let result: boolean = false;
+
+        if (this.user) {
+            let body: any = this.initBatchBody(TypeFeedbackEnum.ScoreCreate,
+                EventsFeedbackEnum.Score,
+                {
+                    "name": PREFIX_GAIA,
+                    "traceId": traceId,
+                    "value": score,
+                    "comment": comment
+                },
+                traceId);
+
+            this.jsonRequest("POST", "", {}, body).then((response: any) => {
+                if (response.errors.length > 0) {
+                    logger.error("createScore: errors", response["errors"]);
+                } else if (response.successes) {
+                    //this._traceMap[EventsFeedbackEnum.Completion] = response.successes[0].id;
+                } else {
+                    logger.error("createScore: unexpected response");
+                    logger.error(response);
+                    //reject(new Error("Invalid response"));
+                }
+            });
+
+            result = true;
+        } else {
+            logger.error("createScore: user not found");
+            this._authorization = ""; //evita novas chamadas deste e demais eventos
+            //reject(new Error("eventLogin: user not found"));
+        }
+
+
+        logger.profile("createScore");
+        return result;
     }
 
     eventGeneric(data: any) {

@@ -209,7 +209,7 @@ export class AbstractApi {
                 this.logError(url, result, bodyResp);
             } else {
                 this.logResponse(url, bodyResp);
-                if (resp.headers.get("content-type") == "application/json") {
+                if (resp.headers.get("content-type")?.startsWith("application/json")) {
                     try {
                         result = JSON.parse(bodyResp);
                     } catch (error) {
