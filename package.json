@@ -135,6 +135,12 @@
           "command": "tds-gaia.infer",
           "when": "webviewId == 'tds-gaia-view' && tds-gaia.logged"
         }
+      ],
+      "commandPalette": [
+        {
+          "command": "tds-gaia.afterInsert",
+          "when": "1 == 0"
+        }
       ]
     },
     "commands": [
@@ -256,10 +262,12 @@
             ],
             "default": [
               {
-                "language": "advpl"
+                "language": "advpl",
+                "scheme": "file"
               },
               {
-                "language": "advpl-asp"
+                "language": "advpl-asp",
+                "scheme": "file"
               }
             ],
             "description": "Filter documents to enable suggestions for"
@@ -326,27 +334,6 @@
               "Depuração",
               "Detalhado",
               "Requisições HTTP",
-              "Informações",
-              "Avisos",
-              "Erros"
-            ]
-          },
-          "tds-gaia.trace": {
-            "type": "string",
-            "enum": [
-              "off",
-              "trace",
-              "debug",
-              "info",
-              "warning",
-              "error"
-            ],
-            "default": "info",
-            "description": "Nível de severidade mínima a ser apresentada no console da extensão.",
-            "enumDescriptions": [
-              "Desligado (não recomendado)",
-              "Rastreamento",
-              "Depuração",
               "Informações",
               "Avisos",
               "Erros"

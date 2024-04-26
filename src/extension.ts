@@ -20,14 +20,13 @@ import { IaApiInterface } from './api/interfaceApi';
 import { CarolApi } from './api/carolApi';
 import { ChatViewProvider } from './panels/chatViewProvider';
 import { ChatApi } from './api/chatApi';
-//import { GaiaCodeLensProvider } from './codeLens';
 import { PREFIX_GAIA, logger } from './logger';
-import { InlineCompletionItemProvider } from './completionItemProvider';
 import { registerIaCommands } from './commands/IA/index';
 import { registerChatCommands } from './commands/chat';
 import { registerAuthentication } from './authenticationProvider';
 import { FeedbackApi } from './api/feedBackApi';
 import { updateContextKey } from './util';
+import { registerInlineCompletionItemProvider } from './completionItemProvider';
 
 let ctx: vscode.ExtensionContext;
 
@@ -51,8 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
 	registerAuthentication(context)
 	registerIaCommands(context, iaApi, chatApi);
 	registerChatCommands(context, chatApi);
-
-	InlineCompletionItemProvider.register(context);
+	registerInlineCompletionItemProvider(context);
 
 	// Register TDS-Gaia CodeLens provider
 	// let codeLensProviderDisposable = vscode.languages.registerCodeLensProvider(

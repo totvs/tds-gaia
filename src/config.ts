@@ -61,15 +61,9 @@ export type TGaiaConfig = {
   maxSuggestions: number;
   tryAutoReconnection: number;
 
-  trace: {
-    server: string | undefined
-  }
-
-  //deprecated: used in HF Api
-  maxNewTokens: number;
-  temperature: number;
-  top_p: number;
-  top_k: number;
+  // trace: {
+  //   server: string | undefined
+  // }
 }
 
 export type TGaiaCustomConfig = {
