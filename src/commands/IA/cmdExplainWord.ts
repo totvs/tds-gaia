@@ -24,14 +24,14 @@ export function registerExplainWord(context: vscode.ExtensionContext, iaApi: IaA
 
                 if (wordToExplain.length > 0) {
                     const messageId: string = chatApi.gaia(
-                        vscode.l10n.t("Explaining Word \'{0}\'", whatExplain)
+                        vscode.l10n.t("Explaining Word \'{0}\'", whatExplain), {}
                     );
 
                     return iaApi.explainCode(wordToExplain).then((value: string) => {
                         if (getGaiaConfiguration().clearBeforeExplain) {
-                            chatApi.gaia("clear");
+                            chatApi.gaia("clear", {});
                         }
-                        chatApi.gaia(value, messageId);
+                        chatApi.gaia(value, { answeringId: messageId, canFeedback: true });
                     });
                 } else {
                     chatApi.gaiaWarning("I couldn't identify a word to explain it.");

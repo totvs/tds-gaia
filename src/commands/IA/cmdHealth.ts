@@ -27,7 +27,7 @@ export function registerHealth(context: vscode.ExtensionContext, iaApi: IaApiInt
 
         let messageId: string = "";
         if (attempt == 1) {
-            messageId = chatApi.gaia(vscode.l10n.t("Verifying service availability."));
+            messageId = chatApi.gaia(vscode.l10n.t("Verifying service availability."), {});
         }
 
         return new Promise((resolve, reject) => {
@@ -51,7 +51,7 @@ export function registerHealth(context: vscode.ExtensionContext, iaApi: IaApiInt
                         if (attempt == 1) {
                             message.push(`\'${parts[1]}\'`);
                         }
-                        chatApi.gaia(message);
+                        chatApi.gaia(message, {});
 
                         if ((attempt <= totalAttempts) && (time !== null)) {
                             tryAgain(attempt, totalAttempts, Number.parseInt(time[1])).then(
@@ -67,10 +67,10 @@ export function registerHealth(context: vscode.ExtensionContext, iaApi: IaApiInt
                             chatApi.gaia([
                                 vscode.l10n.t("Sorry, even after **{0} attempts**, I still have technical difficulties.", totalAttempts),
                                 vscode.l10n.t("To restart the validation of the service, execute {0}.", chatApi.commandText("health"))
-                            ], messageId);
+                            ], { answeringId: messageId});
                         }
                     } else {
-                        chatApi.gaia(vscode.l10n.t("Available service!"), messageId);
+                        chatApi.gaia(vscode.l10n.t("Available service!"), {answeringId: messageId});
                         vscode.window.showInformationMessage(`${PREFIX_GAIA} Available service!`);
                     }
                 } else {

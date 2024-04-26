@@ -11,9 +11,9 @@ export function registerOpenManual(context: vscode.ExtensionContext, chatApi: Ch
         const title: string = args[0].title;
 
         return vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
-            chatApi.gaia(vscode.l10n.t("**{0}** opened.", title));
+            chatApi.gaia(vscode.l10n.t("**{0}** opened.", title), {});
         }, (reason) => {
-            chatApi.gaia(vscode.l10n.t("It was not possible to open **{0}**.", title));
+            chatApi.gaia(vscode.l10n.t("It was not possible to open **{0}**.", title), {});
             logger.error(reason);
         });
     });

@@ -188,7 +188,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                     "Sorry.I didn't understand this command.",
                     `\`${msg}\``,
                     vscode.l10n.t("Please open a {0}. That way I can investigate this issue better.", chatApi.commandText("open_issue"))
-                  ], "");
+                  ], {});
                   logger.warn(msg);
                 }
               }
@@ -202,7 +202,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
               .filter((msg: TMessageModel) => msg.messageId == data.messageId)
               .forEach((msg: TMessageModel) => {
                 msg.feedback = false;
-                feedback.eventGeneric({ message: msg.message, ...data });
+                feedback.eventInferTypes(msg.messageId, [], Number.parseInt(data.value), vscode.l10n.t("Scoring the chat message"));
               });
 
             this.sendUpdateModel(this.chatModel, undefined);

@@ -68,7 +68,7 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
      */
     public async createSession(scopes: string[]): Promise<vscode.AuthenticationSession> {
         try {
-            const [_, accessTokens, feedBackPK, feedBackSK] = await this.login();
+            const [_, accessTokens, feedbackPK, feedbackSK] = await this.login();
             if (accessTokens.length < 2) {
                 throw new Error(vscode.l10n.t(`${AUTH_NAME} invalid credentials)`));
             }
@@ -85,7 +85,7 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
                 scopes: [
                     //pk-lf-b1633e3c-c038-4dbe-af55-82bf21be0fd5
                     //sk-lf-bdad2a8c-f646-4ab6-886a-66401033cc48
-                    `feedback:${Buffer.from(`pk-lf-${feedBackPK}:sk-lf-${feedBackSK}`).toString("base64")}}`
+                    `feedback:${feedbackPK}:${feedbackSK}`
                 ]
             };
 
@@ -226,8 +226,8 @@ export function registerAuthentication(context: vscode.ExtensionContext) {
                 const session: vscode.AuthenticationSession | undefined = await getGaiaSession();
 
                 if (session) {
-                    const [_, feedbackToken] = session.scopes[0].split(":");
-                    feedback.start(feedbackToken);
+                    const [_, publicKey, secretKey] = session.scopes[0].split(":");
+                    feedback.start(publicKey, secretKey);
                     feedback.eventLogin();
                 } else {
                     vscode.commands.executeCommand('tds-gaia.logout');

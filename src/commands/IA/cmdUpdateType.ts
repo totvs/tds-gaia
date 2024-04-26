@@ -1,10 +1,11 @@
 import * as vscode from "vscode";
 import { InferData, dataCache } from "../../dataCache";
 import { getSymbols } from "../utilCommands";
-import { chatApi } from "../../extension";
+import { chatApi, feedback } from "../../extension";
 import { buildInferText } from "../buildInferText";
 import { InferType } from "../../api/interfaceApi";
 import { TBuildInferTextReturn, TGetSymbolsReturn } from "../resultStruct";
+import { ScoreEnum } from "../../api/xfeedbackApi";
 
 /**
 * Registers a command to update the variables type of the current document.
@@ -30,8 +31,9 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
 
         //inferData.types = inferData.types;
         dataCache.set(messageId, inferData);
-        chatApi.gaiaUpdateMessage(messageId, text);
-
+        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: true });
+        feedback.eventInferTypes(messageId, inferTypes, ScoreEnum.Positive,
+            vscode.l10n.t("User accept all typification"), true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.updateTypify', async (...args) => {
@@ -50,7 +52,9 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
         const text: string[] = buildInferTextReturn.text;
 
         dataCache.set(messageId, inferData);
-        chatApi.gaiaUpdateMessage(messageId, text);
+        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: true });
+        feedback.eventInferTypes(messageId, inferTypes, ScoreEnum.Positive,
+            vscode.l10n.t("User accept some typification"), false);
     }));
 }
 

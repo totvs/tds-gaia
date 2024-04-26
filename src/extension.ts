@@ -24,9 +24,9 @@ import { PREFIX_GAIA, logger } from './logger';
 import { registerIaCommands } from './commands/IA/index';
 import { registerChatCommands } from './commands/chat';
 import { registerAuthentication } from './authenticationProvider';
-import { FeedbackApi } from './api/feedBackApi';
 import { updateContextKey } from './util';
 import { registerInlineCompletionItemProvider } from './completionItemProvider';
+import { FeedbackApi } from './api/xfeedbackApi';
 
 let ctx: vscode.ExtensionContext;
 

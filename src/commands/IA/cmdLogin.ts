@@ -26,8 +26,8 @@ export function registerLogin(context: vscode.ExtensionContext, iaApi: IaApiInte
             if (await iaApi.login(session.account.id, session.accessToken)) {
                 logger.info(vscode.l10n.t('Logged in successfully'));
                 vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
-                const [_, accessToken] = session.scopes[0].split(":");
-                feedback.start(accessToken);
+                const [_, publicKey, secretKey] = session.scopes[0].split(":");
+                feedback.start(publicKey, secretKey);
                 feedback.eventLogin();
             } else {
                 logger.error(vscode.l10n.t('Failed to automatic login'));

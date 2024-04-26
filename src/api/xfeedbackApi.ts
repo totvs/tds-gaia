@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import { LoggedUser, getGaiaUser } from "../config";
-import { Completion, AbstractApi } from "./interfaceApi";
+import { Completion, AbstractApi, InferType } from "./interfaceApi";
 import { PREFIX_GAIA, logger } from "../logger";
 import { randomUUID } from "crypto";
 
@@ -23,9 +23,10 @@ enum EventsFeedbackEnum {
     Logout = "logout",
     Completion = "completion",
     Score = "score",
+    Infer = "infer",
 }
 
-enum ScoreEnum {
+export enum ScoreEnum {
     Negative = 0,
     Positive = 5
 }
@@ -33,18 +34,18 @@ enum ScoreEnum {
 const END_POINT: string = "https://events.dta.totvs.ai";
 
 export class FeedbackApi extends AbstractApi {
-    // prefixo _ indica envolvidas com a API CAROL
-    private _authorization: string = "";
+    private authorization: string = "";
     private startDate: Date = new Date(); //apenas para evitar erro sintaxe, atribuído em #eventLogin
     private traceId: string = "";
     private user: LoggedUser | undefined = undefined;
-
-    private _traceMap: Record<EventsFeedbackEnum, string> = {
+    private traceMap: Record<EventsFeedbackEnum, string> = {
         "login": "",
         "logout": "",
         "completion": "",
         "score": "",
+        "infer": "",
     };
+    private feedbackMap: Record<string, string> = {};
 
     /**
      * Constructor for FeedbackApi class.
@@ -63,9 +64,10 @@ export class FeedbackApi extends AbstractApi {
         return vscode.env.sessionId;
     };
 
-    async start(accessToken: string): Promise<boolean> {
-        this._authorization = accessToken;
-        this._authorization = Buffer.from("pk-lf-b1633e3c-c038-4dbe-af55-82bf21be0fd5:sk-lf-bdad2a8c-f646-4ab6-886a-66401033cc48").toString("base64");
+    async start(publicKey: string, secretKey: string): Promise<boolean> {
+        //this.authorization = accessToken;
+        //this.authorization = Buffer.from("pk-lf-b1633e3c-c038-4dbe-af55-82bf21be0fd5:sk-lf-bdad2a8c-f646-4ab6-886a-66401033cc48").toString("base64");
+        this.authorization = Buffer.from(`pk-lf-${publicKey}:sk-lf-${secretKey}`).toString("base64");
 
         logger.info(vscode.l10n.t("Logging Service is using [{0}]", this.apiRequest));
 
@@ -73,7 +75,8 @@ export class FeedbackApi extends AbstractApi {
     }
 
     async stop(): Promise<boolean> {
-        this._authorization = "";
+        this.authorization = "";
+        this.user = undefined;
 
         return Promise.resolve(true);
     }
@@ -88,7 +91,7 @@ export class FeedbackApi extends AbstractApi {
     * @returns A Promise that resolves to the response JSON data format or an Error if the request fails.
     */
     protected async jsonRequest(method: "GET" | "POST", url: string, headers: Record<string, string>, data: any): Promise<{} | Error> {
-        headers["authorization"] = `Basic ${this._authorization}`
+        headers["authorization"] = `Basic ${this.authorization}`
 
         return super.jsonRequest(method, url, headers, data);
     }
@@ -102,6 +105,7 @@ export class FeedbackApi extends AbstractApi {
     */
     private initBatchBody(type: TypeFeedbackEnum, event: EventsFeedbackEnum, data: { [key: string]: any }, parentTrace?: string): { [key: string]: any } {
         data["sessionId"] = this.sessionId;
+        data["id"] = `${event}_id_${randomUUID()}`;
 
         if (this.traceId !== "") {
             data["traceId"] = parentTrace ? parentTrace : this.traceId;
@@ -111,7 +115,7 @@ export class FeedbackApi extends AbstractApi {
             "batch": [
                 {
                     "type": type,
-                    "id": this.traceId !== "" ? `${event}_id_${randomUUID()}` : `trace_id_${randomUUID()}`,
+                    "id": "XX" + this.traceId !== "" ? `${event}_id_${randomUUID()}` : `trace_id_${randomUUID()}`,
                     "timestamp": new Date().toISOString(),
                     "body": data
                 }
@@ -123,7 +127,7 @@ export class FeedbackApi extends AbstractApi {
         logger.profile("createTrace");
         let result: boolean = false;
 
-        if (this._authorization.length > 0) {
+        if (this.authorization.length > 0) {
             this.user = getGaiaUser();
 
             if (this.user) {
@@ -136,7 +140,7 @@ export class FeedbackApi extends AbstractApi {
                         {
                             "type": "trace-create",
                             "id": `trace_id_${randomUUID()}`,
-                            "timestamp": "2024-15-04T02:20:00.000Z",
+                            "timestamp": new Date().toISOString(),
                             "body": {
                                 "id": `trace_id_${randomUUID()}`,
                                 "sessionId": this.sessionId,
@@ -173,7 +177,7 @@ export class FeedbackApi extends AbstractApi {
 
         if (!result) {
             this.traceId = "";
-            this._authorization = ""; //evita novas chamadas deste e demais eventos
+            this.authorization = ""; //evita novas chamadas deste e demais eventos
         }
 
         logger.profile("createTrace");
@@ -190,7 +194,7 @@ export class FeedbackApi extends AbstractApi {
             logger.profile("eventLogin");
             let result: boolean = false;
 
-            if (this._authorization.length > 0) {
+            if (this.authorization.length > 0) {
                 if (this.traceId == "") {
                     await this.createTrace();
                 }
@@ -230,7 +234,7 @@ export class FeedbackApi extends AbstractApi {
                     });
                 } else {
                     logger.error("eventLogin: user not found");
-                    this._authorization = ""; //evita novas chamadas deste e demais eventos
+                    this.authorization = ""; //evita novas chamadas deste e demais eventos
                     reject(new Error("eventLogin: user not found"));
                 }
             }
@@ -246,7 +250,7 @@ export class FeedbackApi extends AbstractApi {
             logger.profile("eventLogout");
             let result: boolean = false;
 
-            if (this._authorization.length > 0) {
+            if (this.authorization.length > 0) {
                 if (this.user) {
                     const endDate: Date = new Date();
 
@@ -282,7 +286,7 @@ export class FeedbackApi extends AbstractApi {
                     });
                 } else {
                     logger.error("eventLogout: user not found");
-                    this._authorization = ""; //evita novas chamadas deste e demais eventos
+                    this.authorization = ""; //evita novas chamadas deste e demais eventos
                     reject(new Error("eventLogin: user not found"));
                 }
             }
@@ -301,7 +305,7 @@ export class FeedbackApi extends AbstractApi {
             logger.profile("eventCompletion");
             let result: boolean = false;
 
-            if (this._authorization.length > 0) {
+            if (this.authorization.length > 0) {
                 if (this.traceId == "") {
                     await this.createTrace();
                 }
@@ -324,15 +328,15 @@ export class FeedbackApi extends AbstractApi {
                             }
                         });
 
-                    this._traceMap[EventsFeedbackEnum.Completion] = "";
+                    this.traceMap[EventsFeedbackEnum.Completion] = "";
                     this.jsonRequest("POST", "", {}, body).then((response: any) => {
                         if (response.errors.length > 0) {
                             logger.error("eventCompletion: errors", response["errors"]);
                             reject(new Error("eventCompletion: errors"));
                         } else if (response.successes) {
-                            this._traceMap[EventsFeedbackEnum.Completion] = response.successes[0].id;
+                            this.traceMap[EventsFeedbackEnum.Completion] = response.successes[0].id;
                             this.createScore(
-                                this._traceMap[EventsFeedbackEnum.Completion],
+                                this.traceMap[EventsFeedbackEnum.Completion],
                                 argument.selected == -1 ? ScoreEnum.Negative : ScoreEnum.Positive,
                                 argument.completions[argument.selected].generated_text || "<no suggestion>"
                             );
@@ -348,7 +352,7 @@ export class FeedbackApi extends AbstractApi {
                     result = true;
                 } else {
                     logger.error("eventLogin: user not found");
-                    this._authorization = ""; //evita novas chamadas deste e demais eventos
+                    this.authorization = ""; //evita novas chamadas deste e demais eventos
                     reject(new Error("eventLogin: user not found"));
                 }
             }
@@ -375,7 +379,7 @@ export class FeedbackApi extends AbstractApi {
 
             this.jsonRequest("POST", "", {}, body).then((response: any) => {
                 if (response.errors.length > 0) {
-                    logger.error("createScore: errors", response["errors"]);
+                    logger.error("createScore: errors\n%s", response["errors"]);
                 } else if (response.successes) {
                     //this._traceMap[EventsFeedbackEnum.Completion] = response.successes[0].id;
                 } else {
@@ -388,18 +392,91 @@ export class FeedbackApi extends AbstractApi {
             result = true;
         } else {
             logger.error("createScore: user not found");
-            this._authorization = ""; //evita novas chamadas deste e demais eventos
+            this.authorization = ""; //evita novas chamadas deste e demais eventos
             //reject(new Error("eventLogin: user not found"));
         }
-
 
         logger.profile("createScore");
         return result;
     }
 
-    eventGeneric(data: any) {
-        logger.profile("eventGeneric");
-        logger.profile("eventGeneric");
+    /**
+    * Traces the feedback for the given message ID.
+    *
+    * @param messageId - The ID of the message to trace feedback for.
+    * @param codeToAnalyze - The code to analyze for feedback.
+    * @param types - The types to include in the feedback.
+    * @returns 
+    */
+    traceFeedback(messageId: string, codeToAnalyze: string, types: InferType[]): void {
+        logger.profile("traceFeedback");
+
+        if (this.user) {
+            const body: any = {
+                "batch": [
+                    {
+                        "type": "trace-create",
+                        "id": `trace_id_${randomUUID()}`,
+                        "timestamp": new Date().toISOString(),
+                        "body": {
+                            "id": `trace_id_${randomUUID()}`,
+                            "sessionId": this.sessionId,
+                            "name": PREFIX_GAIA,
+                            "userId": this.user.email,
+                            "input": JSON.stringify({ code: codeToAnalyze }),
+                            "output": JSON.stringify({ types: types }),
+                        }
+                    }
+                ]
+            }
+
+            this.jsonRequest("POST", "", {}, body).then((response: any) => {
+                if (response.errors.length > 0) {
+                    logger.error("traceFeedback: errors", response["errors"]);
+                } else if (response.successes) {
+                    //this._traceMap[EventsFeedbackEnum.Completion] = response.successes[0].id;
+                    this.registerFeedback(messageId, response.successes[0].id)
+                } else {
+                    logger.error("traceFeedback: unexpected response");
+                    logger.error(response);
+                    //reject(new Error("Invalid response"));
+                }
+            });
+        } else {
+            logger.error("createScore: user not found");
+            this.authorization = ""; //evita novas chamadas deste e demais eventos
+            //reject(new Error("eventLogin: user not found"));
+        }
+
+        logger.profile("traceFeedback");
+        return;
+    }
+
+    /**
+    * Registers a feedback trace ID for the given response ID.
+    * 
+    * @param responseId - The ID of the response to register feedback for.
+    * @param traceID - The trace ID to associate with the feedback.
+    */
+    private registerFeedback(responseId: string, traceID: string) {
+        this.feedbackMap[responseId] = traceID;
+    }
+
+    eventInferTypes(messageId: string, inferTypes: InferType[], score: ScoreEnum, comment: string = "", unregister: boolean = false): void {
+        logger.profile("eventInferTypes");
+        const traceId: string = this.feedbackMap[messageId] || "";
+
+        if (traceId) {
+            this.createScore(traceId, score, `${comment} ${JSON.stringify(inferTypes)}`);
+            if (unregister) {
+                delete this.feedbackMap[messageId];
+            }
+        } else {
+            logger.error("eventInferTypes: traceId not found");
+        }
+
+        logger.profile("eventInferTypes");
 
     }
+
 }

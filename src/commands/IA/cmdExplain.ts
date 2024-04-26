@@ -33,18 +33,17 @@ export function registerExplain(context: vscode.ExtensionContext, iaApi: IaApiIn
 
             if (codeToExplain.length > 0) {
                 const messageId: string = chatApi.gaia(
-                    vscode.l10n.t("Analyzing the code for explain {0}", whatExplain)
-                );
+                    vscode.l10n.t("Analyzing the code for explain {0}", whatExplain), {});
 
                 return iaApi.explainCode(codeToExplain).then((value: string) => {
                     if (getGaiaConfiguration().clearBeforeExplain) {
-                        chatApi.gaia("clear");
+                        chatApi.gaia("clear", {});
                     }
-                    chatApi.gaia(value, messageId);
+                    chatApi.gaia(value, { canFeedback: true, answeringId: messageId });
                 });
             } else {
                 chatApi.gaiaWarning([
-                    "I couldn't identify a code to explain it.", 
+                    "I couldn't identify a code to explain it.",
                     "Try positioning the cursor in another line of implementation."
                 ]);
             }
