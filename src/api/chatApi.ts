@@ -262,7 +262,7 @@ export class ChatApi {
             operation: MessageOperationEnum.Add,
             messageId: id,
             answering: options.answeringId || "",
-            inProcess: (options.answeringId === undefined),
+            inProcess: (options.answeringId || "") === "",
             timeStamp: new Date(),
             author: "Gaia",
             message: workMessage,

@@ -17,7 +17,7 @@ limitations under the License.
 import * as vscode from "vscode";
 import { PREFIX_GAIA } from "../../logger";
 import { isGaiaLogged } from "../../config";
-import { chatApi, llmApi } from "../../api";
+import { chatApi, feedbackApi, llmApi } from "../../api";
 
 export function registerLogout(context: vscode.ExtensionContext): void {
 
@@ -27,7 +27,7 @@ export function registerLogout(context: vscode.ExtensionContext): void {
     */
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.logout', async (...args) => {
         if (isGaiaLogged()) {
-            //await feedback.eventLogout();
+            feedbackApi.eventLogout();
             chatApi.logout();
             llmApi.logout();
 

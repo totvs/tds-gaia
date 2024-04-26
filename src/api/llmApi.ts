@@ -36,7 +36,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
 
     start(): Promise<boolean> {
 
-        logger.info(vscode.l10n.t("Extension is using [{0}]", this.apiRequest));
+        logger.info(vscode.l10n.t("Gaia IA is using [{0}]", this.apiRequest));
 
         return Promise.resolve(true)
     }

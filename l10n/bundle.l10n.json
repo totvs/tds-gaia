@@ -29,7 +29,7 @@
   "Error requesting [type: {0}, url: {1}]": "Error requesting [type: {0}, url: {1}]",
   "Analyzing the code for explain {0}": "Analyzing the code for explain {0}",
   "Explaining Word '{0}'": "Explaining Word '{0}'",
-  "Extension is using [{0}]": "Extension is using [{0}]",
+  "Gaia IA is using  [{0}]": "Gaia IA is using  [{0}]",
   "Please open a {0}. That way I can investigate this issue better.": "Please open a {0}. That way I can investigate this issue better.",
   "Getting health check...": "Getting health check...",
   "Hello, **{0}**.": "Hello, **{0}**.",
