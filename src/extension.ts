@@ -16,23 +16,16 @@ limitations under the License.
 
 import * as vscode from 'vscode';
 import { getGaiaLogLevel, isGaiaLogged, isGaiaShowBanner } from './config';
-import { IaApiInterface } from './api/interfaceApi';
-import { CarolApi } from './api/carolApi';
 import { ChatViewProvider } from './panels/chatViewProvider';
-import { ChatApi } from './api/chatApi';
 import { PREFIX_GAIA, logger } from './logger';
 import { registerIaCommands } from './commands/IA/index';
 import { registerChatCommands } from './commands/chat';
 import { registerAuthentication } from './authenticationProvider';
 import { updateContextKey } from './util';
 import { registerInlineCompletionItemProvider } from './completionItemProvider';
-import { FeedbackApi } from './api/xfeedbackApi';
+import { chatApi, feedbackApi, llmApi } from './api';
 
 let ctx: vscode.ExtensionContext;
-
-export const chatApi: ChatApi = new ChatApi();
-export const iaApi: IaApiInterface = new CarolApi(chatApi);
-export const feedback: FeedbackApi = new FeedbackApi();
 
 /**
  * Activates the extension by recording the handling of commands, events and others.
@@ -48,8 +41,8 @@ export function activate(context: vscode.ExtensionContext) {
 	showBanner()
 
 	registerAuthentication(context)
-	registerIaCommands(context, iaApi, chatApi);
-	registerChatCommands(context, chatApi);
+	registerIaCommands(context);
+	registerChatCommands(context);
 	registerInlineCompletionItemProvider(context);
 
 	// Register TDS-Gaia CodeLens provider
@@ -77,8 +70,8 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 
 	return new Promise(async (value: any) => {
-		await feedback.stop();
-		await iaApi.stop();
+		await feedbackApi.stop();
+		await llmApi.stop();
 	});
 }
 

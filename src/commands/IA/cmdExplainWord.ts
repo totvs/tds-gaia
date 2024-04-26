@@ -1,9 +1,24 @@
-import * as vscode from "vscode";
-import { IaApiInterface } from '../../api/interfaceApi';
-import { ChatApi } from '../../api/chatApi';
-import { getGaiaConfiguration } from "../../config";
+/*
+Copyright 2024 TOTVS S.A
 
-export function registerExplainWord(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import * as vscode from "vscode";
+import { getGaiaConfiguration } from "../../config";
+import { chatApi, llmApi } from "../../api";
+
+export function registerExplainWord(context: vscode.ExtensionContext): void {
 
     /**
         * Registers a text editor command to explain the word under the cursor selection. 
@@ -27,7 +42,7 @@ export function registerExplainWord(context: vscode.ExtensionContext, iaApi: IaA
                         vscode.l10n.t("Explaining Word \'{0}\'", whatExplain), {}
                     );
 
-                    return iaApi.explainCode(wordToExplain).then((value: string) => {
+                    return llmApi.explainCode(wordToExplain).then((value: string) => {
                         if (getGaiaConfiguration().clearBeforeExplain) {
                             chatApi.gaia("clear", {});
                         }

@@ -20,12 +20,12 @@ import { TChatModel } from '../model/chatModel';
 import { getExtraPanelConfigurations, getWebviewContent } from './utilities/webview-utils';
 import { MessageOperationEnum, TMessageModel } from '../model/messageModel';
 import { TFieldErrors } from '../model/abstractMode';
-import { chatApi, feedback } from '../extension';
 import { TQueueMessages } from '../api/chatApi';
 import { getGaiaUser } from '../config';
 import { logger } from '../logger';
 import { highlightCode } from '../decoration';
 import { dataCache } from '../dataCache';
+import { chatApi, feedbackApi } from '../api';
 
 enum ChatCommandEnum {
 
@@ -202,7 +202,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
               .filter((msg: TMessageModel) => msg.messageId == data.messageId)
               .forEach((msg: TMessageModel) => {
                 msg.feedback = false;
-                feedback.eventInferTypes(msg.messageId, [], Number.parseInt(data.value), vscode.l10n.t("Scoring the chat message"));
+                feedbackApi.eventInferTypes(msg.messageId, [], Number.parseInt(data.value), vscode.l10n.t("Scoring the chat message"));
               });
 
             this.sendUpdateModel(this.chatModel, undefined);

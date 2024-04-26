@@ -1,13 +1,29 @@
-import * as vscode from "vscode";
-import { IaApiInterface } from '../../api/interfaceApi';
-import { ChatApi } from '../../api/chatApi';
+/*
+Copyright 2024 TOTVS S.A
 
-export function registerGenerateCode(context: vscode.ExtensionContext, iaApi: IaApiInterface,  chatApi: ChatApi): void {
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import * as vscode from "vscode";
+import { llmApi } from "../../api";
+
+export function registerGenerateCode(context: vscode.ExtensionContext): void {
 
     //o que o usuário descrever vai vim veio argumento
     context.subscriptions.push(vscode.commands.registerTextEditorCommand('tds-gaia.generateCode', () => {
         const text: string = "Gerar código para varrer um array";
-        iaApi.generateCode(text);
-    }));   
+
+        llmApi.generateCode(text);
+    }));
 
 }

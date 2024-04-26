@@ -15,11 +15,11 @@ limitations under the License.
 */
 
 import * as vscode from 'vscode';
-import { chatApi } from '../extension';
 import { InferData, dataCache } from '../dataCache';
 import { InferType } from '../api/interfaceApi';
 import { getSymbols } from './utilCommands';
 import { StatusReturnEnum, TBuildInferTextReturn, TGetSymbolsReturn } from './resultStruct';
+import { chatApi } from '../api';
 
 /**
 * Builds the text to display for inferred type information.

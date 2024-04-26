@@ -20,7 +20,6 @@ import { getGaiaUser, isGaiaFirstUse, isGaiaLogged, isGaiaReady } from "../confi
 import { Queue } from "../queue";
 import { MessageOperationEnum, TMessageModel } from "../model/messageModel";
 import { exit } from "process";
-import { feedback } from './../extension';
 
 /**
  * Defines the queue message type for chat messages.

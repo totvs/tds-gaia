@@ -1,11 +1,26 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from "vscode";
-import { IaApiInterface } from '../../api/interfaceApi';
-import { ChatApi } from '../../api/chatApi';
 import { PREFIX_GAIA, logger } from "../../logger";
 import { getGaiaConfiguration, setGaiaReady } from "../../config";
 import { promiseFromEvent, updateContextKey } from "../../util";
+import { chatApi, llmApi } from "../../api";
 
-export function registerHealth(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
+export function registerHealth(context: vscode.ExtensionContext): void {
 
     /**
      * Registers a health check command that checks the health of the Gaia service. 
@@ -33,7 +48,7 @@ export function registerHealth(context: vscode.ExtensionContext, iaApi: IaApiInt
         return new Promise((resolve, reject) => {
             const totalAttempts: number = getGaiaConfiguration().tryAutoReconnection;
 
-            iaApi.checkHealth(detail).then(async (error: any) => {
+            llmApi.checkHealth(detail).then(async (error: any) => {
                 updateContextKey("readyForUse", error === undefined);
                 setGaiaReady(error === undefined);
 
@@ -67,10 +82,10 @@ export function registerHealth(context: vscode.ExtensionContext, iaApi: IaApiInt
                             chatApi.gaia([
                                 vscode.l10n.t("Sorry, even after **{0} attempts**, I still have technical difficulties.", totalAttempts),
                                 vscode.l10n.t("To restart the validation of the service, execute {0}.", chatApi.commandText("health"))
-                            ], { answeringId: messageId});
+                            ], { answeringId: messageId });
                         }
                     } else {
-                        chatApi.gaia(vscode.l10n.t("Available service!"), {answeringId: messageId});
+                        chatApi.gaia(vscode.l10n.t("Available service!"), { answeringId: messageId });
                         vscode.window.showInformationMessage(`${PREFIX_GAIA} Available service!`);
                     }
                 } else {

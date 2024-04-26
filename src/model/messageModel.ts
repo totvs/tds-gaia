@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 import { TAbstractModel } from "./abstractMode";
-import { feedback } from './../extension';
 
 /**
 * Defines the possible operations that can be performed on a message.

@@ -17,10 +17,9 @@ limitations under the License.
 import * as vscode from "vscode";
 import { InferTypeResponse } from '../../api/interfaceApi';
 import { getGaiaConfiguration } from "../../config";
-import { chatApi, iaApi } from "../../extension";
 import { buildInferText } from "../buildInferText";
 import { TBuildInferTextReturn } from "../resultStruct";
-import { feedback } from './../../extension';
+import { chatApi, feedbackApi, llmApi } from "../../api";
 
 /**
 * Registers a command to infer types for a selected function in the active text editor.
@@ -107,7 +106,7 @@ export function registerInfer(context: vscode.ExtensionContext): void {
                         vscode.l10n.t("Analyzing the code for infer type variables. {0} ", whatAnalyze)
                         , {});
 
-                    return iaApi.inferType(codeToAnalyze).then(async (response: InferTypeResponse) => {
+                    return llmApi.inferType(codeToAnalyze).then(async (response: InferTypeResponse) => {
                         if (response !== undefined && response.types !== undefined && response.types.length) {
                             const responseId: string = chatApi.nextMessageId();
                             const buildInferTextReturn: TBuildInferTextReturn = await buildInferText(editor.document.uri, rangeForAnalyze, responseId, response.types);
@@ -115,7 +114,7 @@ export function registerInfer(context: vscode.ExtensionContext): void {
 
                             chatApi.gaia(text.join("\n"), { answeringId: messageId, canFeedback: true });
                             //chatApi.gaia(vscode.l10n.t("I think that the types are right."), { answeringId: messageId });
-                            feedback.traceFeedback(responseId, codeToAnalyze, response.types)
+                            feedbackApi.traceFeedback(responseId, codeToAnalyze, response.types)
                         } else {
                             chatApi.gaia(vscode.l10n.t("Sorry, I couldn't make the typification because of an internal problem."), { answeringId: messageId });
                         }

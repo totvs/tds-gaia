@@ -1,3 +1,19 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from "vscode";
 
 import { TGaiaConfig, getGaiaConfiguration, getGaiaUser, isGaiaLogged, setGaiaUser } from "../config";
@@ -6,21 +22,16 @@ import { Completion, CompletionResponse, AbstractApi, IaApiInterface, InferTypeR
 import { logger } from "../logger";
 import { ChatApi } from "./chatApi";
 
-export class CarolApi extends AbstractApi implements IaApiInterface {
-    // prefixo _ indica envolvidas com a API CAROL
-    private _authorization: string = "";
-    protected chat: ChatApi;
+export class LLMApi extends AbstractApi implements IaApiInterface {
+    private authorization: string = "";
 
     /**
-     * Constructor for CarolAPI class.
+     * Constructor for llmApi. class.
      * Initializes the IA API client.
      * 
-     * @param chat - ChatApi client instance
      */
-    constructor(chat: ChatApi) {
+    constructor() {
         super(`${getGaiaConfiguration().endPoint}/api`, getGaiaConfiguration().apiVersion);
-
-        this.chat = chat;
     }
 
     start(): Promise<boolean> {
@@ -44,11 +55,11 @@ export class CarolApi extends AbstractApi implements IaApiInterface {
     * @param data - The data to include in the request body (optional).
     * @returns A Promise that resolves to the response JSON data format or an Error if the request fails.
     */
-    protected async jsonRequest(method: "GET" | "POST", url: string, headers: Record<string, string>, data: any = undefined): Promise < {} | Error > {
-        headers["X-Auth"] = this._authorization;
+    protected async jsonRequest(method: "GET" | "POST", url: string, headers: Record<string, string>, data: any = undefined): Promise<{} | Error> {
+        headers["X-Auth"] = this.authorization;
 
         return super.jsonRequest(method, url, headers, data);
-}
+    }
 
     /**
      * Logs in the user and sets the Gaia user information.
@@ -61,13 +72,14 @@ export class CarolApi extends AbstractApi implements IaApiInterface {
         let result: boolean = false;
         const parts: string[] = email.split("@");
 
-        this._authorization = authorization;
+        this.authorization = authorization;
         //obter informações usuário 
         setGaiaUser({
-            id: `ID:${this._authorization}`,
+            id: `ID:${this.authorization
+                }`,
             email: email,
             name: parts[0],
-            fullname: `${capitalize(parts[0])} at ${parts.length > 1 ? capitalize(parts[1]): "<unknown>"}`,
+            fullname: `${capitalize(parts[0])} at ${parts.length > 1 ? capitalize(parts[1]) : "<unknown>"} `,
             displayName: capitalize(parts[0]),
             avatarUrl: "",
             expiration: new Date(2024, 0, 1, 0, 0, 0, 0),
@@ -92,7 +104,7 @@ export class CarolApi extends AbstractApi implements IaApiInterface {
     logout(): Promise<boolean> {
         logger.profile("logout");
         logger.info(vscode.l10n.t("Logging out..."));
-        this._authorization = "";
+        this.authorization = "";
 
         if (isGaiaLogged()) {
             setGaiaUser(undefined);

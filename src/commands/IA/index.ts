@@ -1,6 +1,20 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from "vscode";
-import { IaApiInterface } from '../../api/interfaceApi';
-import { ChatApi } from '../../api/chatApi';
 import { registerInfer } from './cmdInferType';
 import { registerExplain } from './cmdExplain';
 import { registerHealth } from "./cmdHealth";
@@ -14,18 +28,16 @@ import { registerUpdateType } from "./cmdUpdateType";
 * Registers all the IA-related commands with the VS Code extension context.
 *
 * @param context - The VS Code extension context.
-* @param iaApi - The IA API interface.
-* @param chatApi - The chat API.
 */
-export function registerIaCommands(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
+export function registerIaCommands(context: vscode.ExtensionContext): void {
 
     registerInfer(context);
     registerUpdateType(context);
 
-    registerExplain(context, iaApi, chatApi);
-    registerHealth(context, iaApi, chatApi);
-    registerLogin(context, iaApi, chatApi);
-    registerExplainWord(context, iaApi, chatApi);
-    registerLogout(context, iaApi, chatApi);
-    registerGenerateCode(context, iaApi, chatApi);
+    registerExplain(context);
+    registerHealth(context);
+    registerLogin(context);
+    registerExplainWord(context);
+    registerLogout(context);
+    registerGenerateCode(context);
 }

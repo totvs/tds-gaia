@@ -1,11 +1,25 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from "vscode";
-import { IaApiInterface } from '../../api/interfaceApi';
-import { ChatApi } from '../../api/chatApi';
 import { PREFIX_GAIA, logger } from "../../logger";
 import { GaiaAuthenticationProvider, getGaiaSession } from "../../authenticationProvider";
-import { feedback } from "../../extension";
+import { chatApi, feedbackApi, llmApi } from "../../api";
 
-export function registerLogin(context: vscode.ExtensionContext, iaApi: IaApiInterface, chatApi: ChatApi): void {
+export function registerLogin(context: vscode.ExtensionContext): void {
 
     /**
     * Registers a command with VS Code to prompt the user to login.
@@ -21,14 +35,14 @@ export function registerLogin(context: vscode.ExtensionContext, iaApi: IaApiInte
         let session: vscode.AuthenticationSession | undefined = await getGaiaSession();
 
         if (session !== undefined) {
-            await iaApi.start();
+            await llmApi.start();
 
-            if (await iaApi.login(session.account.id, session.accessToken)) {
+            if (await llmApi.login(session.account.id, session.accessToken)) {
                 logger.info(vscode.l10n.t('Logged in successfully'));
                 vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
                 const [_, publicKey, secretKey] = session.scopes[0].split(":");
-                feedback.start(publicKey, secretKey);
-                feedback.eventLogin();
+                feedbackApi.start(publicKey, secretKey);
+                feedbackApi.eventLogin();
             } else {
                 logger.error(vscode.l10n.t('Failed to automatic login'));
                 vscode.window.showErrorMessage(vscode.l10n.t("{0} Failed to automatic login", PREFIX_GAIA));

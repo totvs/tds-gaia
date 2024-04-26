@@ -18,8 +18,8 @@ import * as vscode from "vscode";
 import { delay } from "./util";
 import { TGaiaConfig, getGaiaConfiguration } from "./config";
 import { Completion, CompletionResponse } from "./api/interfaceApi";
-import { feedback, iaApi } from "./extension"
 import { logger } from "./logger";
+import { llmApi, feedbackApi } from "./api";
 
 let textBeforeCursor: string = "";
 let textAfterCursor: string = "";
@@ -74,7 +74,7 @@ export function registerInlineCompletionItemProvider(context: vscode.ExtensionCo
                 textAfterCursor = document.getText().substring(offset + 1);
 
                 const response: CompletionResponse =
-                    await iaApi.getCompletions(textBeforeCursor, textAfterCursor);
+                    await llmApi.getCompletions(textBeforeCursor, textAfterCursor);
                 const items: vscode.InlineCompletionItem[] = [];
 
                 if (response !== undefined && response.completions.length) {
@@ -119,7 +119,7 @@ export function registerInlineCompletionItemProvider(context: vscode.ExtensionCo
     vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
 
     const afterInsert = vscode.commands.registerCommand('tds-gaia.afterInsert', async (selectedIndex: number, completions: Completion[]) => {
-        feedback.eventCompletion({ selected: selectedIndex - 1, completions: completions, textBefore: textBeforeCursor, textAfter: textAfterCursor });
+        feedbackApi.eventCompletion({ selected: selectedIndex - 1, completions: completions, textBefore: textBeforeCursor, textAfter: textAfterCursor });
     });
     context.subscriptions.push(afterInsert);
 }

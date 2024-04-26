@@ -17,9 +17,9 @@ limitations under the License.
 import * as vscode from "vscode";
 import { Disposable } from "vscode";
 import { PromiseAdapter, promiseFromEvent } from "./util";
-import { feedback, iaApi } from "./extension";
 import { LoggedUser, getGaiaUser } from "./config";
 import { randomUUID } from "crypto";
+import { feedbackApi, llmApi } from "./api";
 
 const AUTH_TYPE: string = "auth-gaia";
 const AUTH_NAME: string = "Gaia";
@@ -141,9 +141,9 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
                 placeHolder: vscode.l10n.t('Your token goes here...')
             }).then(async input => {
                 if (input !== undefined) {
-                    if (await iaApi.start()) {
+                    if (await llmApi.start()) {
                         const [email, accessToken, publicKey, secretKey] = input.split(":");
-                        if (await iaApi.login(email, accessToken)) {
+                        if (await llmApi.login(email, accessToken)) {
                             return [email, accessToken, publicKey, secretKey];
                         } else {
                             return ["", "", "", ""];
@@ -227,8 +227,8 @@ export function registerAuthentication(context: vscode.ExtensionContext) {
 
                 if (session) {
                     const [_, publicKey, secretKey] = session.scopes[0].split(":");
-                    feedback.start(publicKey, secretKey);
-                    feedback.eventLogin();
+                    feedbackApi.start(publicKey, secretKey);
+                    feedbackApi.eventLogin();
                 } else {
                     vscode.commands.executeCommand('tds-gaia.logout');
                 }
