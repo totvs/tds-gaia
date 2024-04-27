@@ -30,7 +30,6 @@ export interface IFeedbackProps { //extends TMessageModel {
 
 export default function Feedback(props: IFeedbackProps): any {
     const [feedbackSubmitted, setFeedbackSubmitted] = useState('')
-
     const onFeedbackBtnSubmit = useCallback(
         (text: string, value: string) => {
             props.feedbacksOnSubmit(text, value)
@@ -38,6 +37,11 @@ export default function Feedback(props: IFeedbackProps): any {
         },
         [props.feedbacksOnSubmit]
     )
+
+    const moreProps: any = {}
+    if ((props.disabled !== undefined) && (props.disabled)) {
+        moreProps["disabled"] = true;
+    }
 
     return (
         <div className="tds-feedback">
@@ -47,6 +51,7 @@ export default function Feedback(props: IFeedbackProps): any {
                 appearance="icon"
                 type="button"
                 onClick={() => onFeedbackBtnSubmit('positive', '5')}
+                {...moreProps}
             >
                 <i className="codicon codicon-thumbsup-filled" />
             </VSCodeButton>
@@ -55,6 +60,7 @@ export default function Feedback(props: IFeedbackProps): any {
                 appearance="icon"
                 type="button"
                 onClick={() => onFeedbackBtnSubmit('negative', '2.5')}
+                {...moreProps}
             >
                 <i className="codicon codicon-arrow-both" />
             </VSCodeButton>
@@ -63,6 +69,7 @@ export default function Feedback(props: IFeedbackProps): any {
                 appearance="icon"
                 type="button"
                 onClick={() => onFeedbackBtnSubmit('negative', '0')}
+                {...moreProps}
             >
                 <i className="codicon codicon-thumbsdown-filled" />
             </VSCodeButton>

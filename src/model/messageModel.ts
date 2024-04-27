@@ -45,6 +45,7 @@ export type TMessageModel = TAbstractModel & {
   timeStamp: Date;                 //  X  |        |   
   author: string;                  //  X  |        |   
   message: string;                 //  X  |   X    |   
-  className: string                //  X  |   X    |
-  feedback: boolean                //  X  |   X    |
+  className: string;               //  X  |   X    |
+  feedback: boolean;               //  X  |   X    |
+  disabled: boolean;               //  X  |   X    |
 }

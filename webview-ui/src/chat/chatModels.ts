@@ -15,4 +15,5 @@ export type TMessageModel = {
     message: string;
     feedback: boolean
     className: string;
+    disabled?: boolean;
 }

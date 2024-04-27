@@ -188,9 +188,11 @@ export default function MessageRow(props: IMessageRowProps): any {
             <VSCodeDataGridCell grid-column="1">
                 <>
                     <Message {...row} isHovering={false} />
-                    {row.feedback && <Feedback feedbacksOnSubmit={(text:string, value: string) => {
-                        sendFeedback(row.messageId, text, value, "");
-                    }} />}
+                    {row.feedback && <Feedback
+                        disabled={row.disabled}
+                        feedbacksOnSubmit={(text: string, value: string) => {
+                            sendFeedback(row.messageId, text, value, "");
+                        }} />}
                 </>
             </VSCodeDataGridCell>
         </VSCodeDataGridRow >

@@ -180,6 +180,7 @@ export type TMessageOptions = {
     answeringId?: string;
     canFeedback?: boolean;
     inProgress?: boolean;
+    disabledFeedback?: boolean;
 }
 
 type TCommandKey = keyof typeof commandsMap;
@@ -267,7 +268,8 @@ export class ChatApi {
             author: "Gaia",
             message: workMessage,
             className: "tds-message-gaia",
-            feedback: (options.canFeedback || false)
+            feedback: (options.canFeedback || false),
+            disabled: (options.disabledFeedback || false)
         });
 
         return id;
@@ -294,7 +296,8 @@ export class ChatApi {
             author: "Gaia",
             message: workMessage,
             className: "tds-message-gaia",
-            feedback: options.canFeedback || false
+            feedback: options.canFeedback || false,
+            disabled: (options.disabledFeedback || false)
         });
 
         return messageId;
@@ -412,7 +415,8 @@ export class ChatApi {
                 author: getGaiaUser()?.displayName || "<unknown>",
                 message: message == undefined ? "???" : message,
                 className: "tds-message-user",
-                feedback: false
+                feedback: false,
+                disabled: true
             });
 
             this.processMessage(message);
