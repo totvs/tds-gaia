@@ -1,6 +1,12 @@
 # TDS-Gaia, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
 
-## TDS-Gaia 0.0.NEXT
+## TDS-Gaia 0.0.6
+
+### Novos recursos
+
+- Opinião do usuário (_feedback)
+  Recurso que permite ao usuário opinar sobre a qualidade das respostas dados pela  IA.
+   Estas podem ser ``positivas`` (concorda com a resposta), ``negativas`` (não concorda) ou ``mais-ou-menos`` (pode melhorar ou há erros não significativos).
 
 ### Melhorias
 

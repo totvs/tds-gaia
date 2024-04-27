@@ -56,7 +56,7 @@ posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP 
 
 | Funcionalidade | Atalho        | Ação |
 | -------------- | ------------- | ---- |
-| Login          | Ctrl+D Ctrl+L | Apresenta o usuário ao IA. |
+| Login          | Ctrl+D Ctrl+L | Conecta o usuário ao serviço de IA. Veja [Autenticação](#autenticação) |
 | Auto-completar |               | Acionado automaticamente durante a edição. |
 |                |               | **Dica:** Ao ser apresentada a sugestão posicione o _mouse_ sobre ela para obter uma lista de opções. |
 | Explicação*    | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
@@ -117,6 +117,10 @@ Para desinstalar a extensão, selecione o comando "Desinstalar" após acionar o 
 
 A extensão já vem configurada pronto para uso, não requerendo nenhuma configuração adicional. Caso queira saber mais, acesse [Configuração](docs/configuration.md).
 
+### Autenticação
+
+O primeiro passo, é você autenticar-se (_login_) no **TDS-Gaia**.
+
 ### Começando a usar
 
 Você pode utilizar  as funcionalidades através de comandos, que podem ser acionados de diversas formas. 
@@ -154,7 +158,8 @@ Posicione o cursor na linha na qual deseja uma explicação e acione o comando.
 
 #### Palavra corrente
 
-Posicione o cursor na palavra a qual deseja uma explicação e acione o comando. Útil para obter explicações sobre funções e métodos. 
+Posicione o cursor na palavra a qual deseja uma explicação e acione o comando.
+Útil para obter explicações sobre funções e métodos. 
 
 #### Bloco selecionado
 
@@ -185,7 +190,6 @@ Stack: TypeError: fetch failed
  at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
  at async CarolApi.checkHealth (w:\ws_tds_vscode\tds-gaia\out\api\carolApi.js:30:20)
 `
-
 #### Correção
 
 Entre em contato com o suporte de segurança de sua empresa/organização para que ele libere o acesso a URL `https://advpl.ds.dta.totvs.ai` ou outro _endpoint_ indicado.
@@ -194,4 +198,4 @@ Dependendo de configurações de seu sistema operacional/ambiente de trabalho, v
 
 ## Extensões com incompatibilidade
 
-Outras extensões que usam recursos de inteligência artificial para apoio a desenvolvedores, podem interferir no funcionamento do **TDS-Gaia**. Se possível, [desabilite-a](https://code.visualstudio.com/docs/editor/extension-marketplace#_disable-an-extension) para áreas de trabalho com fontes AdvPL ou configure-a para ignorar esses fontes (veja documentação da extensão).
+Extensões de terceiros que usam recursos de inteligência artificial para apoio a desenvolvedores, podem interferir no funcionamento do **TDS-Gaia**. Se possível, [desabilite-a](https://code.visualstudio.com/docs/editor/extension-marketplace#_disable-an-extension) para áreas de trabalho com fontes AdvPL ou configure-a para ignorar esses fontes (veja documentação da extensão).
