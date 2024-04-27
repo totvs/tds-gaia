@@ -19,7 +19,7 @@ import { Disposable } from "vscode";
 import { PromiseAdapter, promiseFromEvent } from "./util";
 import { LoggedUser, getGaiaUser } from "./config";
 import { randomUUID } from "crypto";
-import { feedbackApi, llmApi } from "./api";
+import { chatApi, feedbackApi, llmApi } from "./api";
 
 const AUTH_TYPE: string = "auth-gaia";
 const AUTH_NAME: string = "Gaia";
@@ -226,6 +226,8 @@ export function registerAuthentication(context: vscode.ExtensionContext) {
                 const session: vscode.AuthenticationSession | undefined = await getGaiaSession();
 
                 if (session) {
+                    //chatApi.checkUser("");
+
                     const [_, publicKey, secretKey] = session.scopes[0].split(":");
                     feedbackApi.start(publicKey, secretKey);
                     feedbackApi.eventLogin();

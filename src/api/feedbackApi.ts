@@ -144,12 +144,13 @@ export class FeedbackApi {
                 }
             }
 
-            //const event: EventElement = this.createEvent(trace, EventsFeedbackEnum.Login);
+            const event: EventElement = this.createEvent(trace, EventsFeedbackEnum.Login);
 
             this.traceApi.enqueue(trace);
-            //this.traceApi.enqueue(event);
+            this.traceApi.enqueue(event);
             this.traceApi.sendQueue();
 
+            this.elementMap[EventsFeedbackEnum.Login] = event;
             //this.traceMap[trace.id] = trace;
         } else {
             logger.error("eventLogin: user not found");
@@ -174,8 +175,10 @@ export class FeedbackApi {
                 "duration": `${(eventLogout.timeStamp.getMilliseconds() - eventLogin.timeStamp.getMilliseconds()) / 1000} seg`
             });
 
-            //this.traceApi.enqueue(eventLogout);
+            this.traceApi.enqueue(eventLogout);
             this.traceApi.sendQueue();
+
+            delete this.elementMap[EventsFeedbackEnum.Login];
         } else {
             logger.debug("eventLogout: login event not found in map.");
         }

@@ -57,7 +57,7 @@ export function registerLogin(context: vscode.ExtensionContext): void {
         }
 
         session = await vscode.authentication.getSession(GaiaAuthenticationProvider.AUTH_TYPE, [], { createIfNone: true });
-        console.log(session);
+
         if (session !== undefined) {
 
             if (session.accessToken) {
@@ -65,8 +65,6 @@ export function registerLogin(context: vscode.ExtensionContext): void {
             } else {
                 vscode.window.showInformationMessage(vscode.l10n.t("{0} Login failure", PREFIX_GAIA));
             }
-
-            chatApi.checkUser("");
         }
     }));
 }

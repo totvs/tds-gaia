@@ -174,7 +174,7 @@ export default function ChatView() {
           }
           <VSCodeDataGrid id="messagesGrid"> {/*grid-template-columns=""*/}
             {model.messages.map((row: TMessageModel, index: number) => (
-              <MessageRow index={index} message={row} messages={model.messages} />
+              <MessageRow key={`msgRow_${index}`} index={index} message={row} messages={model.messages} />
             ))}
           </VSCodeDataGrid>
         </section >
