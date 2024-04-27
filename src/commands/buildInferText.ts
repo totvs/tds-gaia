@@ -15,10 +15,11 @@ limitations under the License.
 */
 
 import * as vscode from 'vscode';
-import { chatApi } from '../extension';
 import { InferData, dataCache } from '../dataCache';
 import { InferType } from '../api/interfaceApi';
 import { getSymbols } from './utilCommands';
+import { StatusReturnEnum, TBuildInferTextReturn, TGetSymbolsReturn } from './resultStruct';
+import { chatApi } from '../api';
 
 /**
 * Builds the text to display for inferred type information.
@@ -29,14 +30,16 @@ import { getSymbols } from './utilCommands';
 * @param types - The inferred types for the variables in the code.
 * @returns An array of strings representing the text to display for the inferred type information.
 */
-export async function buildInferText(documentUri: vscode.Uri, range: vscode.Range, messageId: string, types: InferType[]): Promise<string[]> {
+export async function buildInferText(documentUri: vscode.Uri, range: vscode.Range, messageId: string, types: InferType[]): Promise<TBuildInferTextReturn> {
     const text: string[] = [];
     const inferData: InferData = dataCache.get(messageId) || {
         documentUri: documentUri,
         range: range,
         types: []
     }
-    const documentSymbols: vscode.DocumentSymbol[] | undefined = await getSymbols(inferData.documentUri, inferData.range);
+    const getSymbolsReturn: TGetSymbolsReturn = await getSymbols(inferData.documentUri, inferData.range);
+    const documentSymbols: vscode.DocumentSymbol[] | undefined = getSymbolsReturn.symbols;
+
     let someTipped: boolean = false;
     dataCache.set(messageId, inferData);
 
@@ -51,7 +54,6 @@ export async function buildInferText(documentUri: vscode.Uri, range: vscode.Rang
         });
 
         varType.active = varType.active === undefined ? true : varType.active; //normalização do dado
-
         let alreadyTipped: boolean = !(varType.active) || (documentSymbol?.detail.includes(`as ${varType.type}`) || false);
 
         const index: number = inferData.types.findIndex((inferType) => {
@@ -72,22 +74,21 @@ export async function buildInferText(documentUri: vscode.Uri, range: vscode.Rang
         };
 
         someTipped = someTipped || !alreadyTipped;
-        const command: string = alreadyTipped ?
-            `**${varType.var}**`
+        const linkPosition: string = (alreadyTipped || documentSymbol == undefined)
+            ? ""
+            : chatApi.linkToRange(documentUri, documentSymbol.selectionRange);
+        const command: string = (alreadyTipped || documentSymbol == undefined)
+            ? `**${varType.var}**`
             : chatApi.commandText("updateType",
                 {
                     cacheId: messageId,
                     varName: varType.var,
                 })
                 .replace(/\[.*\]/, `[${varType.var}]`);
-        const link: string = chatApi.linkToRange(documentUri,
-            documentSymbol?.selectionRange || new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0))
-        );
 
-        text.push(vscode.l10n.t("- {0} as **{1}** {2}", command, varType.type, link));
-        //}
+        text.push(vscode.l10n.t("- {0} as **{1}** {2}", command, varType.type, linkPosition));
     }
-    text.push("");
+
     if (someTipped) {
         text.push(vscode.l10n.t("{0} or click on variable name.",
             `${chatApi.commandText("updateTypeAll", {
@@ -97,5 +98,14 @@ export async function buildInferText(documentUri: vscode.Uri, range: vscode.Rang
         text.push(vscode.l10n.t("All variables are already typed."));
     }
 
-    return text;
+    if (getSymbolsReturn.status !== StatusReturnEnum.Ok) {
+        text.push("");
+        text.push(`_${getSymbolsReturn.message}_`);
+    }
+
+    return {
+        status: StatusReturnEnum.Ok,
+        text: text,
+        feedback: true
+    };
 }

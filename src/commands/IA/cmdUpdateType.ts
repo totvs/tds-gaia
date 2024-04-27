@@ -1,9 +1,28 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from "vscode";
 import { InferData, dataCache } from "../../dataCache";
 import { getSymbols } from "../utilCommands";
-import { chatApi } from "../../extension";
 import { buildInferText } from "../buildInferText";
 import { InferType } from "../../api/interfaceApi";
+import { TBuildInferTextReturn, TGetSymbolsReturn } from "../resultStruct";
+import { ScoreEnum } from "../../api/feedbackApi";
+import { chatApi, feedbackApi } from "../../api";
+import { activate } from './../../extension';
 
 /**
 * Registers a command to update the variables type of the current document.
@@ -24,12 +43,17 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
                 active: !(processVars.includes(type.var))
             };
         });
-        const text: string[] = await buildInferText(inferData.documentUri, inferData.range, messageId, inferTypes);
+        const buildInferTextReturn: TBuildInferTextReturn = await buildInferText(inferData.documentUri, inferData.range, messageId, inferTypes);
+        const text: string[] = buildInferTextReturn.text;
 
-        //inferData.types = inferData.types;
         dataCache.set(messageId, inferData);
-        chatApi.gaiaUpdateMessage(messageId, text);
-
+        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: true, disabledFeedback: buildInferTextReturn.feedback });
+        feedbackApi.scoreInferType(messageId, inferTypes.filter(((type: InferType) => !type.active)),
+            ScoreEnum.Relative,
+            (inferTypes.length == processVars.length)
+                ? vscode.l10n.t(`User accept all`)
+                : vscode.l10n.t(`User accept rest: ${processVars.join(",")}`),
+            true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.updateTypify', async (...args) => {
@@ -44,11 +68,13 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
                 active: !(processVars.includes(type.var))
             };
         });
-        const text: string[] = await buildInferText(inferData.documentUri, inferData.range, messageId, inferTypes);
+        const buildInferTextReturn: TBuildInferTextReturn = await buildInferText(inferData.documentUri, inferData.range, messageId, inferTypes);
+        const text: string[] = buildInferTextReturn.text;
 
-        //inferData.types = inferData.types;
         dataCache.set(messageId, inferData);
-        chatApi.gaiaUpdateMessage(messageId, text);
+        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: true, disabledFeedback: buildInferTextReturn.feedback });
+        feedbackApi.scoreInferType(messageId, inferTypes.filter(((type: InferType) => !type.active)),
+            ScoreEnum.Relative, vscode.l10n.t(`User accept: ${processVars.join(",")}`), false);
     }));
 }
 
@@ -57,7 +83,8 @@ async function updateType(inferData: InferData, targetSymbol: string | undefined
     const processVars: string[] = [];
 
     if (editor !== undefined) {
-        const documentSymbols: vscode.DocumentSymbol[] | undefined = await getSymbols(inferData.documentUri, inferData.range, targetSymbol);
+        const getSymbolsReturn: TGetSymbolsReturn = await getSymbols(inferData.documentUri, inferData.range);
+        const documentSymbols: vscode.DocumentSymbol[] | undefined = getSymbolsReturn.symbols;
 
         if (documentSymbols && documentSymbols.length > 0) {
             editor.edit(editBuilder => {
@@ -65,8 +92,12 @@ async function updateType(inferData: InferData, targetSymbol: string | undefined
                     if (!infer.active) {
                         processVars.push(infer.var);
                     } else {
-                        documentSymbols.forEach(symbol => {
-                            if (infer.var === symbol.name) {
+                        documentSymbols
+                            .filter(symbol => {
+                                return ((infer.var === symbol.name)
+                                    && ((targetSymbol === "" || targetSymbol === symbol.name)));
+                            })
+                            .forEach(symbol => {
                                 const changeRange: vscode.Range = new vscode.Range(
                                     symbol.range.start.line,
                                     symbol.range.start.character,
@@ -75,8 +106,7 @@ async function updateType(inferData: InferData, targetSymbol: string | undefined
                                 editBuilder.replace(changeRange, `${infer.var} as ${infer.type}`);
 
                                 processVars.push(infer.var);
-                            }
-                        });
+                            });
                     }
                 });
             });

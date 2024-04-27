@@ -16,7 +16,7 @@ limitations under the License.
 
 import { ButtonAppearance } from "@vscode/webview-ui-toolkit";
 import "./form.css";
-import { ChangeHandler, FieldValues, FormState, RegisterOptions, UseFormReturn, UseFormSetError, UseFormSetValue, useFormContext } from "react-hook-form";
+import { FieldValues, RegisterOptions, UseFormReturn, UseFormSetError, UseFormSetValue, useFormContext } from "react-hook-form";
 import { VSCodeButton, VSCodeLink, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
 import { sendClose, sendReset } from "../utilities/common-command-webview";
 import React from "react";

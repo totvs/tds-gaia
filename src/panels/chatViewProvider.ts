@@ -20,12 +20,12 @@ import { TChatModel } from '../model/chatModel';
 import { getExtraPanelConfigurations, getWebviewContent } from './utilities/webview-utils';
 import { MessageOperationEnum, TMessageModel } from '../model/messageModel';
 import { TFieldErrors } from '../model/abstractMode';
-import { chatApi } from '../extension';
 import { TQueueMessages } from '../api/chatApi';
 import { getGaiaUser } from '../config';
 import { logger } from '../logger';
 import { highlightCode } from '../decoration';
 import { dataCache } from '../dataCache';
+import { chatApi, feedbackApi } from '../api';
 
 enum ChatCommandEnum {
 
@@ -123,7 +123,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       enableCommandUris: true
     };
 
-    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-gaia-vscode');
+    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-gaia');
     const extensionUri: vscode.Uri = ext!.extensionUri;
 
     webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView", { title: "Gaia: Chat" });
@@ -188,17 +188,26 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                     "Sorry.I didn't understand this command.",
                     `\`${msg}\``,
                     vscode.l10n.t("Please open a {0}. That way I can investigate this issue better.", chatApi.commandText("open_issue"))
-                  ], "");
+                  ], {});
                   logger.warn(msg);
                 }
               }
 
               break;
             }
+          case CommonCommandFromWebViewEnum.Feedback:
+            this.chatModel.messages
+              .filter((msg: TMessageModel) => msg.messageId == data.messageId)
+              .forEach((msg: TMessageModel) => {
+                msg.disabled = true;
+                feedbackApi.scoreMessage(msg.messageId, Number.parseInt(data.value));
+              });
+
+            this.sendUpdateModel(this.chatModel, undefined);
+            break;
         }
       }
     );
-
   }
 
   protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {

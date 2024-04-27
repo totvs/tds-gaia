@@ -18,8 +18,8 @@ import * as vscode from "vscode";
 import { delay } from "./util";
 import { TGaiaConfig, getGaiaConfiguration } from "./config";
 import { Completion, CompletionResponse } from "./api/interfaceApi";
-import { iaApi } from "./extension"
 import { logger } from "./logger";
+import { llmApi, feedbackApi } from "./api";
 
 let textBeforeCursor: string = "";
 let textAfterCursor: string = "";
@@ -32,100 +32,95 @@ let textAfterCursor: string = "";
  * Handles errors and cancellation.
 */
 //acionamento manual: F1 + editor.action.inlineSuggest.trigger
-export class InlineCompletionItemProvider implements vscode.InlineCompletionItemProvider {
 
-    /**
-     * Registers the inline completion provider. 
-     * 
-    */
-    static register(context: vscode.ExtensionContext) {
-        const config: TGaiaConfig = getGaiaConfiguration();
-        const provider: vscode.InlineCompletionItemProvider = new InlineCompletionItemProvider();
-        const documentFilter = config.documentFilter;
-        const inlineRegister: vscode.Disposable = vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
-        context.subscriptions.push(inlineRegister);
+/**
+ * Registers the inline completion provider. 
+ * 
+*/
+let loading: boolean = false;
 
-        const afterInsert = vscode.commands.registerCommand('tds-gaia.afterInsert', async (response: Completion) => {
-            vscode.commands.executeCommand("tds-gaia.logCompletionFeedback", { completion: response, textBefore: textBeforeCursor, textAfter: textAfterCursor });
-        });
-
-        const logCompletionFeedback = vscode.commands.registerCommand('tds-gaia.logCompletionFeedback', async (response: { completion: Completion, textBefore: string, textAfter: string }) => {
-            iaApi.logCompletionFeedback(response);
-        });
-
-        context.subscriptions.push(afterInsert);
-        context.subscriptions.push(logCompletionFeedback);
-    }
-
-    async provideInlineCompletionItems(document: vscode.TextDocument, position: vscode.Position, context: vscode.InlineCompletionContext, token: vscode.CancellationToken): Promise<vscode.InlineCompletionItem[]> {
-        // if (context.workspaceState.get("tds-gaia.readyFoUse") === false) {
-        //     return;
-        // }
-
-        const config = getGaiaConfiguration();
-        const autoSuggest = config.enableAutoSuggest;
-        const requestDelay = config.requestDelay;
-
-        if (context.triggerKind === vscode.InlineCompletionTriggerKind.Automatic && !autoSuggest) {
-            return [];
-        }
-        if (position.line < 0) {
-            return [];
-        }
-
-        if (requestDelay > 0) {
-            logger.debug("Delay " + requestDelay + "ms before requesting completions");
-            const cancelled = await delay(requestDelay * 10, token);
-            if (cancelled) {
-                logger.debug("Request cancelled by user");
-                return [];
-            }
-        }
-
-        const offset = document.offsetAt(position);
-
-        textBeforeCursor = document.getText().substring(0, offset);
-        textAfterCursor = document.getText().substring(offset + 1);
-
-        try {
-            const response: CompletionResponse =
-                await iaApi.getCompletions(textBeforeCursor, textAfterCursor);
-
-            if (token.isCancellationRequested) {
-                logger.warn('Request cancelled by user');
-                return [];
-            }
-
-            const items: vscode.InlineCompletionItem[] = [];
-
-            if (response !== undefined && response.completions.length) {
-                for (const completion of response.completions) {
-                    items.push({
-                        insertText: completion.generated_text,
-                        range: new vscode.Range(position, position),
-                        command: {
-                            title: 'afterInsert',
-                            command: 'tds-gaia.afterInsert',
-                            arguments: [completion],
-                        }
-                    });
+export function registerInlineCompletionItemProvider(context: vscode.ExtensionContext) {
+    const provider: vscode.InlineCompletionItemProvider = {
+        async provideInlineCompletionItems(document: vscode.TextDocument, position: vscode.Position, context: vscode.InlineCompletionContext, token: vscode.CancellationToken) {
+            //: Promise<vscode.InlineCompletionItem[]> {
+            try {
+                if (loading) {
+                    throw new Error("is currently loading");
                 }
+                loading = true;
+
+                const config: TGaiaConfig = getGaiaConfiguration();
+                const autoSuggest: boolean = config.enableAutoSuggest;
+                const requestDelay: number = config.requestDelay;
+
+                if (context.triggerKind === vscode.InlineCompletionTriggerKind.Automatic && !autoSuggest) {
+                    throw new Error("manual trigger");
+                }
+                if (position.line < 0) {
+                    throw new Error("invalid position");
+                }
+
+                if (requestDelay > 0) {
+                    logger.debug("Delay " + requestDelay + "ms before requesting completions");
+                    const cancelled = await delay(requestDelay * 10, token);
+                    if (cancelled) {
+                        throw new Error("Request cancelled by user");
+                    }
+                }
+
+                const offset = document.offsetAt(position);
+
+                textBeforeCursor = document.getText().substring(0, offset);
+                textAfterCursor = document.getText().substring(offset + 1);
+
+                const response: CompletionResponse =
+                    await llmApi.getCompletions(textBeforeCursor, textAfterCursor);
+                const items: vscode.InlineCompletionItem[] = [];
+
+                if (response !== undefined && response.completions.length) {
+                    for (const completion of response.completions) {
+                        const item: vscode.InlineCompletionItem = new vscode.InlineCompletionItem(
+                            completion.generated_text,
+                            new vscode.Range(position, position),
+                            {
+                                title: 'afterInsert',
+                                command: 'tds-gaia.afterInsert',
+                                arguments: [items.length, response.completions],
+                            })
+                        items.push(item);
+                    }
+
+                    if (token.isCancellationRequested) {
+                        //feedback.eventCompletion({ selected: -1, completions: response.completions, textBefore: textBeforeCursor, textAfter: textAfterCursor });
+                    }
+                }
+                loading = false;
+
+                return { items: items };
+            } catch (e) {
+                const err_msg = (e as Error);
+
+                if (err_msg.message.includes("is currently loading")) {
+                    vscode.window.showWarningMessage(err_msg.message);
+                } else {//if (err_msg.message !== "Canceled") {
+                    //vscode.window.showErrorMessage(err_msg.message);
+                    loading = false;
+                }
+
+                logger.debug(err_msg.message);
+
+                return;
             }
-
-            const result: vscode.ProviderResult<vscode.InlineCompletionItem[]> = items;
-            return Promise.resolve(result);
-        } catch (e) {
-            const err_msg = (e as Error);
-
-            if (err_msg.message.includes("is currently loading")) {
-                vscode.window.showWarningMessage(err_msg.message);
-            } else if (err_msg.message !== "Canceled") {
-                vscode.window.showErrorMessage(err_msg.message);
-            }
-
-            console.error(e);
-
-            return [];
         }
-    }
+    };
+
+    const config: TGaiaConfig = getGaiaConfiguration();
+    const documentFilter: vscode.DocumentFilter | vscode.DocumentFilter[] = config.documentFilter;
+    vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
+
+    const afterInsert = vscode.commands.registerCommand('tds-gaia.afterInsert', async (selectedIndex: number, completions: Completion[]) => {
+        feedbackApi.eventCompletion({ selected: selectedIndex - 1, completions: completions, textBefore: textBeforeCursor, textAfter: textAfterCursor });
+    });
+    context.subscriptions.push(afterInsert);
 }
+

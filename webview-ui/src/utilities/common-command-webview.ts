@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 import { TAbstractModel } from "../../../src/model/abstractMode";
+import Feedback from "../chat/feedback";
 import { vscode } from "./vscodeWrapper";
 
 /**
@@ -58,7 +59,8 @@ export enum CommonCommandToPanelEnum {
 	Reset = "RESET",
 	Validate = "VALIDATE",
 	UpdateModel = "UPDATE_MODEL",
-	LinkMouseOver = "LINK_MOUSE_OVER"
+	LinkMouseOver = "LINK_MOUSE_OVER",
+	Feedback = "FEEDBACK"
 }
 
 export type CommonCommandToPanel = CommonCommandToPanelEnum;

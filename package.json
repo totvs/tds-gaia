@@ -1,5 +1,5 @@
 {
-  "name": "tds-gaia-vscode",
+  "name": "tds-gaia",
   "displayName": "TDS-Gaia, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Gaia will assist you in AdvPL programming",
   "version": "0.0.5",
@@ -32,10 +32,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/totvs/tds-gaia-vscode.git"
+    "url": "https://github.com/totvs/tds-gaia.git"
   },
   "bugs": {
-    "url": "https://github.com/totvs/tds-gaia-vscode.git"
+    "url": "https://github.com/totvs/tds-gaia.git"
   },
   "galleryBanner": {
     "color": "#100f11",
@@ -43,9 +43,9 @@
   },
   "badges": [
     {
-      "url": "https://img.shields.io/github/stars/totvs/tds-gaia-vscode?style=social",
-      "description": "Star tds-gaia-vscode on Github",
-      "href": "https://github.com/totvs/tds-gaia-vscode"
+      "url": "https://img.shields.io/github/stars/totvs/tds-gaia?style=social",
+      "description": "Star tds-gaia on Github",
+      "href": "https://github.com/totvs/tds-gaia"
     },
     {
       "url": "https://img.shields.io/twitter/follow/totvs?style=social",
@@ -53,7 +53,7 @@
       "href": "https://twitter.com/TOTVS"
     }
   ],
-  "homepage": "https://github.com/totvs/tds-gaia-vscode",
+  "homepage": "https://github.com/totvs/tds-gaia",
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -134,6 +134,12 @@
         {
           "command": "tds-gaia.infer",
           "when": "webviewId == 'tds-gaia-view' && tds-gaia.logged"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "tds-gaia.afterInsert",
+          "when": "1 == 0"
         }
       ]
     },
@@ -256,10 +262,12 @@
             ],
             "default": [
               {
-                "language": "advpl"
+                "language": "advpl",
+                "scheme": "file"
               },
               {
-                "language": "advpl-asp"
+                "language": "advpl-asp",
+                "scheme": "file"
               }
             ],
             "description": "Filter documents to enable suggestions for"
@@ -331,27 +339,6 @@
               "Erros"
             ]
           },
-          "tds-gaia.trace": {
-            "type": "string",
-            "enum": [
-              "off",
-              "trace",
-              "debug",
-              "info",
-              "warning",
-              "error"
-            ],
-            "default": "info",
-            "description": "Nível de severidade mínima a ser apresentada no console da extensão.",
-            "enumDescriptions": [
-              "Desligado (não recomendado)",
-              "Rastreamento",
-              "Depuração",
-              "Informações",
-              "Avisos",
-              "Erros"
-            ]
-          },
           "tds-gaia.lastLogin": {
             "type": "string",
             "default": "",
@@ -405,11 +392,6 @@
         "key": "Ctrl+D Ctrl+G",
         "mac": "Cmd+D Cmd+G",
         "command": "tds-gaia.generateCode"
-      },
-      {
-        "key": "Alt+A",
-        "mac": "Option+A",
-        "command": "tds-gaia.updateTypifyAll"
       }
     ]
   },

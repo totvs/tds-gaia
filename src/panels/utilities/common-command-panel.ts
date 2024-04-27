@@ -24,7 +24,8 @@ export enum CommonCommandFromWebViewEnum {
 	Reset = "RESET",
 	Save = "SAVE",
 	SaveAndClose = "SAVE_AND_CLOSE",
-	LinkMouseOver = "LINK_MOUSE_OVER"
+	LinkMouseOver = "LINK_MOUSE_OVER",
+	Feedback = "FEEDBACK"
 }
 
 export type CommonCommandFromWebView = CommonCommandFromWebViewEnum;

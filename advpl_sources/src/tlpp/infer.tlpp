@@ -1,0 +1,64 @@
+#include "tlpp-core.th"
+
+//Fonte: https://tdn.totvs.com/display/tec/Tipagem+de+Dados
+static function primitive()
+	local n1 as numeric
+	local c1 as character //char
+	local d1 as date
+	local b1 as codeblock //block
+	local l1 as logical //boolean
+	local a1 as array
+	local o1 as object
+	local u1 //undefined, contem NIL
+
+	conout(n1)
+	conout(c1)
+	conout(d1)
+	conout(b1)
+	conout(m1)
+	conout(l1)
+	conout(a1)
+	conout(o1)
+	conout(u1)
+Return
+
+static function inferPrimitive()
+	local n1 := 0
+	local c1 := ""
+	local d1 := date()
+	local b1 := {||}
+	local l1 := .t.
+	local a1 := []
+	local o1 := object():new()
+	local u1 := NIL
+
+	conout(n1)
+	conout(c1)
+	conout(d1)
+	conout(b1)
+	conout(m1)
+	conout(l1)
+	conout(a1)
+	conout(o1)
+	conout(u1)
+Return
+
+static function inferFromDB()
+	local filial := SB1->B1_FILIAL
+	local cod := SB1->B1_COD
+	local notExistFileld := SB1->XXXXXXXXXXXXXXXXXXXX
+	local percICM := B1_PICM
+	local conv := B1_CONV
+	local dtUltCalc := B1_UCALSTD
+	local descIngles := B1_VM_I
+	
+	conout(filial)
+	conout(cod)
+	conout(notExistFileld)
+	conout(percICM)
+	conout(conv)
+	conout(dtUltCalc)
+	conout(descIngles)
+Return
+
+

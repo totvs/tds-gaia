@@ -40,8 +40,8 @@ const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
 const EXPLAIN_WORD_RE = /^explain\sword\s(source)?$/i;
 const INFER_TYPE_RE = /^infer\s(source)?$/i;
-const UPDATE_ALL_TYPE_RE = /^updatealltypify\s(source)?$/i;
-const UPDATE_TYPE_RE = /^updatetypify\s(source)?$/i;
+const UPDATE_ALL_TYPE_RE = /^updateAllTypify\s(source)?$/i;
+const UPDATE_TYPE_RE = /^updateTypify\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
 const OPEN_QUICK_GUIDE = /^(open )?(quick guide)$/i;
@@ -169,6 +169,20 @@ const commandsMap: Record<string, TCommand> = {
     }
 };
 
+/**
+* Represents the options for a chat message.
+* 
+* @property {string} [answeringId] - The ID of the message being answered.
+* @property {boolean} [withFeedback] - Whether the message should include feedback.
+* @property {boolean} [inProgress] - Whether the message is in progress.
+*/
+export type TMessageOptions = {
+    answeringId?: string;
+    canFeedback?: boolean;
+    inProgress?: boolean;
+    disabledFeedback?: boolean;
+}
+
 type TCommandKey = keyof typeof commandsMap;
 
 /**
@@ -178,6 +192,7 @@ type TCommandKey = keyof typeof commandsMap;
  * Dispatches events for new messages.
  */
 export class ChatApi {
+
     static getCommand(_command: TCommandKey): TCommand | undefined {
         const commandId: TCommandKey = _command;
         let command: TCommand | undefined = commandsMap[commandId];
@@ -236,7 +251,7 @@ export class ChatApi {
      * @param answeringId - (Optional) The ID of the message this is answering.
      * @returns The ID of the sent message.
      */
-    gaia(message: string | string[], answeringId: string | undefined = undefined): string {
+    gaia(message: string | string[], options: TMessageOptions): string {
         let workMessage: string = typeof message == "string"
             ? message
             : message.join("\n\n");
@@ -247,11 +262,14 @@ export class ChatApi {
         this.sendMessage({
             operation: MessageOperationEnum.Add,
             messageId: id,
-            answering: answeringId || "",
-            inProcess: (answeringId === undefined),
+            answering: options.answeringId || "",
+            inProcess: (options.answeringId || "") === "",
             timeStamp: new Date(),
             author: "Gaia",
-            message: workMessage
+            message: workMessage,
+            className: "tds-message-gaia",
+            feedback: (options.canFeedback || false),
+            disabled: (options.disabledFeedback || false)
         });
 
         return id;
@@ -264,7 +282,7 @@ export class ChatApi {
     * @param message - The updated message content, either as a single string or an array of strings. If an array, the lines will be joined with a newline.
     * @returns The message ID of the updated message.
     */
-    gaiaUpdateMessage(messageId: string, message: string | string[]): string {
+    gaiaUpdateMessage(messageId: string, message: string | string[], options: TMessageOptions): string {
         let workMessage: string = typeof message == "string"
             ? message
             : message.join("\n\n");
@@ -272,11 +290,14 @@ export class ChatApi {
         this.sendMessage({
             operation: MessageOperationEnum.Update,
             messageId: messageId,
-            answering: "",
+            answering: options.answeringId || "",
             inProcess: false,
             timeStamp: new Date(),
             author: "Gaia",
-            message: workMessage
+            message: workMessage,
+            className: "tds-message-gaia",
+            feedback: options.canFeedback || false,
+            disabled: (options.disabledFeedback || false)
         });
 
         return messageId;
@@ -292,7 +313,7 @@ export class ChatApi {
             ? message
             : message.map((line: string) => `> ${line}`);
 
-        this.gaia(workMessage, "");
+        this.gaia(workMessage, {});
     }
 
     /**
@@ -311,7 +332,7 @@ export class ChatApi {
                 return line;
             });
 
-        this.gaia(workMessage, "");
+        this.gaia(workMessage, {});
     }
 
     /**
@@ -330,7 +351,8 @@ export class ChatApi {
                 return line;
             });
 
-        this.gaia(workMessage, "");
+        this.gaia(workMessage, {});
+
     }
 
     /**
@@ -347,17 +369,17 @@ export class ChatApi {
                     this.gaia([
                         vscode.l10n.t("It seems like this is the first time we've met."),
                         vscode.l10n.t("Want to know how to interact with me? {0}", this.commandText("hint_1"))
-                    ], answeringId);
+                    ], { answeringId: answeringId });
                 }
                 this.gaia([
                     vscode.l10n.t("To start, I need to know you."),
                     vscode.l10n.t("Please, identify yourself with the command {0}", this.commandText("login"))
-                ], answeringId);
+                ], { answeringId: answeringId });
             } else {
                 this.gaia([
                     vscode.l10n.t("Hello, **{0}**.", getGaiaUser()?.displayName || "<unknown>"),
                     vscode.l10n.t("I'm ready to help you in any way possible!"),
-                ], answeringId);
+                ], { answeringId: answeringId });
             }
         } else {
             vscode.commands.executeCommand("tds-gaia.health");
@@ -368,7 +390,7 @@ export class ChatApi {
         this.gaia([
             vscode.l10n.t("**{0}**, thank you for working with me!", getGaiaUser()?.displayName || "<unknown>"),
             vscode.l10n.t("See you soon!"),
-        ], "");
+        ], {});
     }
 
     /**
@@ -392,6 +414,9 @@ export class ChatApi {
                 timeStamp: new Date(),
                 author: getGaiaUser()?.displayName || "<unknown>",
                 message: message == undefined ? "???" : message,
+                className: "tds-message-user",
+                feedback: false,
+                disabled: true
             });
 
             this.processMessage(message);
@@ -448,7 +473,8 @@ export class ChatApi {
                 ...args,
                 ...command.commandArgs
             };
-            const encodeArgs: string = args ? `?${encodeURI(JSON.stringify(args))}` : "";
+            const argsString: string = JSON.stringify(args);
+            const encodeArgs: string = argsString.length > 2 ? `?${encodeURI(argsString)}` : "";
 
             return `[${command.caption}](command:${command.commandId}${encodeArgs})${command.key ? " `" + command.key + "`" : ""} `;
         }
@@ -520,7 +546,8 @@ export class ChatApi {
                 vscode.commands.executeCommand(command.commandId);
             }
         } else {
-            this.gaia(vscode.l10n.t("I didn't understand. You can type {0} to see available commands.", this.commandText("help")), "");
+            this.gaia(vscode.l10n.t("I didn't understand. You can type {0} to see available commands.",
+                this.commandText("help")), {});
         }
     }
 
@@ -557,10 +584,17 @@ function doHelp(chat: ChatApi, message: string): boolean {
                     vscode.l10n.t("If you are familiar with **VS-Code**, see {0}, if you do not or want more details, see {1} (will open on your default browser).",
                         chat.commandText("open-quick-guide"),
                         chat.commandText("open-manual")),
-                    vscode.l10n.t("To know the commands, type `{0}` or `{0} command`.", chat.commandText("help"))
-                ], "");
+                ], {});
+                chat.gaia([
+                    vscode.l10n.t("To know the commands, type `{0}`.", chat.commandText("help")),
+                    vscode.l10n.t("If you want to know more about a specific command, type `{0} command`.", chat.commandText("help")),
+                ], {});
+                chat.gaia([
+                    vscode.l10n.t("In some messages of mine, there may be a block of **feedback**."),
+                    vscode.l10n.t("I thank you to give your opinion and comment, especially if You think I'm wrong."),
+                ], {});
             } else {
-                chat.gaia(vscode.l10n.t("Command aid {0}.", matches[2]));
+                chat.gaia(vscode.l10n.t("Command aid {0}.", matches[2]), {});
             }
         } else {
             chat.gaia([
@@ -568,7 +602,7 @@ function doHelp(chat: ChatApi, message: string): boolean {
                 vscode.l10n.t("If you are familiar with **VS-Code**, see {0}, if you do not or want more details, see {1} (will open on your default browser).",
                     chat.commandText("open-quick-guide"),
                     chat.commandText("open-manual")),
-            ], "");
+            ], {});
         }
 
         result = true;

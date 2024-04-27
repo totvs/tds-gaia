@@ -1,4 +1,5 @@
 advpl
+blockquote
 Blockquotes
 codicon
 codicons

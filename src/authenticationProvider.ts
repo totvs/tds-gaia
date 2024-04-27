@@ -16,48 +16,34 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { Disposable } from "vscode";
-
-//import { v4 as uuid } from 'uuid';
 import { PromiseAdapter, promiseFromEvent } from "./util";
-//import fetch from 'node-fetch';
+import { LoggedUser, getGaiaUser } from "./config";
+import { randomUUID } from "crypto";
+import { chatApi, feedbackApi, llmApi } from "./api";
 
-const AUTH_TYPE: string = "auth-gaia0";
-const AUTH_NAME: string = "Gaia Authentication";
-const CLIENT_ID: string = "3GUryQ7ldAeKEuD2obYnppsnmj58eP5u";
-const AUTH0_DOMAIN = "totvs.fluigidentity.com/cloudpass";
+const AUTH_TYPE: string = "auth-gaia";
+const AUTH_NAME: string = "Gaia";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`
-
-class UriEventHandler extends vscode.EventEmitter<vscode.Uri> implements vscode.UriHandler {
-    public handleUri(uri: vscode.Uri) {
-        this.fire(uri);
-    }
-}
+const SCOPES: string[] = ["feedback"];
 
 export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider, Disposable {
     static AUTH_TYPE: string = AUTH_TYPE;
+    static SCOPES: string[] = SCOPES;
 
     private _sessionChangeEmitter = new vscode.EventEmitter<vscode.AuthenticationProviderAuthenticationSessionsChangeEvent>();
     private _disposable: Disposable;
-    private _pendingStates: string[] = [];
     private _codeExchangePromises = new Map<string, { promise: Promise<string>; cancel: vscode.EventEmitter<void> }>();
-    private _uriHandler = new UriEventHandler();
+    private _processHandler = new vscode.EventEmitter<string>();
 
     constructor(private readonly context: vscode.ExtensionContext) {
         this._disposable = vscode.Disposable.from(
             vscode.authentication.registerAuthenticationProvider(AUTH_TYPE, AUTH_NAME, this, { supportsMultipleAccounts: false }),
-            vscode.window.registerUriHandler(this._uriHandler)
+            //vscode.window.registerUriHandler(this._processHandler)
         )
     }
 
     get onDidChangeSessions() {
         return this._sessionChangeEmitter.event;
-    }
-
-    get redirectUri() {
-        const publisher = this.context.extension.packageJSON.publisher;
-        const name = this.context.extension.packageJSON.name;
-
-        return `${vscode.env.uriScheme}://${publisher}.${name}`;
     }
 
     /**
@@ -82,25 +68,28 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
      */
     public async createSession(scopes: string[]): Promise<vscode.AuthenticationSession> {
         try {
-            const token = await this.login(scopes);
-            if (!token) {
-                throw new Error(`Auth0 login failure`);
+            const [_, accessTokens, feedbackPK, feedbackSK] = await this.login();
+            if (accessTokens.length < 2) {
+                throw new Error(vscode.l10n.t(`${AUTH_NAME} invalid credentials)`));
             }
 
-            const userInfo: { name: string, email: string } = await this.getUserInfo(token);
+            const userInfo: LoggedUser | undefined = getGaiaUser();
 
             const session: vscode.AuthenticationSession = {
-                id: "uuid()",
-                accessToken: token,
+                id: randomUUID(),
+                accessToken: accessTokens,
                 account: {
-                    label: userInfo.name,
-                    id: userInfo.email
+                    label: userInfo?.name || userInfo?.email || "Unknown",
+                    id: userInfo?.email || "unknown",
                 },
-                scopes: []
+                scopes: [
+                    //pk-lf-b1633e3c-c038-4dbe-af55-82bf21be0fd5
+                    //sk-lf-bdad2a8c-f646-4ab6-886a-66401033cc48
+                    `feedback:${feedbackPK}:${feedbackSK}`
+                ]
             };
 
             await this.context.secrets.store(SESSIONS_SECRET_KEY, JSON.stringify([session]))
-
             this._sessionChangeEmitter.fire({ added: [session], removed: [], changed: [] });
 
             return session;
@@ -138,55 +127,49 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
     }
 
     /**
-     * Log in to Auth0
+     * Log in to auth-gaia
      */
-    private async login(scopes: string[] = []) {
-        return await vscode.window.withProgress<string>({
+    private async login() {
+        return await vscode.window.withProgress<string[]>({
             location: vscode.ProgressLocation.Notification,
-            title: "Signing in to IA Service...",
+            title: vscode.l10n.t("Signing in to Gaia IA Service..."),
             cancellable: true
         }, async (_, token) => {
-            const stateId = "uuid()";
+            const inputKeys: Thenable<string[] | undefined> = vscode.window.showInputBox({
+                ignoreFocusOut: true,
+                prompt: vscode.l10n.t('Please enter your API token. Format: "<e-mail>:<access token>:<log public token>:<log secret token>)"'),
+                placeHolder: vscode.l10n.t('Your token goes here...')
+            }).then(async input => {
+                if (input !== undefined) {
+                    if (await llmApi.start()) {
+                        const [email, accessToken, publicKey, secretKey] = input.split(":");
+                        if (await llmApi.login(email, accessToken)) {
+                            return [email, accessToken, publicKey, secretKey];
+                        } else {
+                            return ["", "", "", ""];
+                        }
+                    }
+                }
 
-            this._pendingStates.push(stateId);
+                return;
+            })
 
-            const scopeString = scopes.join(' ');
-
-            if (!scopes.includes('openid')) {
-                scopes.push('openid');
-            }
-            if (!scopes.includes('profile')) {
-                scopes.push('profile');
-            }
-            if (!scopes.includes('email')) {
-                scopes.push('email');
-            }
-
-            const searchParams = new URLSearchParams([
-                ['response_type', "token"],
-                ['client_id', CLIENT_ID],
-                ['redirect_uri', this.redirectUri],
-                ['state', stateId],
-                ['scope', scopes.join(' ')],
-                ['prompt', "login"]
-            ]);
-            const uri = vscode.Uri.parse(`https://${AUTH0_DOMAIN}/authorize?${searchParams.toString()}`);
-            await vscode.env.openExternal(uri);
-
+            const scopeString: string = SCOPES.join(' ');
             let codeExchangePromise = this._codeExchangePromises.get(scopeString);
             if (!codeExchangePromise) {
-                codeExchangePromise = promiseFromEvent(this._uriHandler.event, this.handleUri(scopes));
+                codeExchangePromise = promiseFromEvent(this._processHandler.event, this.handleProcess(SCOPES));
                 this._codeExchangePromises.set(scopeString, codeExchangePromise);
             }
 
             try {
                 return await Promise.race([
+                    inputKeys,
                     codeExchangePromise.promise,
-                    new Promise<string>((_, reject) => setTimeout(() => reject('Cancelled'), 60000)),
-                    promiseFromEvent<any, any>(token.onCancellationRequested, (_, __, reject) => { reject('User Cancelled'); }).promise
+                    new Promise<string[]>((_, reject) => setTimeout(() => reject(['Cancelled', "", ""]), 60000)),
+                    promiseFromEvent<any, any>(token.onCancellationRequested, (_, __, reject) => { reject(['User Cancelled', "", ""]); }).promise
                 ]);
             } finally {
-                this._pendingStates = this._pendingStates.filter(n => n !== stateId);
+                //this._pendingStates = this._pendingStates.filter(n => n !== stateId);
                 codeExchangePromise?.cancel.fire();
                 this._codeExchangePromises.delete(scopeString);
             }
@@ -198,43 +181,31 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
      * @param scopes 
      * @returns 
      */
-    private handleUri: (scopes: readonly string[]) => PromiseAdapter<vscode.Uri, string> =
-        (scopes) => async (uri, resolve, reject) => {
-            const query = new URLSearchParams(uri.fragment);
-            const access_token = query.get('access_token');
-            const state = query.get('state');
+    private handleProcess: (scopes: readonly string[]) => PromiseAdapter<string, string> =
+        (scopes) => async (access_token, resolve, reject) => {
+            console.log('handleProcess', access_token);
+            // const query = new URLSearchParams(uri.fragment);
+            // const access_token = query.get('access_token');
+            // const state = query.get('state');
 
-            if (!access_token) {
-                reject(new Error('No token'));
-                return;
-            }
-            if (!state) {
-                reject(new Error('No state'));
-                return;
-            }
+            // if (!access_token) {
+            //     reject(new Error('No token'));
+            //     return;
+            // }
+            // if (!state) {
+            //     reject(new Error('No state'));
+            //     return;
+            // }
 
             // Check if it is a valid auth request started by the extension
-            if (!this._pendingStates.some(n => n === state)) {
-                reject(new Error('State not found'));
-                return;
-            }
+            // if (!this._pendingStates.some(n => n === state)) {
+            //     reject(new Error('State not found'));
+            //     return;
+            // }
 
             resolve(access_token);
         }
 
-    /**
-     * Get the user info from Auth0
-     * @param token 
-     * @returns 
-     */
-    private async getUserInfo(token: string) {
-        const response = await fetch(`https://${AUTH0_DOMAIN}/userinfo`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        return await response.json();
-    }
 }
 
 /**
@@ -249,51 +220,43 @@ export function registerAuthentication(context: vscode.ExtensionContext) {
         new GaiaAuthenticationProvider(context)
     );
 
-    // getSession();
-    // getMsSession();
-    // getMsDefaultSession();
-
-    //getAuthSession();
-
     subscriptions.push(
         vscode.authentication.onDidChangeSessions(async e => {
-            console.log(e);
-
             if (e.provider.id === AUTH_TYPE) {
-                getSession();
-            } else if (e.provider.id === "auth0") {
-                //getAuth0Session();
+                const session: vscode.AuthenticationSession | undefined = await getGaiaSession();
+
+                if (session) {
+                    //chatApi.checkUser("");
+
+                    const [_, publicKey, secretKey] = session.scopes[0].split(":");
+                    feedbackApi.start(publicKey, secretKey);
+                    feedbackApi.eventLogin();
+                } else {
+                    vscode.commands.executeCommand('tds-gaia.logout');
+                }
             }
         })
     );
 }
 
-const getSession = async () => {
-    const session = await vscode.authentication.getSession(AUTH_TYPE, [], { createIfNone: false });
-    if (session) {
-        vscode.window.showInformationMessage(`Welcome back ${session.account.label}`)
-    }
-}
+// }
 
-const getMsSession = async () => {
-    const session = await vscode.authentication.getSession('microsoft', [
-        "VSCODE_CLIENT_ID:f3164c21-b4ca-416c-915c-299458eba95b",
-        "VSCODE_TENANT:common",
-        "https://graph.microsoft.com/User.Read"
-    ], { createIfNone: false });
+// const getMsDefaultSession = async () => {
+//     const session = await vscode.authentication.getSession('microsoft', [
+//         "https://graph.microsoft.com/User.Read",
+//         "https://graph.microsoft.com/Calendar.Read"
+//     ], { createIfNone: false });
 
-    if (session) {
-        vscode.window.showInformationMessage(vscode.l10n.t("Welcome back {0}", session.account.label))
-    }
-}
+//     if (session) {
+//         vscode.window.showInformationMessage(vscode.l10n.t("Welcome back {0}", session.account.label))
+//     }
+// }
 
-const getMsDefaultSession = async () => {
-    const session = await vscode.authentication.getSession('microsoft', [
-        "https://graph.microsoft.com/User.Read",
-        "https://graph.microsoft.com/Calendar.Read"
-    ], { createIfNone: false });
-
-    if (session) {
-        vscode.window.showInformationMessage(vscode.l10n.t("Welcome back {0}", session.account.label))
-    }
+/**
+* Retrieves the current Gaia authentication session, if available.
+* 
+* @returns The current Gaia authentication session, or `undefined` if no session is available.
+*/
+export async function getGaiaSession(): Promise<vscode.AuthenticationSession | undefined> {
+    return await vscode.authentication.getSession(GaiaAuthenticationProvider.AUTH_TYPE, GaiaAuthenticationProvider.SCOPES, { createIfNone: false });
 }
