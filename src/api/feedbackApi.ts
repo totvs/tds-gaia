@@ -52,7 +52,6 @@ export class FeedbackApi {
         //
     }
 
-
     /**
     * Starts the feedback service by initializing the trace API with the provided public and secret keys.
     *
@@ -246,21 +245,7 @@ export class FeedbackApi {
                 "scorePerItem": ScoreEnum.Positive / types.length
             }
 
-            // const event: EventElement = this.createEvent(trace, EventsFeedbackEnum.SelectedCompletion);
-            // event.input = JSON.stringify({
-            //     "index": argument.selected
-            // });
-            // event.output = argument.selected !== 1
-            //     ? JSON.stringify(argument.completions[argument.selected])
-            //     : "";
-
-            // const score: ScoreElement = this.createScore(trace);
-            // score.name = "completion";
-            // score.value = argument.selected !== 1 ? ScoreEnum.Positive : ScoreEnum.Negative;
-
             this.traceApi.enqueue(trace);
-            //this.traceApi.enqueue(event);
-            //this.traceApi.enqueue(score);
             this.traceApi.sendQueue();
 
             this.elementMap[trace.id] = trace;
@@ -312,7 +297,7 @@ export class FeedbackApi {
         return result;
     }
 
-    scoreMessage(messageId: string, message: string, scoreValue: number) {
+    scoreMessage(messageId: string, scoreValue: number) {
         logger.profile("scoreInferType");
 
         if (this.user) {
@@ -333,6 +318,44 @@ export class FeedbackApi {
         }
 
         logger.profile("scoreInferType");
+        return;
+    }
+
+    /**
+    * Traces the explanation of a code snippet.
+    *
+    * @param messageId - The ID of the message associated with the code explanation.
+    * @param codeToExplain - The code snippet to be explained.
+    * @param explain - The explanation for the code snippet.
+    */
+    traceExplain(messageId: string, codeToExplain: string, explain: string): void {
+        logger.profile("traceExplain");
+        let result: string = "";
+
+        if (this.user) {
+            const trace: TraceElement = this.createTrace();
+            trace.input = JSON.stringify({
+                code: codeToExplain,
+            });
+            trace.output = JSON.stringify({
+                explain: explain,
+            });
+            // trace.metadata = {
+            //     "typesCount": types.length,
+            //     "scorePerItem": ScoreEnum.Positive / types.length
+            // }
+
+
+            this.traceApi.enqueue(trace);
+            this.traceApi.sendQueue();
+
+            this.elementMap[trace.id] = trace;
+            this.feedbackMap[messageId] = trace.id;
+        } else {
+            logger.error("traceExplain: user not found");
+        }
+
+        logger.profile("traceExplain");
         return;
     }
 

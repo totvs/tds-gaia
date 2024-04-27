@@ -196,13 +196,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
               break;
             }
           case CommonCommandFromWebViewEnum.Feedback:
-            console.log("Feedback");
-            console.dir(data)
             this.chatModel.messages
               .filter((msg: TMessageModel) => msg.messageId == data.messageId)
               .forEach((msg: TMessageModel) => {
                 msg.feedback = false;
-                feedbackApi.scoreMessage(msg.messageId, msg.message, Number.parseInt(data.value));
+                feedbackApi.scoreMessage(msg.messageId, Number.parseInt(data.value));
               });
 
             this.sendUpdateModel(this.chatModel, undefined);

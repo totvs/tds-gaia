@@ -16,7 +16,7 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { getGaiaConfiguration } from "../../config";
-import { chatApi, llmApi } from "../../api";
+import { chatApi, feedbackApi, llmApi } from "../../api";
 
 export function registerExplain(context: vscode.ExtensionContext): void {
     /**
@@ -35,9 +35,9 @@ export function registerExplain(context: vscode.ExtensionContext): void {
 
             if (selection && !selection.isEmpty) {
                 const selectionRange: vscode.Range = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
+                
                 codeToExplain = editor.document.getText(selectionRange);
                 whatExplain = chatApi.linkToSource(editor.document.uri, selectionRange);
-
             } else {
                 const curPos: vscode.Position = selection.start;
                 const contentLine: string = editor.document.lineAt(curPos.line).text;
@@ -50,11 +50,14 @@ export function registerExplain(context: vscode.ExtensionContext): void {
                 const messageId: string = chatApi.gaia(
                     vscode.l10n.t("Analyzing the code for explain {0}", whatExplain), {});
 
-                return llmApi.explainCode(codeToExplain).then((value: string) => {
+                return llmApi.explainCode(codeToExplain).then((explain: string) => {
+                    const responseId: string = chatApi.nextMessageId();
                     if (getGaiaConfiguration().clearBeforeExplain) {
-                        chatApi.gaia("clear", {});
+                        chatApi.user("clear", true);
                     }
-                    chatApi.gaia(value, { canFeedback: true, answeringId: messageId });
+
+                    chatApi.gaia(explain, { canFeedback: true, answeringId: messageId });
+                    feedbackApi.traceExplain(responseId, codeToExplain, explain)
                 });
             } else {
                 chatApi.gaiaWarning([
