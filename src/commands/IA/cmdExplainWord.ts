@@ -16,7 +16,7 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { getGaiaConfiguration } from "../../config";
-import { chatApi, llmApi } from "../../api";
+import { chatApi, feedbackApi, llmApi } from "../../api";
 
 export function registerExplainWord(context: vscode.ExtensionContext): void {
 
@@ -39,23 +39,25 @@ export function registerExplainWord(context: vscode.ExtensionContext): void {
 
                 if (wordToExplain.length > 0) {
                     const messageId: string = chatApi.gaia(
-                        vscode.l10n.t("Explaining Word \'{0}\'", whatExplain), {}
+                        vscode.l10n.t("Explaining word **{0}** {1}", wordToExplain, whatExplain), {}
                     );
 
-                    return llmApi.explainCode(wordToExplain).then((value: string) => {
+                    return llmApi.explainCode(wordToExplain).then((explain: string) => {
+                        const responseId: string = chatApi.nextMessageId();
                         if (getGaiaConfiguration().clearBeforeExplain) {
                             chatApi.gaia("clear", {});
                         }
-                        chatApi.gaia(value, { answeringId: messageId, canFeedback: true });
+                        chatApi.gaia(explain, { answeringId: messageId, canFeedback: true });
+                        feedbackApi.traceExplain(responseId, wordToExplain, explain)
                     });
                 } else {
-                    chatApi.gaiaWarning("I couldn't identify a word to explain it.");
+                    chatApi.gaiaWarning(vscode.l10n.t("I couldn't identify a word to explain it."));
                 }
             } else {
-                chatApi.gaiaWarning("I couldn't identify a word to explain it.");
+                chatApi.gaiaWarning(vscode.l10n.t("I couldn't identify a word to explain it."));
             }
         } else {
-            chatApi.gaiaWarning("Current editor is not valid for this operation.");
+            chatApi.gaiaWarning(vscode.l10n.t("Current editor is not valid for this operation."));
         }
     }));
 }

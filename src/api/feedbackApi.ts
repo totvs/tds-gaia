@@ -298,7 +298,7 @@ export class FeedbackApi {
     }
 
     scoreMessage(messageId: string, scoreValue: number) {
-        logger.profile("scoreInferType");
+        logger.profile("scoreMessage");
 
         if (this.user) {
             const traceId: string = this.feedbackMap[messageId];
@@ -313,11 +313,11 @@ export class FeedbackApi {
                 this.traceApi.enqueue(score);
                 this.traceApi.sendQueue();
             } else {
-                logger.error("eventInferType: Infer trace element not found");
+                logger.error("scoreMessage: Message trace element not found");
             }
         }
 
-        logger.profile("scoreInferType");
+        logger.profile("scoreMessage");
         return;
     }
 

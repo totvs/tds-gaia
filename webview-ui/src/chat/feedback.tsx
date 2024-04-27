@@ -43,18 +43,28 @@ export default function Feedback(props: IFeedbackProps): any {
         <div className="tds-feedback">
             <div id="buttons">&nbsp;</div>
             <VSCodeButton
+                aria-label="Positive"
                 appearance="icon"
                 type="button"
                 onClick={() => onFeedbackBtnSubmit('positive', '5')}
             >
-                <i className="codicon codicon-thumbsup" />
+                <i className="codicon codicon-thumbsup-filled" />
             </VSCodeButton>
             <VSCodeButton
+                aria-label="More or Less"
+                appearance="icon"
+                type="button"
+                onClick={() => onFeedbackBtnSubmit('negative', '2.5')}
+            >
+                <i className="codicon codicon-arrow-both" />
+            </VSCodeButton>
+            <VSCodeButton
+                aria-label="Negative"
                 appearance="icon"
                 type="button"
                 onClick={() => onFeedbackBtnSubmit('negative', '0')}
             >
-                <i className="codicon codicon-thumbsdown" />
+                <i className="codicon codicon-thumbsdown-filled" />
             </VSCodeButton>
             {
                 // <VSCodeLink id="comment" href="#" onClick={() => onFeedbackBtnSubmit('comment', '')}>

@@ -28,7 +28,7 @@
   "Detail: {0}": "Detalhe: {0}",
   "Error requesting [type: {0}, url: {1}]": "Erro solicitando [tipo: {0}, url: {1}]",
   "Analyzing the code for explain {0}": "Explicando o código ",
-  "Explaining Word '{0}'": "Explicando palavra '{0}'",
+  "Explaining word Explaining word **{0}** {1}": "Explicando a palavra **{0}** {1}",
   "Gaia IA is using  [{0}]": "A extensão está usando [{0}]",
   "Please open a {0}. That way I can investigate this issue better.": "Favor abrir um {0}. Assim posso investigar melhor esse problema.",
   "Getting health check...": "Obtendo verificação de saúde...",
