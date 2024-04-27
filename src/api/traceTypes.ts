@@ -42,7 +42,7 @@ export class TraceElement implements ITraceElement {
     userId: string = "";
     input: string = "";
     output: string = "";
-    metadata: {} | undefined = undefined;
+    metadata: Record<string, any> | undefined = undefined;
 
     /**
     * Gets the current session ID.

@@ -102,13 +102,13 @@ function showBanner(force: boolean = false): void {
 		{
 			const lines: string[] = [
 				"",
-				"--------------------------------v---------------------------------------------",
-				"     ////    //  //////  ////// |  TDS-Gaia, your partner in AdvPL programming",
-				`    //  //        //    //  //  |  Version ${ext?.packageJSON["version"]} (EXPERIMENTAL)`,
-				`   //  //  //    //    //  //   |  TOTVS Technology`,
-				"  //  //  //    //    //  //    |",
-				" ////    //    //    //////     |  https://github.com/totvs/tds-gaia",
-				"--------------------------------^----------------------------------------------",
+				"--------------------------------------v---------------------------------------------",
+				"    ////////  ////////  ///  //////// |  TDS-Gaia, your partner in AdvPL programming",
+				`   //        //    //       //    //  |  Version ${ext?.packageJSON["version"]} (EXPERIMENTAL)`,
+				`  //  ====  ////////  ///  ////////   |  TOTVS Technology`,
+				" //    //  //    //  ///  //    //    |",
+				"////////  //    //  ///  //    //     |  https://github.com/totvs/tds-gaia",
+				"-----------------------------=--------^---------------------------------------------",
 			];
 
 			logger.info(lines.join("\n"));

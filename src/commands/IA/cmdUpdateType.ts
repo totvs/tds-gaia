@@ -22,6 +22,7 @@ import { InferType } from "../../api/interfaceApi";
 import { TBuildInferTextReturn, TGetSymbolsReturn } from "../resultStruct";
 import { ScoreEnum } from "../../api/feedbackApi";
 import { chatApi, feedbackApi } from "../../api";
+import { activate } from './../../extension';
 
 /**
 * Registers a command to update the variables type of the current document.
@@ -45,11 +46,14 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
         const buildInferTextReturn: TBuildInferTextReturn = await buildInferText(inferData.documentUri, inferData.range, messageId, inferTypes);
         const text: string[] = buildInferTextReturn.text;
 
-        //inferData.types = inferData.types;
         dataCache.set(messageId, inferData);
-        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: true });
-        feedbackApi.eventInferTypes(messageId, inferTypes, ScoreEnum.Positive,
-            vscode.l10n.t("User accept all typification"), true);
+        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: buildInferTextReturn.feedback });
+        feedbackApi.scoreInferType(messageId, inferTypes.filter(((type: InferType) => !type.active)),
+            ScoreEnum.Relative,
+            (inferTypes.length == processVars.length)
+                ? vscode.l10n.t(`User accept all`)
+                : vscode.l10n.t(`User accept rest: ${processVars.join(",")}`),
+            true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.updateTypify', async (...args) => {
@@ -68,9 +72,9 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
         const text: string[] = buildInferTextReturn.text;
 
         dataCache.set(messageId, inferData);
-        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: true });
-        feedbackApi.eventInferTypes(messageId, inferTypes, ScoreEnum.Positive,
-            vscode.l10n.t("User accept some typification"), false);
+        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: buildInferTextReturn.feedback });
+        feedbackApi.scoreInferType(messageId, inferTypes.filter(((type: InferType) => !type.active)),
+            ScoreEnum.Relative, vscode.l10n.t(`User accept: ${processVars.join(",")}`), false);
     }));
 }
 
@@ -88,8 +92,12 @@ async function updateType(inferData: InferData, targetSymbol: string | undefined
                     if (!infer.active) {
                         processVars.push(infer.var);
                     } else {
-                        documentSymbols.forEach(symbol => {
-                            if (infer.var === symbol.name) {
+                        documentSymbols
+                            .filter(symbol => {
+                                return ((infer.var === symbol.name)
+                                    && ((targetSymbol === "" || targetSymbol === symbol.name)));
+                            })
+                            .forEach(symbol => {
                                 const changeRange: vscode.Range = new vscode.Range(
                                     symbol.range.start.line,
                                     symbol.range.start.character,
@@ -98,8 +106,7 @@ async function updateType(inferData: InferData, targetSymbol: string | undefined
                                 editBuilder.replace(changeRange, `${infer.var} as ${infer.type}`);
 
                                 processVars.push(infer.var);
-                            }
-                        });
+                            });
                     }
                 });
             });

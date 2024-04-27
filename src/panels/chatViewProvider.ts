@@ -202,7 +202,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
               .filter((msg: TMessageModel) => msg.messageId == data.messageId)
               .forEach((msg: TMessageModel) => {
                 msg.feedback = false;
-                feedbackApi.eventInferTypes(msg.messageId, [], Number.parseInt(data.value), vscode.l10n.t("Scoring the chat message"));
+                feedbackApi.scoreMessage(msg.messageId, msg.message, Number.parseInt(data.value));
               });
 
             this.sendUpdateModel(this.chatModel, undefined);

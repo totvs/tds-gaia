@@ -109,12 +109,13 @@ export function registerInfer(context: vscode.ExtensionContext): void {
                     return llmApi.inferType(codeToAnalyze).then(async (response: InferTypeResponse) => {
                         if (response !== undefined && response.types !== undefined && response.types.length) {
                             const responseId: string = chatApi.nextMessageId();
-                            const buildInferTextReturn: TBuildInferTextReturn = await buildInferText(editor.document.uri, rangeForAnalyze, responseId, response.types);
+                            const buildInferTextReturn: TBuildInferTextReturn =
+                                await buildInferText(editor.document.uri, rangeForAnalyze, responseId, response.types);
                             const text: string[] = buildInferTextReturn.text;
 
                             chatApi.gaia(text.join("\n"), { answeringId: messageId, canFeedback: true });
                             //chatApi.gaia(vscode.l10n.t("I think that the types are right."), { answeringId: messageId });
-                            feedbackApi.traceFeedback(responseId, codeToAnalyze, response.types)
+                            feedbackApi.traceInferType(responseId, codeToAnalyze, response.types)
                         } else {
                             chatApi.gaia(vscode.l10n.t("Sorry, I couldn't make the typification because of an internal problem."), { answeringId: messageId });
                         }

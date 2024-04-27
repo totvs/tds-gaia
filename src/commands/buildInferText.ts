@@ -89,7 +89,6 @@ export async function buildInferText(documentUri: vscode.Uri, range: vscode.Rang
         text.push(vscode.l10n.t("- {0} as **{1}** {2}", command, varType.type, linkPosition));
     }
 
-    text.push("");
     if (someTipped) {
         text.push(vscode.l10n.t("{0} or click on variable name.",
             `${chatApi.commandText("updateTypeAll", {
@@ -106,6 +105,7 @@ export async function buildInferText(documentUri: vscode.Uri, range: vscode.Rang
 
     return {
         status: StatusReturnEnum.Ok,
-        text: text
+        text: text,
+        feedback: true
     };
 }

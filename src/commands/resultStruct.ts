@@ -51,4 +51,5 @@ export type TGetSymbolsReturn = TBasicReturn & {
 
 export type TBuildInferTextReturn = TBasicReturn & {
     text: string[];
+    feedback: boolean;
 }

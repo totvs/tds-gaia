@@ -25,12 +25,14 @@ enum EventsFeedbackEnum {
     Login = "login",
     Logout = "logout",
     SelectedCompletion = "selectedCompletion",
+    InferType = "inferType",
     // Completion = "completion",
     // Score = "score",
     // Infer = "infer",
 }
 
 export enum ScoreEnum {
+    Relative = -1,
     Negative = 0,
     Positive = 5
 }
@@ -133,6 +135,14 @@ export class FeedbackApi {
                 "company": this.user.orgs?.join(",") || "",
                 "gaiaVersion": gaiaExt?.packageJSON.version || "unavailable",
                 "tdsVersion": tdsExt?.packageJSON.version || "unavailable",
+                "vscode": {
+                    "version": vscode.version,
+                    "language": vscode.env.language,
+                    "arc": process.arch,
+                    "platform": process.platform,
+                    "processor": process.env.PROCESSOR_ARCHITECTURE || "unavailable",
+                    "processorID": process.env.PROCESSOR_IDENTIFIER || "unavailable"
+                }
             }
 
             //const event: EventElement = this.createEvent(trace, EventsFeedbackEnum.Login);
@@ -167,7 +177,8 @@ export class FeedbackApi {
 
             //this.traceApi.enqueue(eventLogout);
             this.traceApi.sendQueue();
-
+        } else {
+            logger.debug("eventLogout: login event not found in map.");
         }
 
         this.user = undefined;
@@ -205,86 +216,124 @@ export class FeedbackApi {
             this.traceApi.enqueue(event);
             this.traceApi.enqueue(score);
             this.traceApi.sendQueue();
+        } else {
+            logger.error("eventCompletion: user not found");
         }
+
     }
 
     /**
     * Traces the feedback for the given message ID.
     *
-    * @param messageId - The ID of the message to trace feedback for.
     * @param codeToAnalyze - The code to analyze for feedback.
     * @param types - The types to include in the feedback.
     * @returns 
     */
-    traceFeedback(messageId: string, codeToAnalyze: string, types: InferType[]): void {
-        logger.profile("traceFeedback");
+    traceInferType(messageId: string, codeToAnalyze: string, types: InferType[]): string {
+        logger.profile("traceInferType");
+        let result: string = "";
 
-        // if (this.user) {
-        //     const body: any = {
-        //         "batch": [
-        //             {
-        //                 "type": "trace-create",
-        //                 "id": `trace_id_${randomUUID()}`,
-        //                 "timestamp": new Date().toISOString(),
-        //                 "body": {
-        //                     "id": `trace_id_${randomUUID()}`,
-        //                     "sessionId": this.sessionId,
-        //                     "name": PREFIX_GAIA,
-        //                     "userId": this.user.email,
-        //                     "input": JSON.stringify({ code: codeToAnalyze }),
-        //                     "output": JSON.stringify({ types: types }),
-        //                 }
-        //             }
-        //         ]
-        //     }
+        if (this.user) {
+            const trace: TraceElement = this.createTrace();
+            trace.input = JSON.stringify({
+                code: codeToAnalyze,
+            });
+            trace.output = JSON.stringify({
+                types: types,
+            });
+            trace.metadata = {
+                "typesCount": types.length,
+                "scorePerItem": ScoreEnum.Positive / types.length
+            }
 
-        //     this.jsonRequest("POST", "", {}, body).then((response: any) => {
-        //         if (response.errors.length > 0) {
-        //             logger.error("traceFeedback: errors", response["errors"]);
-        //         } else if (response.successes) {
-        //             //this._traceMap[EventsFeedbackEnum.Completion] = response.successes[0].id;
-        //             this.registerFeedback(messageId, response.successes[0].id)
-        //         } else {
-        //             logger.error("traceFeedback: unexpected response");
-        //             logger.error(response);
-        //             //reject(new Error("Invalid response"));
-        //         }
-        //     });
-        // } else {
-        //     logger.error("createScore: user not found");
-        //     this.authorization = ""; //evita novas chamadas deste e demais eventos
-        //     //reject(new Error("eventLogin: user not found"));
-        // }
+            // const event: EventElement = this.createEvent(trace, EventsFeedbackEnum.SelectedCompletion);
+            // event.input = JSON.stringify({
+            //     "index": argument.selected
+            // });
+            // event.output = argument.selected !== 1
+            //     ? JSON.stringify(argument.completions[argument.selected])
+            //     : "";
 
-        logger.profile("traceFeedback");
+            // const score: ScoreElement = this.createScore(trace);
+            // score.name = "completion";
+            // score.value = argument.selected !== 1 ? ScoreEnum.Positive : ScoreEnum.Negative;
+
+            this.traceApi.enqueue(trace);
+            //this.traceApi.enqueue(event);
+            //this.traceApi.enqueue(score);
+            this.traceApi.sendQueue();
+
+            this.elementMap[trace.id] = trace;
+            this.feedbackMap[messageId] = trace.id;
+        } else {
+            logger.error("traceInferType: user not found");
+        }
+
+        logger.profile("traceInferType");
+        return result;
+    }
+
+    scoreInferType(messageId: string, types: InferType[], scoreValue: number, comment: string = "", unregister: boolean = false) {
+        logger.profile("scoreInferType");
+        let result: string = "";
+
+        if (this.user) {
+            const traceId: string = this.feedbackMap[messageId];
+            const trace: TraceElement = this.elementMap[traceId] as TraceElement;
+
+            if (trace) {
+                const event: EventElement = this.createEvent(trace, EventsFeedbackEnum.InferType);
+                event.input = JSON.stringify({
+                    "types": types
+                });
+
+                const score: ScoreElement = this.createScore(trace);
+                score.name = "inferType";
+                score.value = scoreValue == ScoreEnum.Relative
+                    ? ((trace.metadata || {})["scorePerItem"]) * types.length || ScoreEnum.Positive
+                    : scoreValue;
+                score.comment = comment;
+
+                //this.traceApi.enqueue(trace);
+                //this.traceApi.enqueue(event);
+                this.traceApi.enqueue(score);
+                this.traceApi.sendQueue();
+
+                if (unregister) {
+                    delete this.elementMap[traceId];
+                    delete this.feedbackMap[messageId];
+                }
+            } else {
+                logger.error("eventInferType: Infer trace element not found");
+            }
+        }
+
+        logger.profile("scoreInferType");
+        return result;
+    }
+
+    scoreMessage(messageId: string, message: string, scoreValue: number) {
+        logger.profile("scoreInferType");
+
+        if (this.user) {
+            const traceId: string = this.feedbackMap[messageId];
+            const trace: TraceElement = this.elementMap[traceId] as TraceElement;
+
+            if (trace) {
+                const score: ScoreElement = this.createScore(trace);
+                score.name = "chat-msg";
+                score.value = scoreValue;
+                score.comment = "Score the chat message";
+
+                this.traceApi.enqueue(score);
+                this.traceApi.sendQueue();
+            } else {
+                logger.error("eventInferType: Infer trace element not found");
+            }
+        }
+
+        logger.profile("scoreInferType");
         return;
-    }
-
-    /**
-    * Registers a feedback trace ID for the given response ID.
-    * 
-    * @param responseId - The ID of the response to register feedback for.
-    * @param traceID - The trace ID to associate with the feedback.
-    */
-    private registerFeedback(responseId: string, traceID: string) {
-        this.feedbackMap[responseId] = traceID;
-    }
-
-    eventInferTypes(messageId: string, inferTypes: InferType[], score: ScoreEnum, comment: string = "", unregister: boolean = false): void {
-        logger.profile("eventInferTypes");
-        const traceId: string = this.feedbackMap[messageId] || "";
-
-        // if (traceId) {
-        //     this.createScore(traceId, score, `${comment} ${JSON.stringify(inferTypes)}`);
-        //     if (unregister) {
-        //         delete this.feedbackMap[messageId];
-        //     }
-        // } else {
-        //     logger.error("eventInferTypes: traceId not found");
-        // }
-
-        logger.profile("eventInferTypes");
-
     }
 
 }
