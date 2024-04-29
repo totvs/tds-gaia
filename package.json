@@ -350,25 +350,9 @@
     ],
     "keybindings": [
       {
-        "key": "Ctrl+D Ctrl+L",
-        "mac": "Cmd+D Cmd+L",
-        "command": "tds-gaia.login"
-      },
-      {
-        "key": "Ctrl+D Ctrl+B",
-        "mac": "Cmd+D Cmd+B",
-        "command": "tds-gaia.logout"
-      },
-      {
         "key": "Ctrl+D Ctrl+T",
         "mac": "Cmd+D Cmd+T",
         "command": "tds-gaia.infer",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "Ctrl+shift+l",
-        "mac": "Cmd+shift+l",
-        "command": "editor.action.inlineSuggest.trigger",
         "when": "editorTextFocus"
       },
       {

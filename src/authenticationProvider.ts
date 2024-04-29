@@ -22,7 +22,7 @@ import { randomUUID } from "crypto";
 import { chatApi, feedbackApi, llmApi } from "./api";
 
 const AUTH_TYPE: string = "auth-gaia";
-const AUTH_NAME: string = "Gaia";
+const AUTH_NAME: string = "TDS-Gaia Authentication";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`
 const SCOPES: string[] = ["feedback"];
 
@@ -226,13 +226,14 @@ export function registerAuthentication(context: vscode.ExtensionContext) {
                 const session: vscode.AuthenticationSession | undefined = await getGaiaSession();
 
                 if (session) {
-                    //chatApi.checkUser("");
+                    // //chatApi.checkUser("");
 
-                    const [_, publicKey, secretKey] = session.scopes[0].split(":");
-                    feedbackApi.start(publicKey, secretKey);
-                    feedbackApi.eventLogin();
+                    // const [_, publicKey, secretKey] = session.scopes[0].split(":");
+                    // feedbackApi.start(publicKey, secretKey);
+                    // feedbackApi.eventLogin();
+                    vscode.commands.executeCommand('tds-gaia.afterLogin');
                 } else {
-                    vscode.commands.executeCommand('tds-gaia.logout');
+                    vscode.commands.executeCommand('tds-gaia.afterLogout');
                 }
             }
         })

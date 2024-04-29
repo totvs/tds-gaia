@@ -373,7 +373,7 @@ export class ChatApi {
                 }
                 this.gaia([
                     vscode.l10n.t("To start, I need to know you."),
-                    vscode.l10n.t("Please, identify yourself with the command {0}", this.commandText("login"))
+                    vscode.l10n.t("Please, identify yourself with the command {0}.", this.commandText("login"))
                 ], { answeringId: answeringId });
             } else {
                 this.gaia([
@@ -387,10 +387,12 @@ export class ChatApi {
     }
 
     logout() {
-        this.gaia([
-            vscode.l10n.t("**{0}**, thank you for working with me!", getGaiaUser()?.displayName || "<unknown>"),
-            vscode.l10n.t("See you soon!"),
-        ], {});
+        if (isGaiaLogged()) {
+            this.gaia([
+                vscode.l10n.t("**{0}**, thank you for working with me!", getGaiaUser()?.displayName || "<unknown>"),
+                vscode.l10n.t("See you soon!"),
+            ], {});
+        }
     }
 
     /**

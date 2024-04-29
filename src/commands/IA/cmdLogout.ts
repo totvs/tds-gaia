@@ -22,10 +22,18 @@ import { chatApi, feedbackApi, llmApi } from "../../api";
 export function registerLogout(context: vscode.ExtensionContext): void {
 
     /**
-     * Registers a command to log out the user by deleting the stored API token.
-     * Logs the user out, deletes the stored API token and shows an informational message.
+    * Logs the user out of the Gaia application.
+    * This command unsubscribes the user from the Gaia API, logs them out of the chat and language models, and displays an information message to the user.
     */
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.logout', async (...args) => {
+        if (isGaiaLogged()) {
+            chatApi.gaia(
+                vscode.l10n.t("To logout of the **TDS-Gaia**, please click in ``Accounts`` and in your identification, click in ``Sign Out``"),
+                {});
+        }
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.afterLogout', async (...args) => {
         if (isGaiaLogged()) {
             feedbackApi.eventLogout();
             chatApi.logout();

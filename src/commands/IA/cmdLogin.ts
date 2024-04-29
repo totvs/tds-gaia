@@ -18,6 +18,7 @@ import * as vscode from "vscode";
 import { PREFIX_GAIA, logger } from "../../logger";
 import { GaiaAuthenticationProvider, getGaiaSession } from "../../authenticationProvider";
 import { chatApi, feedbackApi, llmApi } from "../../api";
+import { isGaiaLogged, setGaiaUser } from "../../config";
 
 export function registerLogin(context: vscode.ExtensionContext): void {
 
@@ -30,13 +31,29 @@ export function registerLogin(context: vscode.ExtensionContext): void {
     * 
     * @param args - First arg is a boolean to skip auto-login if true.
     */
-
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.login', async (...args) => {
         let session: vscode.AuthenticationSession | undefined = await getGaiaSession();
 
-        if (session !== undefined) {
-            await llmApi.start();
+        if (session !== undefined) { // If a session is already stored, attempt auto-login.
+            await vscode.commands.executeCommand("tds-gaia.afterLogin");
+            return;
+        };
 
+        if (args.length > 0 && args[0] === true) { //login automático
+            return;
+        }
+
+        session = await vscode.authentication.getSession(GaiaAuthenticationProvider.AUTH_TYPE, [], { createIfNone: true });
+
+        if (session !== undefined) {
+            vscode.commands.executeCommand("tds-gaia.afterLogin");
+        } 
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.afterLogin', async (...args) => {
+        let session: vscode.AuthenticationSession | undefined = await getGaiaSession();
+
+        if (session !== undefined) {
             if (await llmApi.login(session.account.id, session.accessToken)) {
                 logger.info(vscode.l10n.t('Logged in successfully'));
                 vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
@@ -49,22 +66,6 @@ export function registerLogin(context: vscode.ExtensionContext): void {
             }
         };
 
-
-        if (args.length > 0) {
-            if (args[0]) { //indica que login foi acionado automaticamente
-                return;
-            }
-        }
-
-        session = await vscode.authentication.getSession(GaiaAuthenticationProvider.AUTH_TYPE, [], { createIfNone: true });
-
-        if (session !== undefined) {
-
-            if (session.accessToken) {
-                vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
-            } else {
-                vscode.window.showInformationMessage(vscode.l10n.t("{0} Login failure", PREFIX_GAIA));
-            }
-        }
+        chatApi.checkUser("");
     }));
 }
