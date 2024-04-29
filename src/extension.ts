@@ -104,7 +104,7 @@ function showBanner(force: boolean = false): void {
 				"",
 				"--------------------------------------v---------------------------------------------",
 				"    ////////  ////////  ///  //////// |  TDS-Gaia, your partner in AdvPL programming",
-				`   //        //    //       //    //  |  Version ${ext?.packageJSON["version"]} (EXPERIMENTAL)`,
+				`   //        //    //       //    //  |  Version ${ext?.packageJSON["version"]} (BETA)`,
 				`  //  ====  ////////  ///  ////////   |  TOTVS Technology`,
 				" //    //  //    //  ///  //    //    |",
 				"////////  //    //  ///  //    //     |  https://github.com/totvs/tds-gaia",

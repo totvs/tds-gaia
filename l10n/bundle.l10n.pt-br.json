@@ -1,5 +1,5 @@
 {
-  "- **{0}** as **{1}**": "- **{0}** as **{1}**",
+  "- **{0}** as **{1}**": "- **{0}** as **{1}** {2}",
   "- A shortcut;": "- Um atalho;",
   "- By a link presented in this chat;": "- Por uma ligação apresentada no  bate-papo;",
   "- By the command panel (`ctrl + shift - p` or` f1`), filtering by \"tds-gaia\";": "- Pelo painel de comando (`ctrl + shift - p` ou` f1`), filtrando por \"tds-gaia\";",

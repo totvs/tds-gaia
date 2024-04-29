@@ -73,7 +73,7 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
         dataCache.set(messageId, inferData);
         chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: true, disabledFeedback: buildInferTextReturn.feedback });
         feedbackApi.scoreInferType(messageId, inferTypes.filter(((type: InferType) => !type.active)),
-            ScoreEnum.Relative, vscode.l10n.t(`User accept: ${processVars.join(",")}`), false);
+            ScoreEnum.Relative, vscode.l10n.t("User accept: {0}}", processVars.join(",")), false);
     }));
 }
 
