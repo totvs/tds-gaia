@@ -51,17 +51,18 @@ A extensão **TDS-Gaia** é uma extensão para o [Visual Studio Code](https://co
 > - [Instalação](README.md#instalação).
 
 Após a instalação da extensão **TDS-Gaia**. Uma verificação de disponibilidade do serviço de IA é efetuada. 
-Se estiver tudo em ordem, identifique-se efetuando `Login [Ctrl+D Ctrl+L]`. Após validado, abra um fonte AdvPL/TLPP, 
+Se estiver tudo em ordem, identifique-se efetuando `Login`. Após validado, abra um fonte AdvPL/TLPP, 
 posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP ou aguarde alguns instantes, que sugestões de códigos lhe serão apresentadas.
 
-| Funcionalidade | Atalho        | Ação |
-| -------------- | ------------- | ---- |
-| Login          | Ctrl+D Ctrl+L | Conecta o usuário ao serviço de IA. Veja [Autenticação](#autenticação) |
-| Auto-completar |               | Acionado automaticamente durante a edição. |
-|                |               | **Dica:** Ao ser apresentada a sugestão posicione o _mouse_ sobre ela para obter uma lista de opções. |
-| Explicação*    | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
-|                | Ctrl+D Ctrl+W | Explica a palavra corrente (sob o cursor). |
-| Tipificação*   | Ctrl+D Ctrl+T | Tipifica variáveis de uma função/método. |
+| Funcionalidade  | Atalho        | Ação |
+| --------------- | ------------- | ---- |
+| Login           |               | Conecta o usuário ao serviço de IA. Veja [Autenticação](#autenticação) |
+| Auto-completar  |               | Acionado automaticamente durante a edição. |
+|                 |               | **Dica:** Ao ser apresentada a sugestão posicione o _mouse_ sobre ela para obter uma lista de opções.  |
+| Explicação*     | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
+|                 | Ctrl+D Ctrl+W | Explica a palavra corrente (sob o cursor). |
+| Tipificação*    | Ctrl+D Ctrl+T | Tipifica variáveis de uma função/método. |
+| Geração Código* | Ctrl+D Ctrl+G | Geração de código a partir de uma descrição. |
 
 _* Funcionalidades ainda em desenvolvimento. Podem levar 1 minuto ou mais para responder e apresentar respostas inesperadas._
 
@@ -121,16 +122,14 @@ A extensão já vem configurada pronto para uso, não requerendo nenhuma configu
 
 #### Login
 
-- Acione a autenticação no **TDS-Gaia** (`ctrl+shift-l` ou `F1` `TDS-Gaia: Login` ou `Accounts` (abaixo))
-- Informe o _token_ de acesso
-- AGuarde a validação do acesso
+- Acione a autenticação no **TDS-Gaia** (`F1` `TDS-Gaia: Login`) ou `Accounts` (abaixo) e acione ``Sign In to TDS-Gaia...``
+- Informe o _token_ de acesso. 
 
 ![Autenticação](docs/login.png)
 
 #### Desconectar (não é obrigatório)
 
-- Acione o procedimento no **TDS-Gaia** (`F1` `TDS-Gaia: Logout` ou `Accounts` (abaixo))
-- Acione ``Sign Out``
+- Acione o procedimento no **TDS-Gaia** (`F1` `TDS-Gaia: Logout`) ou `Accounts` (abaixo)) e na sua identificação, acione ``Sign Out``
 
 ![Desconexão](docs/logout.png)
 
@@ -146,9 +145,9 @@ Você pode utilizar  as funcionalidades através de comandos, que podem ser acio
 
 Neste documento, quando citado "Acionar o comando ...", entenda que você pode aciona-lo pelo atalho a ele associado, pelo painel de comandos ou digitando-o no _prompt_ do bate-papo. Se for digitar, digite apenas a palavra informada entre chaves do final do comando ou acione o atalho entre parenteses. Lembrando que os atalhos aqui citados, são os atribuídos por padrão.
 
-Por exemplo: "... identifique-se acionando `TDS-Gaia: Login (Ctrl+D Ctrl+L) [login]`", você pode acionar o painel de comandos e localizar o comando ou digitar `login` no _prompt_ ou acionar o atalho `Ctrl+D Ctrl+L ` ou acionar a ligação no bate-papo, se existir ou, ainda, pelo menu de contexto do bate-papo ou fonte em edição.
+Por exemplo: "... identifique-se acionando `TDS-Gaia: Login [login]`", você pode acionar o painel de comandos e localizar o comando ou digitar `login` no _prompt_ ou acionar a ligação no bate-papo, se existir ou, ainda, pelo menu de contexto do bate-papo ou fonte em edição.
 
-Quando o **TDS-Gaia**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando `TDS-Gaia: Login (Ctrl+D Ctrl+L) [login]`. 
+Quando o **TDS-Gaia**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando `TDS-Gaia: Login [login]`. 
 
 Caso não saiba o que fazer ou aparenta não estar funcionando, veja quê o **TDS-Gaia** está lhe dizendo no bate-papo.
 

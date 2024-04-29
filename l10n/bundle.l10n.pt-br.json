@@ -62,7 +62,7 @@
   "No code found in the stack": "Nenhum código encontrado na pilha",
   "Please enter your API token or @your name):": "Por favor, insira seu token de API ou @seu nome):",
   "Please open a {0}. That way I can investigate this issue better.": "Favor abrir um {0}. Assim posso investigar melhor esse problema.",
-  "Please, identify yourself with the command {0}": "Por favor, identifique -se com o comando {0}",
+  "Please, identify yourself with the command {0}.": "Por favor, identifique -se com o comando {0}.",
   "Queue has reached max capacity, you cannot add more items": "A fila atingiu a capacidade máxima, você não pode adicionar mais itens",
   "Quick Guide": "Guia Rápido",
   "See you soon!": "Vejo você em breve!",
