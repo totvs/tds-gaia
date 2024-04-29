@@ -23,7 +23,7 @@
     "development"
   ],
   "engines": {
-    "vscode": "^1.73.0"
+    "vscode": "^1.85.0"
   },
   "icon": "icons/tds-gaia.png",
   "categories": [
