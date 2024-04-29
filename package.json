@@ -423,6 +423,7 @@
     "fs-extra": "^11.2.0",
     "undici": "^6.4.0",
     "vscode-languageclient": "^9.0.1",
+    "webpack": "^5.91.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {

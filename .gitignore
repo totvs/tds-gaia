@@ -22,4 +22,5 @@ sig
 *.log
 *.vsix
 build
-**/.vscode
+
+.vscode
