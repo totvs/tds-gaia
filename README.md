@@ -1,4 +1,4 @@
-# TDS-Dito, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
+# TDS-GAIA, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
 
 > **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
 >
@@ -6,20 +6,20 @@
 >
 > No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
 
-<!--[![GitHub stars](https://img.shields.io/github/stars/brodao2/tds-dito?style=plastic)](https://github.com/brodao2/tds-dito/stargazers)
-![GitHub top language](https://img.shields.io/github/languages/top/brodao2/tds-dito)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/brodao2/tds-dito/Deploy%20Extension)
-![GitHub last commit](https://img.shields.io/github/last-commit/brodao2/tds-dito)
+<!--[![GitHub stars](https://img.shields.io/github/stars/brodao2/tds-gaia?style=plastic)](https://github.com/brodao2/tds-gaia/stargazers)
+![GitHub top language](https://img.shields.io/github/languages/top/brodao2/tds-gaia)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/brodao2/tds-gaia/Deploy%20Extension)
+![GitHub last commit](https://img.shields.io/github/last-commit/brodao2/tds-gaia)
 -->
 <!-- prettier-ignore-start -->
-[![GitHub license](https://img.shields.io/github/license/brodao2/tds-dito?style=plastic)](https://github.com/brodao2/tds-dito/blob/master/LICENSE)
-![Version](https://img.shields.io/visual-studio-marketplace/v/TOTVS.tds-dito)
-![Installs](https://img.shields.io/visual-studio-marketplace/i/TOTVS.tds-dito)
-![Downloads](https://img.shields.io/visual-studio-marketplace/d/TOTVS.tds-dito)
-![Rating](https://img.shields.io/visual-studio-marketplace/stars/TOTVS.tds-dito)
-[![GitHub issues](https://img.shields.io/github/issues/brodao2/tds-dito?style=plastic)](https://github.com/brodao2/tds-dito/issues)
-[![GitHub forks](https://img.shields.io/github/forks/brodao2/tds-dito?style=plastic)](https://github.com/brodao2/tds-dito/network)
-![Visual Studio Marketplace Last Updated](https://img.shields.io/visual-studio-marketplace/last-updated/TOTVS.tds-dito)
+[![GitHub license](https://img.shields.io/github/license/brodao2/tds-gaia?style=plastic)](https://github.com/brodao2/tds-gaia/blob/master/LICENSE)
+![Version](https://img.shields.io/visual-studio-marketplace/v/TOTVS.tds-gaia)
+![Installs](https://img.shields.io/visual-studio-marketplace/i/TOTVS.tds-gaia)
+![Downloads](https://img.shields.io/visual-studio-marketplace/d/TOTVS.tds-gaia)
+![Rating](https://img.shields.io/visual-studio-marketplace/stars/TOTVS.tds-gaia)
+[![GitHub issues](https://img.shields.io/github/issues/brodao2/tds-gaia?style=plastic)](https://github.com/brodao2/tds-gaia/issues)
+[![GitHub forks](https://img.shields.io/github/forks/brodao2/tds-gaia?style=plastic)](https://github.com/brodao2/tds-gaia/network)
+![Visual Studio Marketplace Last Updated](https://img.shields.io/visual-studio-marketplace/last-updated/TOTVS.tds-gaia)
 <!-- markdownlint-disable -->
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](#contributors-)
@@ -27,7 +27,7 @@
 <!-- markdownlint-enabled -->
 <!-- prettier-ignore-end -->
 
-A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://code.visualstudio.com/) que fornece uma interface visual para o serviço de IA da **TOTVS**, que provê serviço de inteligência artificial para ajudá-lo no desenvolvimento de aplicações AdvPL/TLPP.
+A extensão **TDS-Gaia** é uma extensão para o [Visual Studio Code](https://code.visualstudio.com/) que fornece uma interface visual para o serviço de IA da **TOTVS**, que provê serviço de inteligência artificial para ajudá-lo no desenvolvimento de aplicações AdvPL/TLPP.
 
 ## Funcionalidades (_status_)
 
@@ -44,7 +44,7 @@ A extensão **TDS-Dito** é uma extensão para o [Visual Studio Code](https://co
 
 > Indicado para quem já tem familiaridade com o **VS-Code**. Caso contrário, recomenda-se começar por [Instalação](#instalação).
 
-Após a instalação da extensão **TDS-Dito**. Uma verificação de disponibilidade do serviço de IA é efetuada. 
+Após a instalação da extensão **TDS-gaia**. Uma verificação de disponibilidade do serviço de IA é efetuada. 
 Se estiver tudo em ordem, identifique-se efetuando `Login [Ctrl+D Ctrl+E]`. Após validado, abra um fonte AdvPL/TLPP, 
 posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP ou aguarde alguns instantes, que sugestões de códigos lhe serão apresentadas.
 
@@ -73,7 +73,7 @@ Você pode procurar e instalar extensões de dentro do **VS Code**. Abra a visã
 
 ![Ícone da Visão Extensões](images/extensions-view-icon.png)
 
-Em seguida digite `tds` no campo de pesquisa e selecione a extensão `TDS-Dito`.
+Em seguida digite `tds` no campo de pesquisa e selecione a extensão `TDS-gaia`.
 
 Acione  o botão `Instalar`. Após completar a instalação, o botão `Instalar` será alterado para `Gerenciar`. 
 
@@ -81,18 +81,18 @@ Acione  o botão `Instalar`. Após completar a instalação, o botão `Instalar`
 
 Você pode instalar manualmente uma extensão do **VS Code** que foi empacotada em um arquivo `.vsix`. Utilize o comando `Instalar do VSIX...` na visão de extensões após acionar `Modo de Exibição e Mais Ações...` (ícone com "...") ou acione o comando `Extensões: Instalar do VSIX...` no painel de comandos (`CTRL+SHIFT+P`) e selecione o arquivo `.vsix`.
 
-Acesse [releases](https://github.com/brodao2/tds-dito/releases) para baixar a última versão liberada.
+Acesse [releases](https://github.com/brodao2/tds-gaia/releases) para baixar a última versão liberada.
 
 > Caso o acesso seja negado, solicite liberação.
 > Sua solicitação será analisada, podendo ser liberado ou negada sem maiores explicações.
 
 Você pode instalar também usando a opção `--install-extension` através da linha de comando e informando o caminho do arquivo `.vsix`.
 
-> `code --install-extension tds-dito-0.0.1.vsix`
+> `code --install-extension tds-gaia-0.0.1.vsix`
 
-Ao finalizar a instalação, lhe será apresentado um bate-bato (_chat_). É através dele que você e  **Dito, seu parceiro na programação AdvPL/TLPP**, iram interagir.
+Ao finalizar a instalação, lhe será apresentado um bate-bato (_chat_). É através dele que você e  **Gaia, seu parceiro na programação AdvPL/TLPP**, iram interagir.
 
-![Dito: Chat](images/chat.png)
+![Gaia: Chat](images/chat.png)
 
 ### Revertendo uma atualização
 
@@ -120,11 +120,11 @@ Você pode utilizar  as funcionalidades através de comandos, que podem ser acio
 
 Neste documento, quando citado "Acionar o comando ...", entenda que você pode aciona-lo pelo atalho a ele associado, pelo painel de comandos ou digitando-o no _prompt_ do bate-papo. Se for digitar, digite apenas a palavra informada entre chaves do final do comando ou acione o atalho entre parenteses. Lembrando que os atalhos aqui citados, são os atribuídos por padrão.
 
-Por exemplo: "... identifique-se acionando `TDS-Dito: Login (Ctrl+D Ctrl+L) [login]`", você pode acionar o painel de comandos e localizar o comando ou digitar `login` no _prompt_ ou acionar o atalho `Ctrl+D Ctrl+L ` ou acionar a ligação no bate-papo, se existir ou, ainda, pelo menu de contexto do bate-papo ou fonte em edição.
+Por exemplo: "... identifique-se acionando `TDS-Gaia: Login (Ctrl+D Ctrl+L) [login]`", você pode acionar o painel de comandos e localizar o comando ou digitar `login` no _prompt_ ou acionar o atalho `Ctrl+D Ctrl+L ` ou acionar a ligação no bate-papo, se existir ou, ainda, pelo menu de contexto do bate-papo ou fonte em edição.
 
-Quando o **TDS-Dito**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando `TDS-Dito: Login (Ctrl+D Ctrl+L) [login]`. 
+Quando o **TDS-Gaia**, responder no bate-papo que está pronto para auxiliá-lo, identifique-se acionando `TDS-Gaia: Login (Ctrl+D Ctrl+L) [login]`. 
 
-Caso não saiba o que fazer ou aparenta não estar funcionando, veja quê o **TDS-Dito** está lhe dizendo no bate-papo.
+Caso não saiba o que fazer ou aparenta não estar funcionando, veja quê o **TDS-Gaia** está lhe dizendo no bate-papo.
 
 ## Funcionalidades
 
@@ -136,7 +136,7 @@ A extensão fornece sugestões de código analisando seu código AdvPL/TLPP do f
 
 ### Explicação de código
 
-A extensão pode lhe fornecer explicações sobre o código ao acionar o comando `TDS-Dito: Explain (Ctrl+D Ctrl+E) [explain]`. 
+A extensão pode lhe fornecer explicações sobre o código ao acionar o comando `TDS-Gaia: Explain (Ctrl+D Ctrl+E) [explain]`. 
  Se não ficar satisfeito, acione novamente o comando, que lhe será apresentado uma nova explicação.
 
 #### Linha corrente
@@ -157,24 +157,24 @@ Posicione o cursor no cabeçalho da implementação da função ou método e aci
 
 ### Tipificação de variáveis
 
-Em códigos TLPP, a extensão pode analisar uma função ou método e lhe fornecer a tipificação de variáveis com base no seu uso. Com o cursor posicionado em qualquer lugar dentro da função ou método, acionar o comando `TDS-Dito: typify (Ctrl+D Ctrl+T) [typify]`. 
+Em códigos TLPP, a extensão pode analisar uma função ou método e lhe fornecer a tipificação de variáveis com base no seu uso. Com o cursor posicionado em qualquer lugar dentro da função ou método, acionar o comando `TDS-Gaia: typify (Ctrl+D Ctrl+T) [typify]`. 
 
 ## Erros comuns
 
 ### Bloqueio por _firewall_ e outros sistemas de proteção  
 
-O **TDS-Dito**, depende de acesso a URL´s de serviços externos que, eventualmente, precisam ser liberados por sistemas de proteção (_firewalls_, anti-virus e outros).
+O **TDS-Gaia**, depende de acesso a URL´s de serviços externos que, eventualmente, precisam ser liberados por sistemas de proteção (_firewalls_, anti-virus e outros).
 
 #### Sintoma
 
-Apresenta, na visão `TDS-Dito` da aba `Output`, mensagem semelhante:
+Apresenta, na visão `TDS-Gaia` da aba `Output`, mensagem semelhante:
 
 `console
 Cause: Error: unable to get local issuer certificate
 Stack: TypeError: fetch failed
- at fetch (w:\ws_tds_vscode\tds-dito\node_modules\undici\index.js:103:13)
+ at fetch (w:\ws_tds_vscode\tds-gaia\node_modules\undici\index.js:103:13)
  at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
- at async CarolApi.checkHealth (w:\ws_tds_vscode\tds-dito\out\api\carolApi.js:30:20)
+ at async CarolApi.checkHealth (w:\ws_tds_vscode\tds-gaia\out\api\carolApi.js:30:20)
 `
 
 #### Correção
