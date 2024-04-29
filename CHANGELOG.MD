@@ -1,4 +1,12 @@
-# TDS-Gaia, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
+# TDS-Gaia, seu "par" na programação AdvPL/TLPP (**BETA**)
+
+> **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
+>
+> Por ser um projeto **experimental**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
+>
+> No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
+
+Favor ler [GUIA RÁPIDO](https://github.com/brodao2/tds-gaia/blob/main/README.md#guia-rápido).
 
 ## TDS-Gaia 0.0.6
 
@@ -12,10 +20,11 @@
 
 - Indicação visual de processamento de qualquer requisição ao serviço IA (barra de progresso no topo da visão de bate-papo).
 - Adicionado _goto_ sobre uma ligação de posição.
-- Alterado _prompt_ de mensagem de VSCodeTextField (uma linha) para VSCodeTextArea (mais de uma linha).
+- Alterado _prompt_ de mensagem de única linha para múltiplas linhas e redimensionável.
 - Ao acionar `Enter` no _prompt_, aciona o envio deste para processamento
 - Indicação visualmente entre mensagem de resposta e a mensagem de solicitação (comando).
   Ao efetuar  `MouseOver` sobre a mensagem de resposta ou de solicitação, as duas são destacadas.
+- Processo de autenticação
 
 ## TDS-Gaia 0.0.5
 
@@ -49,11 +58,3 @@
 ## TDS-Gaia 0.0.2
 
 Liberação inicial.
-
-> **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
->
-> Por ser um projeto **experimental**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
->
-> No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
-
-Favor ler [GUIA RÁPIDO](https://github.com/brodao2/tds-gaia/blob/main/README.md#guia-ultra-rápido).

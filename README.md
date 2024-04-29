@@ -119,7 +119,20 @@ A extensão já vem configurada pronto para uso, não requerendo nenhuma configu
 
 ### Autenticação
 
-O primeiro passo, é você autenticar-se (_login_) no **TDS-Gaia**.
+#### Login
+
+- Acione a autenticação no **TDS-Gaia** (`ctrl+shift-l` ou `F1` `TDS-Gaia: Login` ou `Accounts` (abaixo))
+- Informe o _token_ de acesso
+- AGuarde a validação do acesso
+
+![Autenticação](docs/login.png)
+
+#### Desconectar (não é obrigatório)
+
+- Acione o procedimento no **TDS-Gaia** (`F1` `TDS-Gaia: Logout` ou `Accounts` (abaixo))
+- Acione ``Sign Out``
+
+![Desconexão](docs/logout.png)
 
 ### Começando a usar
 
