@@ -22,7 +22,6 @@ import { InferType } from "../../api/interfaceApi";
 import { TBuildInferTextReturn, TGetSymbolsReturn } from "../resultStruct";
 import { ScoreEnum } from "../../api/feedbackApi";
 import { chatApi, feedbackApi } from "../../api";
-import { activate } from './../../extension';
 
 /**
 * Registers a command to update the variables type of the current document.
@@ -52,7 +51,7 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
             ScoreEnum.Relative,
             (inferTypes.length == processVars.length)
                 ? vscode.l10n.t(`User accept all`)
-                : vscode.l10n.t(`User accept rest: ${processVars.join(",")}`),
+                : vscode.l10n.t("User accept rest: {0}", processVars.join(",")),
             true);
     }));
 

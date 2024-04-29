@@ -69,8 +69,8 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
     public async createSession(scopes: string[]): Promise<vscode.AuthenticationSession> {
         try {
             const [_, accessTokens, feedbackPK, feedbackSK] = await this.login();
-            if (accessTokens.length < 2) {
-                throw new Error(vscode.l10n.t(`${AUTH_NAME} invalid credentials)`));
+            if (accessTokens.length == 0) {
+                throw new Error(vscode.l10n.t("{0} invalid credentials", AUTH_NAME));
             }
 
             const userInfo: LoggedUser | undefined = getGaiaUser();
