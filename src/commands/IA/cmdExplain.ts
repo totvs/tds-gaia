@@ -35,7 +35,7 @@ export function registerExplain(context: vscode.ExtensionContext): void {
 
             if (selection && !selection.isEmpty) {
                 const selectionRange: vscode.Range = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
-                
+
                 codeToExplain = editor.document.getText(selectionRange);
                 whatExplain = chatApi.linkToSource(editor.document.uri, selectionRange);
             } else {
@@ -70,5 +70,4 @@ export function registerExplain(context: vscode.ExtensionContext): void {
         }
     }
     ));
-
 }

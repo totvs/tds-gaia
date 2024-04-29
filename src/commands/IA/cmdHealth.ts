@@ -85,12 +85,12 @@ export function registerHealth(context: vscode.ExtensionContext): void {
                             ], { answeringId: messageId });
                         }
                     } else {
-                        chatApi.gaia(vscode.l10n.t("Available service!"), { answeringId: messageId });
+                        chatApi.gaia(vscode.l10n.t("Available service!"), { answeringId: "messageId" });
                         vscode.window.showInformationMessage(`${PREFIX_GAIA} Available service!`);
                     }
                 } else {
                     vscode.commands.executeCommand("tds-gaia.login", true).then(() => {
-                        chatApi.checkUser(messageId);
+                        //chatApi.checkUser(messageId);
                     });
                 }
             })

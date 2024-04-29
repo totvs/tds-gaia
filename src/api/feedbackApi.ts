@@ -362,4 +362,33 @@ export class FeedbackApi {
         return;
     }
 
+    traceGenerateCode(messageId: string, generateText: string, generateCode: string) {
+        logger.profile("traceGenerateCode");
+
+        if (this.user) {
+            const trace: TraceElement = this.createTrace();
+            trace.input = JSON.stringify({
+                code: generateText,
+            });
+            trace.output = JSON.stringify({
+                generateCode: generateCode,
+            });
+            trace.metadata = {
+                "completeCode": generateCode.split("\n"),
+            }
+            trace.metadata.lines = trace.metadata.completeCode.length;
+
+            this.traceApi.enqueue(trace);
+            this.traceApi.sendQueue();
+
+            this.elementMap[trace.id] = trace;
+            this.feedbackMap[messageId] = trace.id;
+        } else {
+            logger.error("traceGenerateCode: user not found");
+        }
+
+        logger.profile("traceGenerateCode");
+        return;
+    }
+
 }

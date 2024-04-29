@@ -15,15 +15,49 @@ limitations under the License.
 */
 
 import * as vscode from "vscode";
-import { llmApi } from "../../api";
+import { chatApi, feedbackApi, llmApi } from "../../api";
+import { getGaiaConfiguration } from "../../config";
 
 export function registerGenerateCode(context: vscode.ExtensionContext): void {
 
-    //o que o usuário descrever vai vim veio argumento
-    context.subscriptions.push(vscode.commands.registerTextEditorCommand('tds-gaia.generateCode', () => {
-        const text: string = "Gerar código para varrer um array";
+  context.subscriptions.push(vscode.commands.registerTextEditorCommand('tds-gaia.generateCode', () => {
+    const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+    let generateText: string = "";
 
-        llmApi.generateCode(text);
-    }));
+    if (editor !== undefined) {
+      const selection: vscode.Selection = editor.selection;
+      let whatGenerate: string = "";
 
+      if (selection && !selection.isEmpty) {
+        const selectionRange: vscode.Range = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
+
+        generateText = editor.document.getText(selectionRange);
+        whatGenerate = chatApi.linkToSource(editor.document.uri, selectionRange);
+      }
+
+      if (generateText.length > 0) {
+        const messageId: string = chatApi.gaia(
+          vscode.l10n.t("Generating code using descriptive in {0}", whatGenerate), {});
+
+        return llmApi.generateCode(generateText).then((generateCode: string[]) => {
+          const responseId: string = chatApi.nextMessageId();
+          if (getGaiaConfiguration().clearBeforeExplain) {
+            chatApi.user("clear", true);
+          }
+
+          //chatApi.gaia(`\`\`\`\n${generateCode.join("\n")}\n\`\`\``, { canFeedback: true, answeringId: messageId });
+          chatApi.gaia(generateCode.join("\n"), { canFeedback: true, answeringId: messageId });
+          feedbackApi.traceGenerateCode(responseId, generateText, generateCode.join("\n"));
+        });
+      } else {
+  chatApi.gaiaWarning([
+    "I couldn't identify a description of the code to generate.",
+    "Select the block with the description of the code to be generated."
+  ]);
+}
+    } else {
+  chatApi.gaiaWarning("Current editor is not valid for this operation.");
+}
+
+  }));
 }

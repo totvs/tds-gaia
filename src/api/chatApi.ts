@@ -369,17 +369,17 @@ export class ChatApi {
                     this.gaia([
                         vscode.l10n.t("It seems like this is the first time we've met."),
                         vscode.l10n.t("Want to know how to interact with me? {0}", this.commandText("hint_1"))
-                    ], { answeringId: answeringId });
+                    ], { answeringId: "answeringId" });
                 }
                 this.gaia([
                     vscode.l10n.t("To start, I need to know you."),
                     vscode.l10n.t("Please, identify yourself with the command {0}.", this.commandText("login"))
-                ], { answeringId: answeringId });
+                ], { answeringId: "answeringId" });
             } else {
                 this.gaia([
                     vscode.l10n.t("Hello, **{0}**.", getGaiaUser()?.displayName || "<unknown>"),
                     vscode.l10n.t("I'm ready to help you in any way possible!"),
-                ], { answeringId: answeringId });
+                ], { answeringId: "answeringId" });
             }
         } else {
             vscode.commands.executeCommand("tds-gaia.health");

@@ -150,9 +150,28 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
     */
     async generateCode(text: string): Promise<string[]> {
         logger.profile("generateCode");
+
+        const body: any = {
+            "text": text,
+        };
+
+        let response: any | Error = await this.jsonRequest("POST", "generate", {}, JSON.stringify(body));
+        if (typeof (response) === "object" && response instanceof Error) {
+            logger.profile("generateCode");
+            return [];
+        } else if (!response) {// } || response.length === 0) {
+            logger.profile("generateCode");
+            return [];
+        }
+
+        logger.debug(vscode.l10n.t("Code explain end with {0} size", response.code.length));
+        logger.debug(response);
+
+        const result: string[] = response.code.split("\n");
+
         logger.profile("generateCode");
 
-        throw new Error(vscode.l10n.t("Method not implemented."));
+        return result;
     }
 
     /**
