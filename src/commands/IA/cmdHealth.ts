@@ -112,7 +112,7 @@ function tryAgain(attempt: number, totalAttempt: number, time: number): Promise<
             const delayPromise = new Promise<string>((resolve, _) => {
 
                 const interval = setInterval(() => {
-                    const msg: string = vscode.l10n.t("Verificando disponibilidade em {0} segundos. ({1}/{2})", time, attempt, totalAttempt);
+                    const msg: string = vscode.l10n.t("Checking availability in {0} seconds. ({1}/{2})", time, attempt, totalAttempt);
                     progress.report({ message: msg });
                     if (time % 10 === 0) {
                         logger.info(msg);

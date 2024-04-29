@@ -51,7 +51,7 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
             ScoreEnum.Relative,
             (inferTypes.length == processVars.length)
                 ? vscode.l10n.t(`User accept all`)
-                : vscode.l10n.t("User accept rest: {0}", processVars.join(",")),
+                : vscode.l10n.t("User accept others: {0}", processVars.join(",")),
             true);
     }));
 

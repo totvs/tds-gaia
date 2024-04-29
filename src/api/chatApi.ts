@@ -91,7 +91,7 @@ const commandsMap: Record<string, TCommand> = {
         commandId: "tds-gaia.external-open",
         commandArgs: {
             target: "README.md#guia-rápido",
-            title: vscode.l10n.t("Quick guide")
+            title: vscode.l10n.t("Quick Guide")
         }
     },
     "logout": {
