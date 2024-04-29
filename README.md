@@ -34,7 +34,7 @@ A extensão **TDS-Gaia** é uma extensão para o [Visual Studio Code](https://co
 :white_check_mark: Complemento de código
 :white_check_mark: Explicação de código
 :white_check_mark: Tipificação de variáveis
-:walking: Geração de código a partir de uma descrição
+:white_check_mark: Geração de código a partir de uma descrição
 :white_square_button: Análise de código
 :white_square_button: Tradução automatizada de _strings_
 
@@ -62,7 +62,7 @@ posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP 
 | Explicação*     | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
 |                 | Ctrl+D Ctrl+W | Explica a palavra corrente (sob o cursor). |
 | Tipificação*    | Ctrl+D Ctrl+T | Tipifica variáveis de uma função/método. |
-| Geração Código* | Ctrl+D Ctrl+G | Geração de código a partir de uma descrição. |
+| Geração Código* | Ctrl+D Ctrl+G | Geração de código a partir de uma descrição selecionada no fonte correte. |
 
 _* Funcionalidades ainda em desenvolvimento. Podem levar 1 minuto ou mais para responder e apresentar respostas inesperadas._
 

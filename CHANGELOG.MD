@@ -1,7 +1,5 @@
 # TDS-Gaia, seu "par" na programação AdvPL/TLPP (**BETA**)
 
-## TDS-Gaia 0.0.6
-
 > **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
 >
 > Por ser um projeto **experimental**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
@@ -9,6 +7,14 @@
 > No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
 
 Favor ler [GUIA RÁPIDO](https://github.com/brodao2/tds-gaia/blob/main/README.md#guia-rápido).
+
+## TDS-Gaia 0.0.7
+
+### Correção
+
+- Correção no processo de login, logout e geração de código
+
+## TDS-Gaia 0.0.6
 
 ### Novos recursos
 
