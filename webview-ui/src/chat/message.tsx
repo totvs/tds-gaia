@@ -88,12 +88,9 @@ function mdToHtml(text: string): any[] {
                         </VSCodeLink>
                     );
                 } else if (matchesLink = link.match(LINK_SOURCE_RE)) {
-                    console.log(matchesLink);
-
                     children.push(
                         <span key={spanSeq++}
                             onMouseOver={(e) => {
-                                console.log(matchesLink!.input);
                                 sendLinkMouseOver(matchesLink!.input);
                             }}>
                             <VSCodeLink key={spanSeq++} href={matchesLink[2]}

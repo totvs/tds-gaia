@@ -122,9 +122,6 @@ export default function ChatView() {
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
 
-          //console.log("************************");
-          //console.dir(model);
-
           setDataModel<TFields>(methods.setValue, model);
           setErrorModel(methods.setError, errors);
 
