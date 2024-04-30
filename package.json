@@ -399,9 +399,6 @@
     "test": "node ./out/test/runTest.js"
   },
   "dependencies": {
-    "@huggingface/agents": "^0.0.5",
-    "@huggingface/hub": "^0.13.0",
-    "@huggingface/inference": "^2.6.4",
     "@vscode/l10n": "^0.0.18",
     "@vscode/l10n-dev": "^0.0.31",
     "fs-extra": "^11.2.0",
@@ -422,7 +419,8 @@
     "eslint": "^8.56.0",
     "glob": "^10.3.10",
     "mocha": "^10.2.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "webpack-cli": "^5.1.4"
   },
   "extensionDependencies": [
     "TOTVS.tds-vscode"

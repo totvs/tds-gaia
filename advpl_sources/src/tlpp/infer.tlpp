@@ -1,9 +1,5 @@
 #include "tlpp-core.th"
 
-//acandido:b8L7dgzQFYhnKP2k39VcsC:b1633e3c-c038-4dbe-af55-82bf21be0fd5:bdad2a8c-f646-4ab6-886a-66401033cc48
-//b1633e3c-c038-4dbe-af55-82bf21be0fd5
-//bdad2a8c-f646-4ab6-886a-66401033cc48
-
 //Fonte: https://tdn.totvs.com/display/tec/Tipagem+de+Dados
 static function primitive()
 	local n1 as numeric
@@ -55,7 +51,7 @@ static function inferFromDB()
 	local conv := B1_CONV
 	local dtUltCalc := B1_UCALSTD
 	local descIngles := B1_VM_I
-	
+
 	conout(filial)
 	conout(cod)
 	conout(notExistFileld)
