@@ -6,7 +6,7 @@
 >
 > No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
 
-Favor ler [GUIA RÁPIDO](https://github.com/brodao2/tds-gaia/blob/main/README.md#guia-rápido).
+Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
 ## TDS-Gaia 0.0.8
 

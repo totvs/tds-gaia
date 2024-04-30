@@ -6,19 +6,19 @@
 >
 > No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
 
-<!--[![GitHub stars](https://img.shields.io/github/stars/brodao2/tds-gaia?style=plastic)](https://github.com/brodao2/tds-gaia/stargazers)
-![GitHub top language](https://img.shields.io/github/languages/top/brodao2/tds-gaia)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/brodao2/tds-gaia/Deploy%20Extension)
-![GitHub last commit](https://img.shields.io/github/last-commit/brodao2/tds-gaia)
+<!--[![GitHub stars](https://img.shields.io/github/stars/totvs/tds-gaia?style=plastic)](https://github.com/totvs/tds-gaia/stargazers)
+![GitHub top language](https://img.shields.io/github/languages/top/totvs/tds-gaia)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/totvs/tds-gaia/Deploy%20Extension)
+![GitHub last commit](https://img.shields.io/github/last-commit/totvs/tds-gaia)
 -->
 <!-- prettier-ignore-start -->
-[![GitHub license](https://img.shields.io/github/license/brodao2/tds-gaia?style=plastic)](https://github.com/brodao2/tds-gaia/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/totvs/tds-gaia?style=plastic)](https://github.com/totvs/tds-gaia/blob/master/LICENSE)
 ![Version](https://img.shields.io/visual-studio-marketplace/v/TOTVS.tds-gaia)
 ![Installs](https://img.shields.io/visual-studio-marketplace/i/TOTVS.tds-gaia)
 ![Downloads](https://img.shields.io/visual-studio-marketplace/d/TOTVS.tds-gaia)
 ![Rating](https://img.shields.io/visual-studio-marketplace/stars/TOTVS.tds-gaia)
-[![GitHub issues](https://img.shields.io/github/issues/brodao2/tds-gaia?style=plastic)](https://github.com/brodao2/tds-gaia/issues)
-[![GitHub forks](https://img.shields.io/github/forks/brodao2/tds-gaia?style=plastic)](https://github.com/brodao2/tds-gaia/network)
+[![GitHub issues](https://img.shields.io/github/issues/totvs/tds-gaia?style=plastic)](https://github.com/totvs/tds-gaia/issues)
+[![GitHub forks](https://img.shields.io/github/forks/totvs/tds-gaia?style=plastic)](https://github.com/totvs/tds-gaia/network)
 ![Visual Studio Marketplace Last Updated](https://img.shields.io/visual-studio-marketplace/last-updated/TOTVS.tds-gaia)
 <!-- markdownlint-disable -->
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
@@ -89,7 +89,7 @@ Acione  o botão `Instalar`. Após completar a instalação, o botão `Instalar`
 
 Você pode instalar manualmente uma extensão do **VS Code** que foi empacotada em um arquivo `.vsix`. Utilize o comando `Instalar do VSIX...` na visão de extensões após acionar `Modo de Exibição e Mais Ações...` (ícone com "...") ou acione o comando `Extensões: Instalar do VSIX...` no painel de comandos (`CTRL+SHIFT+P`) e selecione o arquivo `.vsix`.
 
-Acesse [releases](https://github.com/brodao2/tds-gaia/releases) para baixar a última versão liberada.
+Acesse [releases](https://github.com/totvs/tds-gaia/releases) para baixar a última versão liberada.
 
 > Caso o acesso seja negado, solicite liberação.
 > Sua solicitação será analisada, podendo ser liberado ou negada sem maiores explicações.
