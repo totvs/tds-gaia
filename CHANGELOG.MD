@@ -8,6 +8,13 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/brodao2/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.0.8
+
+### Novidades
+
+- Disponibilizado interface visual para a geração de código.
+  Com área para descrever as funcionalidades desejadas e visualização de código gerado. Este pode ser copiado para a área de transferência ou salvo em arquivo.
+
 ## TDS-Gaia 0.0.7
 
 ### Correção
