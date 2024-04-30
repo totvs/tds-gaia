@@ -18,9 +18,8 @@ import * as vscode from "vscode";
 
 import { TGaiaConfig, getGaiaConfiguration, getGaiaUser, isGaiaLogged, setGaiaUser } from "../config";
 import { capitalize } from "../util";
-import { Completion, CompletionResponse, AbstractApi, IaApiInterface, InferTypeResponse } from "./interfaceApi";
+import { CompletionResponse, AbstractApi, IaApiInterface, InferTypeResponse } from "./interfaceApi";
 import { logger } from "../logger";
-import { ChatApi } from "./chatApi";
 
 export class LLMApi extends AbstractApi implements IaApiInterface {
     private authorization: string = "";
@@ -167,7 +166,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
         logger.debug(vscode.l10n.t("Code explain end with {0} size", response.code.length));
         logger.debug(response);
 
-        const result: string[] = response.code.split("\n");
+        const result: string[] = response.code.trim().split("\n");
 
         logger.profile("generateCode");
 

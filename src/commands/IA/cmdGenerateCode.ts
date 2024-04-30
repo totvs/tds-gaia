@@ -17,47 +17,36 @@ limitations under the License.
 import * as vscode from "vscode";
 import { chatApi, feedbackApi, llmApi } from "../../api";
 import { getGaiaConfiguration } from "../../config";
+import { GenerateCodePanel } from "../../panels/generateCodePanel";
 
 export function registerGenerateCode(context: vscode.ExtensionContext): void {
 
-  context.subscriptions.push(vscode.commands.registerTextEditorCommand('tds-gaia.generateCode', () => {
-    const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
-    let generateText: string = "";
+  vscode.commands.registerCommand("tds-gaia.generateCode", () => {
+    GenerateCodePanel.render(context);
+  });
 
-    if (editor !== undefined) {
-      const selection: vscode.Selection = editor.selection;
-      let whatGenerate: string = "";
+  context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.processGenerateCode', (description: string) => {
+    if (description.length > 0) {
+      // chatApi.user(
+      //   vscode.l10n.t("Generate code for description `{0}...`", description.substring(0, 20)), true);
+      const messageId: string = chatApi.gaia(
+        vscode.l10n.t("Generating the code as requested."), {});
 
-      if (selection && !selection.isEmpty) {
-        const selectionRange: vscode.Range = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
+      return llmApi.generateCode(description).then((generateCode: string[]) => {
+        const responseId: string = chatApi.nextMessageId();
+        if (getGaiaConfiguration().clearBeforeExplain) {
+          chatApi.user("clear", true);
+        }
 
-        generateText = editor.document.getText(selectionRange);
-        whatGenerate = chatApi.linkToSource(editor.document.uri, selectionRange);
-      }
+        chatApi.gaia(vscode.l10n.t("Code generated with {0} lines.", generateCode.length), { canFeedback: true, answeringId: messageId });
+        feedbackApi.traceGenerateCode(responseId, description, generateCode);
 
-      if (generateText.length > 0) {
-        const messageId: string = chatApi.gaia(
-          vscode.l10n.t("Generating code using descriptive in {0}", whatGenerate), {});
-
-        return llmApi.generateCode(generateText).then((generateCode: string[]) => {
-          const responseId: string = chatApi.nextMessageId();
-          if (getGaiaConfiguration().clearBeforeExplain) {
-            chatApi.user("clear", true);
-          }
-
-          //chatApi.gaia(`\`\`\`\n${generateCode.join("\n")}\n\`\`\``, { canFeedback: true, answeringId: messageId });
-          chatApi.gaia(generateCode.join("\n"), { canFeedback: true, answeringId: messageId });
-          feedbackApi.traceGenerateCode(responseId, generateText, generateCode.join("\n"));
-        });
-      } else {
-  chatApi.gaiaWarning([
-    "I couldn't identify a description of the code to generate.",
-    "Select the block with the description of the code to be generated."
-  ]);
-}
+        return generateCode
+      });
     } else {
-  chatApi.gaiaWarning("Current editor is not valid for this operation.");
-}
+      chatApi.gaiaWarning(vscode.l10n.t("A description was not informed."));
 
+      return [];
+    }
   }));
 }

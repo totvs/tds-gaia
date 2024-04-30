@@ -23,6 +23,8 @@ type TdsTextFieldProps = TdsFieldProps & {
     textArea?: boolean
     placeholder?: string;
     size?: number;
+    cols?: number;
+    rows?: number;
 };
 
 /**
@@ -43,10 +45,10 @@ export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
     const { field, fieldState } = useController(props);
     const registerField = register(props.name, props.rules);
 
-    // https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/react/README.md#use-oninput-instead-of-onchange-to-handle-keystrokes
-    // if (props.onChange) {
-    //     registerField.onChange = props.onChange;
-    // }
+    // // https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/react/README.md#use-oninput-instead-of-onchange-to-handle-keystrokes
+    //  if (props.onInput) {
+    // //     registerField.onInput = props.onInput;
+    // // }
 
     return (
         <section
@@ -64,7 +66,8 @@ export function TdsTextField(props: TdsTextFieldProps): JSX.Element {
                     {...registerField}
                     placeholder={props.placeholder}
                     resize="vertical"
-                    cols={props.size ?? 30}
+                    cols={props.cols ?? 30}
+                    rows={props.rows ?? 15}
                     onInput={props.onInput}
                 >
                     <PopupMessage field={props} fieldState={fieldState} />

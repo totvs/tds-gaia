@@ -362,7 +362,7 @@ export class FeedbackApi {
         return;
     }
 
-    traceGenerateCode(messageId: string, generateText: string, generateCode: string) {
+    traceGenerateCode(messageId: string, generateText: string, generateCode: string[]) {
         logger.profile("traceGenerateCode");
 
         if (this.user) {
@@ -374,9 +374,9 @@ export class FeedbackApi {
                 generateCode: generateCode,
             });
             trace.metadata = {
-                "completeCode": generateCode.split("\n"),
+                "lines": generateCode.length,
+                "completeCode": generateCode,
             }
-            trace.metadata.lines = trace.metadata.completeCode.length;
 
             this.traceApi.enqueue(trace);
             this.traceApi.sendQueue();

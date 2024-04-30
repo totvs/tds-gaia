@@ -21,6 +21,7 @@ const SOURCE_FOLDER = path.resolve(path.join(
 ));
 
 const CHAT_PATH = path.join(SOURCE_FOLDER, "chat");
+const GENERATE_CODE_PATH = path.join(SOURCE_FOLDER, "generateCode");
 
 module.exports = (env, argv) => {
   const production = (argv.mode === 'production') || (env.NODE_ENV === 'production');
@@ -66,6 +67,7 @@ module.exports = (env, argv) => {
     //O entry pode ser definido com um objeto. A chave, ou no nome da propriedade, nesse caso sera o nome de saída do arquivo.
     entry: {
       chatView: path.join(CHAT_PATH, "index.tsx"),
+      generateCodeView: path.join(GENERATE_CODE_PATH, "index.tsx")
     },
     output: {
       //Todos os arquivos tsx serão compilados e gerados seus equivalentes js na mesma pasta

@@ -1,160 +1,144 @@
-/*
-Copyright 2024 TOTVS S.A
+import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
+import { useController, useFormContext } from "react-hook-form";
+import PopupMessage from "../popup-message";
+import { TdsFieldProps } from "../form";
+import { TSendSelectResourceProps, sendSelectResource } from "../../utilities/common-command-webview";
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+type TdsSelectionResourceFieldProps = Omit<TdsFieldProps, "label"> & Omit<TSendSelectResourceProps, "label">;
+type TdsSelectionFolderFieldProps = Omit<TdsSelectionResourceFieldProps, "model" | "canSelectMany" | "canSelectFiles" | "canSelectFolders" | "filters">;
+type TdsSelectionFileFieldProps = Omit<TdsSelectionResourceFieldProps, "folders" | "files">;
 
-  http: //www.apache.org/licenses/LICENSE-2.0
+/**
+ *
+ * - Uso de _hook_ ``useFieldArray`` e propriedade ``disabled``:
+ *   Por comportamento do _hook_, campos com ``disabled`` ativo não são armazenados
+ *   no _array_ associado ao _hook_.
+ *   Caso seja necessário sua manipulação, use ``readOnly`` como alternativa.
+ *
+ * - A utilização deste campo, requer a implementação do processamento
+ *   da mensagem ``AfterSelectResource`` em ``yourPanel extends TdsPanel<?>: panelListener(...)``
+ *
+ * Exemplo de ``filter``:
+ *
+ * ```
+ * {
+ *   "All Files": ["*"],
+ *   "JSON": ["json"],
+ *   "AdvPL Source Siles": ["prw", "prx", "tlpp"],
+ * }``
+ * ```
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * @param props
+ *
+ * @returns
+ */
+export function TdsSelectionResourceField(props: TdsSelectionResourceFieldProps): JSX.Element {
+	const {
+		register,
+		getValues
+	} = useFormContext();
+	const { fieldState } = useController(props);
+	const registerField = register(props.name, props.rules);
 
-// import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
-// import { useController, useFormContext } from "react-hook-form";
-// import PopupMessage from "../popup-message";
-// import { TdsFieldProps } from "../form";
-// import { TSendSelectResourceProps } from "../../utilities/common-command-webview";
+	registerField.disabled = props.readOnly || false;
 
-// type TdsSelectionResourceFieldProps = Omit<TdsFieldProps, "label"> & Omit<TSendSelectResourceProps, "label">;
-// type TdsSelectionFolderFieldProps = Omit<TdsSelectionResourceFieldProps, "model" | "canSelectMany" | "canSelectFiles" | "canSelectFolders" | "filters">;
-// type TdsSelectionFileFieldProps = Omit<TdsSelectionResourceFieldProps, "folders" | "files">;
+	return (
+		<section
+			className={`tds-field-container tds-selection-resource-field tds-label-field ${props.className ? props.className : ''}`}
+		>
+			<VSCodeButton
+				onClick={() => {
+					sendSelectResource(props.name, { ...props, model: getValues() });;
+				}}
+				{...registerField}
+			>
+				{props.openLabel}
+				<PopupMessage field={{ ...props, label: props.openLabel }} fieldState={fieldState} />
+			</VSCodeButton>
+		</section>
+	)
+}
 
-// /**
-//  *
-//  * - Uso de _hook_ ``useFieldArray`` e propriedade ``disabled``:
-//  *   Por comportamento do _hook_, campos com ``disabled`` ativo não são armazenados
-//  *   no _array_ associado ao _hook_.
-//  *   Caso seja necessário sua manipulação, use ``readOnly`` como alternativa.
-//  *
-//  * - A utilização deste campo, requer a implementação do processamento
-//  *   da mensagem ``AfterSelectResource`` em ``yourPanel extends TdsPanel<?>: panelListener(...)``
-//  *
-//  * Exemplo de ``filter``:
-//  *
-//  * ```
-//  * {
-//  *   "All Files": ["*"],
-//  *   "JSON": ["json"],
-//  *   "AdvPL Source Siles": ["prw", "prx", "tlpp"],
-//  * }``
-//  * ```
+/**
+ *
+ * - Uso de _hook_ ``useFieldArray`` e propriedade ``disabled``:
+ *   Por comportamento do _hook_, campos com ``disabled`` ativo não são armazenados
+ *   no _array_ associado ao _hook_.
+ *   Caso seja necessário sua manipulação, use ``readOnly`` como alternativa.
+ *
+ * - A utilização deste campo, requer a implementação do processamento
+ *   da mensagem ``AfterSelectResource``em ``yourPanel extends TdsPanel<?>: panelListener(...)``
+ *   na aplicação (_view_).
+ *
+ * Exemplo de ``filter``:
+ *
+ * ```
+ * {
+ *   "All Files": ["*"],
+ *   "JSON": ["json"],
+ *   "AdvPL Source Siles": ["prw", "prx", "tlpp"],
+ * }``
+ * ```
+ *
+ * @param props
+ *
+ * @returns
+ */
+export function TdsSelectionFolderField(props: Partial<TdsSelectionFolderFieldProps>): JSX.Element {
+	const {
+		getValues,
+	} = useFormContext();
 
-//  * @param props
-//  *
-//  * @returns
-//  */
-// export function TdsSelectionResourceField(props: TdsSelectionResourceFieldProps): JSX.Element {
-// 	const {
-// 		register,
-// 		getValues
-// 	} = useFormContext();
-// 	const { fieldState } = useController(props);
-// 	const registerField = register(props.name, props.rules);
+	return (<TdsSelectionResourceField
+		name={props.name || "btnSelectionFolder"}
+		title={props.title || "Select Folder"}
+		canSelectFolders={true}
+		canSelectFiles={false}
+		canSelectMany={false}
+		currentFolder={props.currentFolder || ""}
+		openLabel={props.openLabel || "Select Folder"}
+		filters={{}}
+		readOnly={props.readOnly || false}
+	/>)
+}
 
-// 	registerField.disabled = props.readOnly || false;
+/**
+ *
+ * - Uso de _hook_ ``useFieldArray`` e propriedade ``disabled``:
+ *   Por comportamento do _hook_, campos com ``disabled`` ativo não são armazenados
+ *   no _array_ associado ao _hook_.
+ *   Caso seja necessário sua manipulação, use ``readOnly`` como alternativa.
+ *
+ * - A utilização deste campo, requer a implementação do processamento
+ *   da mensagem ``SELECTION_FOLDER``no painel e da mensagem ```SELECTED_FOLDER``
+ *   na aplicação (_view_).
+ *
+ * Exemplo de ``filter``:
+ *
+ * ```
+ * {
+ *   "All Files": ["*"],
+ *   "JSON": ["json"],
+ *   "AdvPL Source Siles": ["prw", "prx", "tlpp"],
+ * }``
+ * ```
+ *
+ * @param props
+ *
+ * @returns
+ */
+export function TdsSelectionFileField(props: Partial<TdsSelectionFileFieldProps>): JSX.Element {
+	const filters = props.filters ? props.filters : {};
 
-// 	return (
-// 		<section
-// 			className={`tds-field-container tds-selection-resource-field tds-label-field ${props.className ? props.className : ''}`}
-// 		>
-// 			<VSCodeButton
-// 				onClick={() => {
-// 					//sendSelectResource(props.name, { ...props, model: getValues() });;
-// 				}}
-// 				{...registerField}
-// 			>
-// 				{props.openLabel}
-// 				<PopupMessage field={{ ...props, label: props.openLabel }} fieldState={fieldState} />
-// 			</VSCodeButton>
-// 		</section>
-// 	)
-// }
-
-// /**
-//  *
-//  * - Uso de _hook_ ``useFieldArray`` e propriedade ``disabled``:
-//  *   Por comportamento do _hook_, campos com ``disabled`` ativo não são armazenados
-//  *   no _array_ associado ao _hook_.
-//  *   Caso seja necessário sua manipulação, use ``readOnly`` como alternativa.
-//  *
-//  * - A utilização deste campo, requer a implementação do processamento
-//  *   da mensagem ``AfterSelectResource``em ``yourPanel extends TdsPanel<?>: panelListener(...)``
-//  *   na aplicação (_view_).
-//  *
-//  * Exemplo de ``filter``:
-//  *
-//  * ```
-//  * {
-//  *   "All Files": ["*"],
-//  *   "JSON": ["json"],
-//  *   "AdvPL Source Siles": ["prw", "prx", "tlpp"],
-//  * }``
-//  * ```
-//  *
-//  * @param props
-//  *
-//  * @returns
-//  */
-// export function TdsSelectionFolderField(props: Partial<TdsSelectionFolderFieldProps>): JSX.Element {
-// 	const {
-// 		getValues,
-// 	} = useFormContext();
-
-// 	return (<TdsSelectionResourceField
-// 		name={props.name || "btnSelectionFolder"}
-// 		title={props.title || "Select Folder"}
-// 		canSelectFolders={true}
-// 		canSelectFiles={false}
-// 		canSelectMany={false}
-// 		currentFolder={props.currentFolder || ""}
-// 		openLabel={props.openLabel || "Select Folder"}
-// 		filters={{}}
-// 		readOnly={props.readOnly || false}
-// 	/>)
-// }
-
-// /**
-//  *
-//  * - Uso de _hook_ ``useFieldArray`` e propriedade ``disabled``:
-//  *   Por comportamento do _hook_, campos com ``disabled`` ativo não são armazenados
-//  *   no _array_ associado ao _hook_.
-//  *   Caso seja necessário sua manipulação, use ``readOnly`` como alternativa.
-//  *
-//  * - A utilização deste campo, requer a implementação do processamento
-//  *   da mensagem ``SELECTION_FOLDER``no painel e da mensagem ```SELECTED_FOLDER``
-//  *   na aplicação (_view_).
-//  *
-//  * Exemplo de ``filter``:
-//  *
-//  * ```
-//  * {
-//  *   "All Files": ["*"],
-//  *   "JSON": ["json"],
-//  *   "AdvPL Source Siles": ["prw", "prx", "tlpp"],
-//  * }``
-//  * ```
-//  *
-//  * @param props
-//  *
-//  * @returns
-//  */
-// export function TdsSelectionFileField(props: Partial<TdsSelectionFileFieldProps>): JSX.Element {
-// 	const filters = props.filters ? props.filters : {};
-
-// 	return (<TdsSelectionResourceField
-// 		name={props.name || "btnSelectionFile"}
-// 		title={props.title || "Select File"}
-// 		canSelectFolders={false}
-// 		canSelectFiles={true}
-// 		canSelectMany={props.canSelectMany || false}
-// 		currentFolder={props.currentFolder || ""}
-// 		openLabel={props.openLabel || "Select File"}
-// 		filters={filters || {}}
-// 		readOnly={props.readOnly || false}
-// 	/>)
-// }
+	return (<TdsSelectionResourceField
+		name={props.name || "btnSelectionFile"}
+		title={props.title || "Select File"}
+		canSelectFolders={false}
+		canSelectFiles={true}
+		canSelectMany={props.canSelectMany || false}
+		currentFolder={props.currentFolder || ""}
+		openLabel={props.openLabel || "Select File"}
+		filters={filters || {}}
+		readOnly={props.readOnly || false}
+	/>)
+}

@@ -38,7 +38,8 @@ export default function NewMessage(): JSX.Element {
                 label={""}
                 textArea={true}
                 placeholder={"Tell me what you need.."}
-                size={40}
+                cols={45}
+                rows={2}
             />
 
             <VSCodeButton
