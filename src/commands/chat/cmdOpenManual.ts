@@ -21,7 +21,7 @@ import { chatApi } from "../../api";
 export function registerOpenManual(context: vscode.ExtensionContext): void {
 
     const openManual = vscode.commands.registerCommand('tds-gaia.external-open', async (...args) => {
-        const baseUrl: string = "https://github.com/brodao2/tds-gaia/blob/main";
+        const baseUrl: string = "https://github.com/totvs/tds-gaia/blob/main";
         const url: string = `${baseUrl}/${args[0].target}`;
         const title: string = args[0].title;
 
