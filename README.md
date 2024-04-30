@@ -1,8 +1,8 @@
-# TDS-Gaia, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
+# TDS-Gaia, seu "par" na programação AdvPL/TLPP (**BETA**)
 
 > **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
 >
-> Por ser um projeto **experimental**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
+> Por ser um projeto **BETA**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
 >
 > No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
 
@@ -38,7 +38,7 @@ A extensão **TDS-Gaia** é uma extensão para o [Visual Studio Code](https://co
 :white_square_button: Análise de código
 :white_square_button: Tradução automatizada de _strings_
 
-**Legendas**: :white_check_mark: Experimental :walking: Em andamento, sem prazo :white_square_button: Em estudo (pode ser cancelado)
+**Legendas**: :white_check_mark: BETA :walking: Em andamento, sem prazo :white_square_button: Em estudo (pode ser cancelado)
 
 ## Guia rápido
 
@@ -62,7 +62,7 @@ posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP 
 | Explicação*     | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
 |                 | Ctrl+D Ctrl+W | Explica a palavra corrente (sob o cursor). |
 | Tipificação*    | Ctrl+D Ctrl+T | Tipifica variáveis de uma função/método. |
-| Geração Código* | Ctrl+D Ctrl+G | Geração de código a partir de uma descrição selecionada no fonte correte. |
+| Geração Código* | Ctrl+D Ctrl+G | Geração de código a partir de uma descrição selecionada no fonte corrente. |
 
 _* Funcionalidades ainda em desenvolvimento. Podem levar 1 minuto ou mais para responder e apresentar respostas inesperadas._
 

@@ -12,7 +12,7 @@ Esta pasta contém a parte visual da extensão [**TDS-Gaia**](https://github.com
 :white_square_mark: Textos de contextualização.
 :white_square_mark: Questionamentos.
 
-**Legendas**: :white_check_mark: Experimental :walking: Em andamento, sem prazo :white_square_button: Em estudo (pode ser cancelado)
+**Legendas**: :white_check_mark: BETA :walking: Em andamento, sem prazo :white_square_button: Em estudo (pode ser cancelado)
 
 ## Guia rápido
 
