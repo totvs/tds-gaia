@@ -13,15 +13,9 @@ user function escolheNum(replay, replayPath, numbers)
 
 		TDSReplay(.T. , {"*"}, {}, {"*"} , replayPath, 0 , .t. , "")
 	endif
-
 //
 	for n := 1 to 5
 		aAdd(aOpcoes, strZero(n,1,0))
-		if n % 2 == 0
-			aAdd(aOpcoes, "1")
-		else
-			aAdd(aOpcoes, "2")
-		endif
 
 	next
 //
