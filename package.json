@@ -293,7 +293,7 @@
           "tds-gaia.maxSuggestions": {
             "order": 7,
             "type": "number",
-            "default": 3,
+            "default": 1,
             "description": "Maximum suggestions per requisition"
           },
           "tds-gaia.showBanner": {
