@@ -8,6 +8,12 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.0.9
+
+### Correção
+
+- Ajuste do valor padrão de número de respostas no código sugerido (_completion_).
+
 ## TDS-Gaia 0.0.8
 
 ### Novidades
