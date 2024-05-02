@@ -2,7 +2,7 @@
   "name": "tds-gaia",
   "displayName": "TDS-Gaia, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Gaia will assist you in AdvPL programming",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "publisher": "TOTVS",
   "preview": true,
   "author": {
