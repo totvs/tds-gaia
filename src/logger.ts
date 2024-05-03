@@ -71,7 +71,7 @@ class OutputChannelTransport extends Transport {
 
             outputChannel.debug(text);
         } else {
-            outputChannel.appendLine(info.message);
+            outputChannel.appendLine(info.message.trim());
         }
 
         // Perform the writing to the remote service
@@ -124,7 +124,7 @@ const myFormat = winston.format.printf((info: winston.Logform.TransformableInfo)
         return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}\n${formatCause(info.error)}`;
     }
 
-    let text: string = `${info.timestamp} [${info.label}] ${info.level}: ${info.message || info.error.message || info}`;
+    let text: string = `${info.timestamp} [${info.label}] ${info.level}: ${(info.message || info.error.message || info).trim()}`;
 
     if (info.durationMs) {
         text += ` (${info.durationMs} ms)`;
@@ -168,6 +168,7 @@ export const logger: winston.Logger = winston.createLogger({
                 winston.format.splat(),
                 winston.format.simple(),
                 winston.format.timestamp({ format: 'HH:mm:ss' }),
+                //myFormat
             ),
         }
         ),

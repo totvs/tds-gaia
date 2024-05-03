@@ -7,7 +7,7 @@
   "- Typing the command in the prompt chat;": "- Digitando o comando no chat de pronta;",
   "{0} Failed to automatic login": "{0} Falhou em fazer login automático",
   "{0} invalid credentials": "{0} credenciais inválidas",
-  "{0} Logged in successfully": "{0} Conectado com sucesso",
+  "{0} Logged in successfully as {1}": "{0} Conectado com sucesso como {1}",
   "{0} Logged out": "{0} Desconectado",
   "{0} Login failure": "{0} Falha de login",
   "{0} or click on variable name.": "{0} ou clique no nome da variável.",

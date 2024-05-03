@@ -66,8 +66,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
      * @returns {Promise<boolean>} A promise that resolves to `true` if the login was successful, or `false` otherwise.
      */
     login(email: string, authorization: string): Promise<boolean> {
-        logger.profile("login");
-        logger.info(vscode.l10n.t("Logging in..."));
+        //logger.profile("login");
         let result: boolean = false;
         const parts: string[] = email.split("@");
 
@@ -85,11 +84,8 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
             expiresAt: new Date(2024, 11, 31, 23, 59, 59, 999),
         });
 
-        let message: string = vscode.l10n.t("Logged in as {0}", getGaiaUser()?.displayName || vscode.l10n.t("<unknown>"));
-        logger.info(message);
-
         result = true;
-        logger.profile("login");
+        //logger.profile("login");
 
         return Promise.resolve(result);
     }
@@ -101,7 +97,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
     * @returns A promise that resolves to `true` when the logout operation is complete.
     */
     logout(): Promise<boolean> {
-        logger.profile("logout");
+        //logger.profile("logout");
         logger.info(vscode.l10n.t("Logging out..."));
         this.authorization = "";
 
@@ -109,7 +105,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
             setGaiaUser(undefined);
         }
 
-        logger.profile("logout");
+        //logger.profile("logout");
         return Promise.resolve(true);
     }
 
@@ -120,7 +116,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
     * @returns A promise that resolves to an `Error` object if the health check fails, or `undefined` if the health check is successful.
     */
     async checkHealth(detail: boolean): Promise<Error | undefined> {
-        logger.profile("checkHealth");
+        //logger.profile("checkHealth");
         let result: any = undefined
         logger.info(vscode.l10n.t("Getting health check..."));
 
@@ -137,7 +133,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
             logger.info(vscode.l10n.t("Gaia IA Service on-line"));
         }
 
-        logger.profile("checkHealth");
+        //logger.profile("checkHealth");
         return Promise.resolve(result);
     }
 
@@ -148,7 +144,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
     * @returns A promise that resolves to an array of generated code strings.
     */
     async generateCode(text: string): Promise<string[]> {
-        logger.profile("generateCode");
+        //logger.profile("generateCode");
 
         const body: any = {
             "text": text,
@@ -156,10 +152,10 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
 
         let response: any | Error = await this.jsonRequest("POST", "generate", {}, JSON.stringify(body));
         if (typeof (response) === "object" && response instanceof Error) {
-            logger.profile("generateCode");
+            //logger.profile("generateCode");
             return [];
         } else if (!response) {// } || response.length === 0) {
-            logger.profile("generateCode");
+            //logger.profile("generateCode");
             return [];
         }
 
@@ -168,7 +164,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
 
         const result: string[] = response.code.trim().split("\n");
 
-        logger.profile("generateCode");
+        //logger.profile("generateCode");
 
         return result;
     }
@@ -181,7 +177,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
      * @returns A promise that resolves to a `CompletionResponse` object containing the generated code completions.
      */
     async getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse> {
-        logger.profile("getCompletions");
+        //logger.profile("getCompletions");
         logger.info(vscode.l10n.t("Code completions..."));
 
         const config: TGaiaConfig = getGaiaConfiguration();
@@ -197,7 +193,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
         let json: any = await this.jsonRequest("POST", "complete", {}, body);
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage(vscode.l10n.t("No code found in the stack"));
-            logger.profile("getCompletions");
+            //logger.profile("getCompletions");
             return { completions: [] };
         }
 
@@ -218,7 +214,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
         }
 
         logger.debug(vscode.l10n.t("Code completions end with {0} suggestions in {1} ms", response.completions.length, json.elapsed_time));
-        logger.profile("getCompletions");
+        //logger.profile("getCompletions");
 
         return response;
     }
@@ -230,7 +226,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
      * @returns The explanation of the provided code, or an empty string if an error occurs.
      */
     async explainCode(code: string): Promise<string> {
-        logger.profile("explainCode");
+        //logger.profile("explainCode");
         logger.info(vscode.l10n.t("Code explain..."));
 
         const body: any = {
@@ -241,7 +237,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
         if (typeof (response) === "object" && response instanceof Error) {
             return "";
         } else if (!response) {// } || response.length === 0) {
-            logger.profile("explainCode");
+            //logger.profile("explainCode");
             return "";
         }
 
@@ -250,7 +246,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
 
         const explanation: string = response.explanation.trim().replace(/<\|[^\|].*\|>/i, "").trim()
 
-        logger.profile("explainCode");
+        //logger.profile("explainCode");
         return explanation;
     }
 
@@ -261,7 +257,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
      * @returns A promise that resolves to a `InferTypeResponse` object containing the inferred types.
      */
     async inferType(code: string): Promise<InferTypeResponse> {
-        logger.profile("inferType");
+        //logger.profile("inferType");
         logger.info(vscode.l10n.t("Code typify..."));
 
         const body: {} = {
@@ -273,14 +269,14 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
 
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage(vscode.l10n.t("No code found in the stack"));
-            logger.profile("innerType");
+            //logger.profile("innerType");
         } else if (json.types) {
             types = json.types;
         }
 
         logger.debug(vscode.l10n.t("Code infer end with {0} suggestions", types.length));
 
-        logger.profile("innerType");
+        //logger.profile("innerType");
 
         return json;
     }
