@@ -1,16 +1,23 @@
 {
   "name": "tds-gaia-webview-ui",
   "version": "0.0.6",
+  "publisher": "TOTVS",
+  "author": {
+    "name": "TOTVS",
+    "email": "tecnologia@totvs.com.br"
+  },
   "private": true,
   "scripts": {
     "-- COMPILE --": "",
     "compile": "webpack --mode=development",
     "-- BUILD --": "",
     "build": "webpack --mode=production",
-    "--LINT--": "",
+    "-- MISC--": "",
+    "link": "npm link @totvs/tds-webtoolkit",
     "lint": "eslint \"src/**/*.tsx"
   },
   "dependencies": {
+    "@totvs/tds-webtoolkit": "^0.0.1",
     "@vscode/codicons": "^0.0.35",
     "@vscode/webview-ui-toolkit": "^1.4.0",
     "react": "^18.2.0",

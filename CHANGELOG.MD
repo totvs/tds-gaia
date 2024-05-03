@@ -8,6 +8,12 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.1.0
+
+### Melhoria
+
+- Em visões (_webView_) para a utilizar o pacote [TDS-Webtoolkit](https://github.com/totvs/TDS-WebToolKit)
+
 ## TDS-Gaia 0.0.9
 
 ### Correção

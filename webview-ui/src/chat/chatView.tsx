@@ -17,20 +17,20 @@ limitations under the License.
 import "./chatView.css";
 import React from "react";
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { CommonCommandFromPanelEnum, ReceiveMessage, sendSave } from "../utilities/common-command-webview";
-import { VSCodeButton, VSCodeDataGrid, VSCodeLink } from "@vscode/webview-ui-toolkit/react";
-import { IFormAction, TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
-import { sendLinkMouseOver } from "./sendCommand";
+import { VSCodeDataGrid } from "@vscode/webview-ui-toolkit/react";
 import NewMessage from "./newMessage";
 import MessageRow from "./messageRow";
 import { TMessageModel } from "./chatModels";
+import { TAbstractModel, sendSave } from "@totvs/tds-webtoolkit";
+import { CommonCommandFromPanelEnum, ReceiveMessage } from "@totvs/tds-webtoolkit";
+import { IFormAction, TdsForm, setDataModel } from "@totvs/tds-webtoolkit";
 
 enum ReceiveCommandEnum {
 }
 
 type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
 
-type TFields = {
+type TFields = TAbstractModel & {
   lastPublication: Date;
   loggedUser: string;
   newMessage: string;
@@ -74,7 +74,7 @@ function findLastIndex<T>(array: T[], predicate: (value: T) => boolean): number 
  * Handles receiving updates from the panel via postMessage.
  * Renders messages, form, and buttons.
  */
-export default function ChatView() {
+export function ChatView() {
   const methods = useForm<TFields>({
     defaultValues: {
       lastPublication: new Date(),
@@ -123,7 +123,7 @@ export default function ChatView() {
           const errors: any = command.data.errors;
 
           setDataModel<TFields>(methods.setValue, model);
-          setErrorModel(methods.setError, errors);
+          //setErrorModel(methods.setError, errors);
 
           break;
 
@@ -162,6 +162,8 @@ export default function ChatView() {
     }
   });
 
+  //              methods={methods}
+
   return (
     <main>
       <section className="tds-chat">
@@ -180,7 +182,6 @@ export default function ChatView() {
             <TdsForm<TFields>
               id="chatForm"
               onSubmit={onSubmit}
-              methods={methods}
               actions={actions}
               isProcessRing={false}
             >

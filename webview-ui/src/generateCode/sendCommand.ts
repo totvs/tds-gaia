@@ -14,17 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TModelData } from "../model/modelData";
-import { CommonCommandToPanelEnum } from "../utilities/common-command-webview";
-import { vscode } from "../utilities/vscodeWrapper";
+import { CommonCommandToPanelEnum, TAbstractModel, tdsVscode } from "@totvs/tds-webtoolkit";
 
 /**
  * Sends a link mouse over event to the webview panel.
  * 
  * @param command - The command string associated with the link mouse over event.
  */
-export function sendGenerateCode(model: TModelData) {
-	vscode.postMessage({
+export function sendGenerateCode(model: TAbstractModel) {
+	tdsVscode.postMessage({
 		command: "GENERATE_CODE",
 		data: {
 			model: model,
@@ -38,8 +36,8 @@ export function sendGenerateCode(model: TModelData) {
  * 
  * @param command - The command string associated with the link mouse over event.
  */
-export function sendCopyToClipboard(model: TModelData) {
-	vscode.postMessage({
+export function sendCopyToClipboard(model: TAbstractModel) {
+	tdsVscode.postMessage({
 		command: CommonCommandToPanelEnum.CopyToClipboard,
 		data: {
 			model: model,
@@ -57,7 +55,7 @@ export function sendCopyToClipboard(model: TModelData) {
 * @param comment - Any additional comments for the feedback.
 */
 export function sendFeedback(messageId: string, text: string, value: string, comment: string) {
-	vscode.postMessage({
+	tdsVscode.postMessage({
 		command: CommonCommandToPanelEnum.Feedback,
 		data: {
 			model: undefined,
