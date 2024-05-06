@@ -382,7 +382,9 @@
     "vscode:prepublish": "npm run compile",
     "--TEST--": "",
     "pretest": "npm run compile && npm run lint",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "--MISC--": "",
+    "postinstall": "cd webview-ui && npm i"
   },
   "dependencies": {
     "@vscode/l10n": "^0.0.18",

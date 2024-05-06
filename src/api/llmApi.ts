@@ -236,13 +236,11 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
         let response: any | Error = await this.jsonRequest("POST", "explain", {}, JSON.stringify(body));
         if (typeof (response) === "object" && response instanceof Error) {
             return "";
-        } else if (!response) {// } || response.length === 0) {
-            //logger.profile("explainCode");
+        } else if (!response || !response.explanation) {
             return "";
         }
 
-        logger.debug(vscode.l10n.t("Code explain end with {0} size", response.length));
-        logger.debug(response);
+        logger.debug(vscode.l10n.t("Code explain end with {0} size", response.explanation.length));
 
         const explanation: string = response.explanation.trim().replace(/<\|[^\|].*\|>/i, "").trim()
 
