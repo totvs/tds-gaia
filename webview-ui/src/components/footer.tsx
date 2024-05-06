@@ -49,7 +49,7 @@ export default function TdsFooter(props: IFooter) {
 		<section className="tds-footer">
 			{children.length > 0 && <>
 				<div className="tds-logo">
-					<img src="..\..\icons\totvs-32x32.png" alt="TOTVS S.A." />
+					<img src="../icons/totvs-32x32.png" alt="TOTVS S.A." />
 				</div>
 				<div className="tds-footer-content">
 					{...children}

@@ -130,7 +130,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
             Error.captureStackTrace(result);
             logger.error(result);
         } else {
-            logger.info(vscode.l10n.t("Gaia IA Service on-line"));
+            logger.info(vscode.l10n.t("TDS-Gaia IA Service is running"));
         }
 
         //logger.profile("checkHealth");

@@ -51,7 +51,6 @@ export type TGaiaConfig = {
   logLevel: "off" | "error" | "warn" | "info" | "http" | "verbose" | "debug";
   endPoint: string;
   apiVersion: string;
-  lastLogin: string;
   documentFilter: {
     [key: string]: string;
   }
@@ -102,7 +101,6 @@ function setGaiaCustomConfiguration(key: keyof TGaiaCustomConfig, newValue: any)
 export function setGaiaUser(user: LoggedUser | undefined) {
 
   setGaiaCustomConfiguration("currentUser", user);
-  setGaiaConfiguration("lastLogin", new Date().toUTCString()); //forçar modificação em settings.json
 }
 
 /**
@@ -123,16 +121,6 @@ export function getGaiaUser(): LoggedUser | undefined {
 export function isGaiaLogged(): boolean {
 
   return getGaiaUser() !== undefined;
-}
-
-/**
- * Checks if this is the first time TGaia has been used by checking 
- * if there is a last login date set in the configuration.
- * 
- * @returns True if this is the first time TGaia is being used, false otherwise.
- */
-export function isGaiaFirstUse(): boolean {
-  return getGaiaConfiguration().lastLogin.length == 0;
 }
 
 /**

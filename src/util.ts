@@ -16,7 +16,6 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { Disposable, EventEmitter } from "vscode";
-import { GaiaAuthenticationProvider } from './authenticationProvider';
 
 /**
  * Capitalizes the first letter of each word in the provided text string.
@@ -126,3 +125,4 @@ export function promiseFromEvent<T, U>(event: vscode.Event<T>, adapter: PromiseA
 export async function updateContextKey(key: string, value: boolean | string | number) {
     vscode.commands.executeCommand('setContext', `tds-gaia.${key}`, value);
 }
+

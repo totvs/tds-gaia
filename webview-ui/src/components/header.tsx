@@ -46,7 +46,7 @@ export default function TdsHeader(props: IHeader) {
 	return (
 		<section className="tds-header">
 			<div className="tds-logo">
-				<img src="..\..\icons\totvs-32x32.png" alt="TOTVS S.A." />
+				<img src="../../icons/totvs-32x32.png" alt="TOTVS S.A." />
 			</div>
 			<h1>{props.title}</h1>
 			{props.linkToDoc && <div className="tds-help-doc"><VSCodeLink href={href}>{text}</VSCodeLink></div>}

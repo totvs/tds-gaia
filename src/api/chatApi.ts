@@ -16,10 +16,11 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import * as path from "path";
-import { getGaiaUser, isGaiaFirstUse, isGaiaLogged, isGaiaReady } from "../config";
+import { getGaiaUser, isGaiaLogged, isGaiaReady } from "../config";
 import { Queue } from "../queue";
 import { MessageOperationEnum, TMessageModel } from "../model/messageModel";
 import { exit } from "process";
+import { isGaiaFirstUse, isGaiaUpdated, updateGaiaLastLogin } from "../extension";
 
 /**
  * Defines the queue message type for chat messages.
@@ -35,6 +36,7 @@ const HELP_RE = /^(help)(\s+(\w+))?$/i;
 const LOGOUT_RE = /^logout$/i;
 const LOGIN_RE = /^login$/i;
 const OPEN_MANUAL_RE = /^(open )?manual$/i;
+const OPEN_CHANGE_LOG_RE = /^(open ) changelog$/i;
 const HEALTH_RE = /^health$/i;
 const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
@@ -81,7 +83,10 @@ const commandsMap: Record<string, TCommand> = {
         caption: vscode.l10n.t("Hint"),
         command: "hint_1",
         regex: HINT_1_RE,
-        commandId: "tds-gaia.showHint?hint=1",
+        commandId: "tds-gaia.showHint",
+        commandArgs: {
+            hint: "1",
+        },
         process: (chat: ChatApi, command: string) => doHelp(chat, "help hint_1")
     },
     "open-quick-guide": {
@@ -99,22 +104,34 @@ const commandsMap: Record<string, TCommand> = {
         regex: LOGOUT_RE,
         alias: ["logoff", "exit", "bye"],
         commandId: "tds-gaia.logout",
-        process: (chat: ChatApi, command: string) => doLogout(chat)
+        //process: (chat: ChatApi, command: string) => doLogout(chat)
     },
     "login": {
         command: "login",
         regex: LOGIN_RE,
         alias: ["logon", "hy", "hello"],
         commandId: "tds-gaia.login",
+        caption: "Login"
     },
     "open-manual": {
         command: "open-manual",
         regex: OPEN_MANUAL_RE,
         alias: ["man", "m"],
         commandId: "tds-gaia.external-open",
+        caption: "Open Manual",
         commandArgs: {
             target: "README.md",
             title: vscode.l10n.t("Manual")
+        }
+    },
+    "open-change-log": {
+        command: "open-change-log",
+        regex: OPEN_CHANGE_LOG_RE,
+        commandId: "tds-gaia.external-open",
+        caption: "Open Change Log",
+        commandArgs: {
+            target: "CHANGELOG.md",
+            title: vscode.l10n.t("Change Log")
         }
     },
     "health": {
@@ -263,7 +280,7 @@ export class ChatApi {
             operation: MessageOperationEnum.Add,
             messageId: id,
             answering: options.answeringId || "",
-            inProcess: (options.answeringId || "") === "",
+            inProcess: (options.answeringId || "") === "" && (options.inProgress || false),
             timeStamp: new Date(),
             author: "Gaia",
             message: workMessage,
@@ -362,24 +379,31 @@ export class ChatApi {
     * @param answeringId - The ID of the message being answered.
     * @returns Void
     */
-    checkUser(answeringId: string) {
+    async checkUser(answeringId: string) {
         if (isGaiaReady()) {
             if (!isGaiaLogged()) {
-                if (isGaiaFirstUse()) {
-                    this.gaia([
-                        vscode.l10n.t("It seems like this is the first time we've met."),
-                        vscode.l10n.t("Want to know how to interact with me? {0}", this.commandText("hint_1"))
-                    ], { answeringId: "answeringId" });
-                }
                 this.gaia([
                     vscode.l10n.t("To start, I need to know you."),
                     vscode.l10n.t("Please, identify yourself with the command {0}.", this.commandText("login"))
-                ], { answeringId: "answeringId" });
+                ], { answeringId: answeringId });
             } else {
                 this.gaia([
                     vscode.l10n.t("Hello, **{0}**.", getGaiaUser()?.displayName || "<unknown>"),
                     vscode.l10n.t("I'm ready to help you in any way possible!"),
-                ], { answeringId: "answeringId" });
+                ], { answeringId: answeringId });
+
+                if (await isGaiaFirstUse()) {
+                    this.gaia([
+                        vscode.l10n.t("It seems like this is the first time we've met."),
+                        vscode.l10n.t("Want to know how to interact with me? {0}", this.commandText("hint_1"))
+                    ], { answeringId: answeringId });
+                } else if (!isGaiaUpdated(false)) {
+                    this.gaia([
+                        vscode.l10n.t("Houve uma evolução em meus processos. Recomendo que você leia {0}.", this.commandText("open-change-log"))
+                    ], { answeringId: answeringId });
+                }
+
+                updateGaiaLastLogin();
             }
         } else {
             vscode.commands.executeCommand("tds-gaia.health");
@@ -467,7 +491,7 @@ export class ChatApi {
     * @returns A formatted command text that can be used to execute the command.
     * 
     */
-    commandText(_command: TCommandKey, args?: {}): string {
+    commandText(_command: TCommandKey, args?: any): string {
         const command: TCommand | undefined = ChatApi.getCommand(_command);
 
         if (command) {
@@ -475,10 +499,20 @@ export class ChatApi {
                 ...args,
                 ...command.commandArgs
             };
-            const argsString: string = JSON.stringify(args);
-            const encodeArgs: string = argsString.length > 2 ? `?${encodeURI(argsString)}` : "";
+            // const argsString: string[] = [];
+            // Object.keys(args).forEach((key: string) => {
+            //     argsString.push(`${key}=${encodeURI(args[key])}`);
+            // });
+            let encodedArgs: string = "";
+            if (args) {
+                //encodeArgs = `${argsString.join("&")}`;
+                encodedArgs = "?" + encodeURIComponent(
+                    JSON.stringify(args)
+                );
 
-            return `[${command.caption}](command:${command.commandId}${encodeArgs})${command.key ? " `" + command.key + "`" : ""} `;
+            }
+
+            return `[${command.caption}](command:${command.commandId}${encodedArgs})${command.key ? " `" + command.key + "`" : ""} `;
         }
 
         return _command;
@@ -576,20 +610,24 @@ function doHelp(chat: ChatApi, message: string): boolean {
     if (matches = message.match(commandsMap["help"].regex)) {
         if (matches[2]) {
             if (matches[2].trim() == "hint_1") {
-                chat.gaia([
-                    vscode.l10n.t("To interact with me, you will use commands that can be triggered by one of these modes:"),
+                const commandAccess: string[] = [
                     vscode.l10n.t("- A shortcut;"),
-                    vscode.l10n.t("- By the command panel (`ctrl + shift - p` or` f1`), filtering by \"tds-gaia\";"),
+                    vscode.l10n.t("- By the command panel (`shift+p` or `f1`), filtering by \"tds-gaia\";"),
                     vscode.l10n.t("- By a link presented in this chat;"),
                     vscode.l10n.t("- Typing the command in the prompt chat;"),
-                    vscode.l10n.t("- Context menu of the chat or source in edition."),
+                    vscode.l10n.t("- Context menu of the chat or source in edition.")
+                ];
+
+                chat.gaia([
+                    vscode.l10n.t("To interact with me, you will use commands that can be triggered by one of these modes:"),
+                    commandAccess.join("\n"),
                     vscode.l10n.t("If you are familiar with **VS-Code**, see {0}, if you do not or want more details, see {1} (will open on your default browser).",
                         chat.commandText("open-quick-guide"),
                         chat.commandText("open-manual")),
                 ], {});
                 chat.gaia([
-                    vscode.l10n.t("To know the commands, type `{0}`.", chat.commandText("help")),
-                    vscode.l10n.t("If you want to know more about a specific command, type `{0} command`.", chat.commandText("help")),
+                    vscode.l10n.t("To know the commands, type {0}.", chat.commandText("help")),
+                    vscode.l10n.t("If you want to know more about a specific command, type {0} `command`.", chat.commandText("help")),
                 ], {});
                 chat.gaia([
                     vscode.l10n.t("In some messages of mine, there may be a block of **feedback**."),
@@ -612,22 +650,3 @@ function doHelp(chat: ChatApi, message: string): boolean {
 
     return result;
 }
-
-/**
- * Logs the user out by printing a logout message.
- * 
- * @returns Always returns true after printing the logout message.
- */
-function doLogout(chat: ChatApi): boolean {
-    chat.logout();
-    chat.checkUser("");
-
-    return true;
-}
-
-/**
- * Clears the chat history.
- */
-// function doClear(chat: ChatApi): any {
-//     chat.user("clear", true);
-// }

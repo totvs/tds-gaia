@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import * as vscode from 'vscode';
-import { getGaiaLogLevel, isGaiaLogged, isGaiaShowBanner } from './config';
+import { getGaiaLogLevel, getGaiaUser, isGaiaLogged, isGaiaShowBanner } from './config';
 import { ChatViewProvider } from './panels/chatViewProvider';
 import { PREFIX_GAIA, logger } from './logger';
 import { registerIaCommands } from './commands/IA/index';
@@ -23,9 +23,9 @@ import { registerChatCommands } from './commands/chat';
 import { registerAuthentication } from './authenticationProvider';
 import { updateContextKey } from './util';
 import { registerInlineCompletionItemProvider } from './completionItemProvider';
-import { chatApi, feedbackApi, llmApi } from './api';
+import { feedbackApi, llmApi } from './api';
 
-let ctx: vscode.ExtensionContext;
+let extensionContext: vscode.ExtensionContext;
 
 /**
  * Activates the extension by recording the handling of commands, events and others.
@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.l10n.t('Congratulations, your extension "{0}" is now active!', PREFIX_GAIA)
 	);
 
-	ctx = context;
+	extensionContext = context;
 	handleConfigChange(context);
 
 	showBanner()
@@ -70,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 
 	return new Promise(async (value: any) => {
-		await feedbackApi.stop();
+		feedbackApi.stop();
 		await llmApi.stop();
 	});
 }
@@ -114,4 +114,39 @@ function showBanner(force: boolean = false): void {
 			logger.info(lines.join("\n"));
 		}
 	}
+}
+
+/**
+ * Checks if this is the first time TGaia has been used by checking 
+ * if there is a last login date set in the configuration.
+ * 
+ * @returns True if this is the first time TGaia is being used, false otherwise.
+ */
+export async function isGaiaFirstUse(): Promise<boolean> {
+	if ((getGaiaUser()?.email || "").startsWith("//")) {
+		await isGaiaUpdated(true);
+	}
+
+	const information: any = JSON.parse((await extensionContext.secrets.get("tds-gaia.information") || "{}"));
+
+	return (information.lastLogin || "").length == 0;
+}
+
+export async function isGaiaUpdated(remove: boolean): Promise<boolean> {
+	if (remove) {
+		await extensionContext.secrets.delete("tds-gaia.information");
+		return false;
+	}
+
+	const information: any = JSON.parse((await extensionContext.secrets.get("tds-gaia.information") || "{}"));
+	return (information.version || extensionContext.extension.packageJSON.version) == extensionContext.extension.packageJSON.version;
+}
+
+export async function updateGaiaLastLogin(): Promise<void> {
+	const information: any = JSON.parse((await extensionContext.secrets.get("tds-gaia.information") || "{}"));
+
+	information.version = extensionContext.extension.packageJSON.version;
+	information.lastLogin = new Date().toISOString();
+
+	await extensionContext.secrets.store("tds-gaia.information", JSON.stringify(information));
 }

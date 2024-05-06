@@ -145,12 +145,12 @@ function mdTextToHtml(text: string): any[] {
                     //if (index == (phrases.length - 1)) {
                     if (phrases.length == 1) {
                         children.push(<p key={spanSeq++}>{mdToHtml(phrase)}</p>);
-                    } else if (index > 0) {
+                    } else { //if (index > 0) {
                         children.push(mdToHtml(phrase));
                         children.push(<br key={spanSeq++} />);
-                    } else {
-                        children.push(<>{mdToHtml(phrase)}</>);
-                    }
+                    } //else {
+                       // children.push(<>{mdToHtml(phrase)}</>);
+                    //}
                 }
             });
         });
