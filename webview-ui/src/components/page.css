@@ -23,13 +23,13 @@ limitations under the License.
 .tds-error {
 	background-color: var(--vscode-inputValidation-errorBackground);
 	border-color: var(--vscode-inputValidation-errorBorder);
-	color: var(--vscode-editorError-foreground);
+	color: var(--vscode-egaiarError-foreground);
 }
 
 .tds-warning {
 	background-color: var(--vscode-inputValidation-warningBackground);
 	border-color: var(--vscode-inputValidation-warningBorder);
-	color: var(--vscode-editorWarning-foreground);
+	color: var(--vscode-egaiarWarning-foreground);
 }
 
 .tds-info {

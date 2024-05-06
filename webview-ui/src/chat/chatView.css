@@ -39,6 +39,7 @@ section.tds-chat section.tds-content {
 	flex-grow: 1;
 	flex-shrink: 1;
 	order: 0;
+	margin-top: 15px;
 }
 
 section.tds-chat section.tds-footer {
@@ -49,10 +50,9 @@ section.tds-chat section.tds-footer {
 	flex-basis: auto;
 	align-self: auto;
 	order: 0;
-	/* width: 100%; */
 }
 
-section.tds-chat div.tds-message-row {
+section.tds-chat vscode-data-grid-row.tds-message-row {
 	display: flex;
 	flex-direction: column;
 	margin: 0;
@@ -61,32 +61,45 @@ section.tds-chat div.tds-message-row {
 	padding: 3px;
 }
 
-section.tds-chat div.tds-message-row+div.tds-message-row {
-	margin-top: 0.5em;
+section.tds-chat vscode-data-grid-row.tds-message-user {
+	background-color: var(--vscode-editor-background);
 }
 
-section.tds-chat div.tds-message-row+div.tds-message-row {
-	margin-bottom: 0.5em;
+section.tds-chat vscode-data-grid-row.tds-message-gaia+vscode-data-grid-row.tds-message-user {
+	margin-top: var(--tds-ver-spacing);
+	margin-bottom: var(--tds-ver-spacing)
 }
 
-section.tds-chat div.tds-message-row div.tds-message-author {
+section.tds-chat vscode-data-grid-row.tds-message-gaia+vscode-data-grid-row.tds-message-gaia,
+section.tds-chat vscode-data-grid-row.tds-message-user+vscode-data-grid-row.tds-message-user {
+	margin-top: 0;
+	margin-bottom: 0;
+	border-top: 1px hidden var(--vscode-editor-foreground);
+}
+
+section.tds-chat vscode-data-grid-row.tds-message-row div.tds-message-author {
 	display: flex;
 }
 
-section.tds-chat div.tds-message-row div.tds-message-author #author {
+section.tds-chat vscode-data-grid-row.tds-message-row div.tds-message-author #author {
 	font-weight: bold;
 	flex-grow: 1;
 }
 
-section.tds-chat div.tds-message-row div.tds-message-author #inProcess {
+section.tds-chat vscode-data-grid-row.tds-message-row div.tds-message-author #inProcess,
+section.tds-chat vscode-data-grid-row.tds-message-row div.tds-message-author #operation {
 	font-style: italic;
 	font-size: 80%;
 	flex-grow: 3;
-	align-self: baseline ;
+	/* align-self: baseline; */
 }
 
-section.tds-chat div.tds-message-row div.tds-message-author #timeStamp {
+section.tds-chat vscode-data-grid-row.tds-message-row div.tds-message-author #timeStamp {
 	font-style: italic;
+}
+
+section.tds-chat vscode-data-grid-row.tds-message-row-flash {
+	background-color: var(--vscode-editor-selectionBackground);
 }
 
 div.tds-message {
@@ -94,7 +107,7 @@ div.tds-message {
 }
 
 div.tds-message+div.tds-message {
-	margin-top: 0.5em;
+	margin-top: var(--tds-ver-spacing)
 }
 
 div.tds-message p {
@@ -106,4 +119,22 @@ div.tds-message p {
 div.tds-message p+p {
 	margin-block-start: var(--tds-ver-spacing);
 	margin-block-end: 0;
+}
+
+div.tds-feedback {
+	display: flex;
+	flex-direction: row;
+	border-top: 1px dashed var(--vscode-editor-foreground);
+	margin-top: var(--tds-ver-spacing);
+	padding-top: var(--tds-ver-spacing);
+}
+
+div.tds-feedback #buttons {
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+div.tds-feedback #comment {
+	flex-grow: 0;
+	flex-shrink: 0;
 }

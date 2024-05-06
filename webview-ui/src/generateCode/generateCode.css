@@ -1,0 +1,16 @@
+/* [name="description"] {
+
+} */
+
+#frmGenerateCode {
+	height: 90%;
+}
+
+[name="description"] {
+	height: 40%;
+}
+
+[name="generateCode"] {
+	font-family: 'Courier New', Courier, monospace;
+	height: 40%;
+}

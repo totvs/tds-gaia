@@ -16,11 +16,11 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import * as path from "path";
-import { getDitoUser, isDitoFirstUse, isDitoLogged, isDitoReady } from "../config";
+import { getGaiaUser, isGaiaLogged, isGaiaReady } from "../config";
 import { Queue } from "../queue";
-import { TMessageActionModel, TMessageModel } from "../model/messageModel";
+import { MessageOperationEnum, TMessageModel } from "../model/messageModel";
 import { exit } from "process";
-import { logger } from "../logger";
+import { isGaiaFirstUse, isGaiaUpdated, updateGaiaLastLogin } from "../extension";
 
 /**
  * Defines the queue message type for chat messages.
@@ -35,16 +35,18 @@ export type TQueueMessages = Queue<TMessageModel>;
 const HELP_RE = /^(help)(\s+(\w+))?$/i;
 const LOGOUT_RE = /^logout$/i;
 const LOGIN_RE = /^login$/i;
-const MANUAL_RE = /^manual$/i;
+const OPEN_MANUAL_RE = /^(open )?manual$/i;
+const OPEN_CHANGE_LOG_RE = /^(open ) changelog$/i;
 const HEALTH_RE = /^health$/i;
 const CLEAR_RE = /^clear$/i;
 const EXPLAIN_RE = /^explain\s(source)?$/i;
 const EXPLAIN_WORD_RE = /^explain\sword\s(source)?$/i;
-const TYPIFY_RE = /^typify\s(source)?$/i;
-const UPDATE_RE = /^update\s(source)?$/i;
+const INFER_TYPE_RE = /^infer\s(source)?$/i;
+const UPDATE_ALL_TYPE_RE = /^updateAllTypify\s(source)?$/i;
+const UPDATE_TYPE_RE = /^updateTypify\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
-const HINT_2_RE = /^(hint_2)$/i;
+const OPEN_QUICK_GUIDE = /^(open )?(quick guide)$/i;
 
 const COMMAND_IN_MESSAGE = /\{command:([^\}]\w+)(\s+\b.*)?\}/i;
 
@@ -53,10 +55,11 @@ const COMMAND_IN_MESSAGE = /\{command:([^\}]\w+)(\s+\b.*)?\}/i;
  * Includes the command name, regex to match it, an optional ID, 
  * optional caption and aliases, and an optional handler function.
 */
-type TCommand = {
+export type TCommand = {
     command: string;
     regex: RegExp;
-    commandId?: string;
+    commandId: string;
+    commandArgs?: {};
     key?: string;
     caption?: string;
     alias?: string[];
@@ -69,106 +72,135 @@ type TCommand = {
  */
 const commandsMap: Record<string, TCommand> = {
     "help": {
-        caption: "Help",
+        caption: vscode.l10n.t("Help"),
         command: "help",
         regex: HELP_RE,
         alias: ["h", "?"],
+        commandId: "tds-gaia.help",
         process: (chat: ChatApi, command: string) => doHelp(chat, command)
     },
     "hint_1": {
-        caption: "Dica",
+        caption: vscode.l10n.t("Hint"),
         command: "hint_1",
         regex: HINT_1_RE,
+        commandId: "tds-gaia.showHint",
+        commandArgs: {
+            hint: "1",
+        },
         process: (chat: ChatApi, command: string) => doHelp(chat, "help hint_1")
     },
-    "hint_2": {
-        caption: "Guia rápido",
-        command: "hint_2",
-        regex: HINT_2_RE,
-        process: (chat: ChatApi, command: string) => doHelp(chat, "help hint_2")
+    "open-quick-guide": {
+        caption: vscode.l10n.t("Quick Guide"),
+        command: "open-quick-guide",
+        regex: OPEN_QUICK_GUIDE,
+        commandId: "tds-gaia.external-open",
+        commandArgs: {
+            target: "README.md#guia-rápido",
+            title: vscode.l10n.t("Quick Guide")
+        }
     },
     "logout": {
         command: "logout",
         regex: LOGOUT_RE,
         alias: ["logoff", "exit", "bye"],
-        commandId: "tds-dito.logout",
-        process: (chat: ChatApi, command: string) => doLogout(chat)
+        commandId: "tds-gaia.logout",
+        //process: (chat: ChatApi, command: string) => doLogout(chat)
     },
     "login": {
         command: "login",
         regex: LOGIN_RE,
         alias: ["logon", "hy", "hello"],
-        commandId: "tds-dito.login",
+        commandId: "tds-gaia.login",
+        caption: "Login"
     },
-    "manual": {
-        command: "manual",
-        regex: MANUAL_RE,
+    "open-manual": {
+        command: "open-manual",
+        regex: OPEN_MANUAL_RE,
         alias: ["man", "m"],
-        commandId: "tds-dito.open-manual",
+        commandId: "tds-gaia.external-open",
+        caption: "Open Manual",
+        commandArgs: {
+            target: "README.md",
+            title: vscode.l10n.t("Manual")
+        }
+    },
+    "open-change-log": {
+        command: "open-change-log",
+        regex: OPEN_CHANGE_LOG_RE,
+        commandId: "tds-gaia.external-open",
+        caption: "Change Log",
+        commandArgs: {
+            target: "CHANGELOG.md",
+            title: vscode.l10n.t("Change Log")
+        }
     },
     "health": {
         command: "health",
         regex: HEALTH_RE,
         alias: ["det", "d"],
-        commandId: "tds-dito.health",
+        commandId: "tds-gaia.health",
     },
     "clear": {
-        caption: "Clear",
+        caption: vscode.l10n.t("Clear"),
         command: "clear",
         regex: CLEAR_RE,
         alias: ["c"],
-        //process: (chat: ChatApi) => doClear(chat)
+        commandId: "tds-gaia.clear",
+        process: (chat: ChatApi) => true
     },
     "explain": {
         command: "explain",
         regex: EXPLAIN_RE,
         alias: ["ex", "e"],
-        commandId: "tds-dito.explain",
+        commandId: "tds-gaia.explain",
     },
     "explain-world": {
         command: "explain-word",
         regex: EXPLAIN_WORD_RE,
         alias: ["ew"],
-        commandId: "tds-dito.explain-word",
+        commandId: "tds-gaia.explain-word",
     },
-    "typify": {
-        command: "typify",
-        regex: TYPIFY_RE,
+    "infer": {
+        command: "infer",
+        regex: INFER_TYPE_RE,
         alias: ["ty", "t"],
-        commandId: "tds-dito.typify",
+        commandId: "tds-gaia.infer",
     },
-    "update": {
-        caption: "Update",
+    "updateTypeAll": {
+        //caption: vscode.l10n.t("Update All Typified Variables"),
         command: "update",
-        regex: UPDATE_RE,
-        //commandId: "tds-dito.typify",
+        regex: UPDATE_TYPE_RE,
+        commandId: "tds-gaia.updateTypifyAll",
+    },
+    "updateType": {
+        //caption: vscode.l10n.t("Update Typified Variables"),
+        command: "update",
+        regex: UPDATE_TYPE_RE,
+        commandId: "tds-gaia.updateTypify",
+    },
+    "generateCode": {
+        //caption: vscode.l10n.t("Generate Code"),
+        command: "generate",
+        regex: UPDATE_TYPE_RE,
+        commandId: "tds-gaia.generateCode",
     }
 };
 
 /**
- * Completes the commands map by adding details like captions, keybindings etc. 
- * from the extension's package.json.
- * 
- * @param extension - The VS Code extension object.
- */
-export function completeCommandsMap(extension: vscode.Extension<any>) {
-    const commands: any = extension.packageJSON.contributes.commands;
-    const keybindings: any = extension.packageJSON.contributes.keybindings;
-
-    Object.keys(commands).forEach((key: string) => {
-        const command: TCommand | undefined = ChatApi.getCommand(commands[key].command);
-
-        if (command) {
-            command.caption = command.caption || commands[key].shortTitle || commands[key].title;
-
-            Object.keys(keybindings).forEach((key2: string) => {
-                if (keybindings[key2].command == command.commandId) {
-                    command.key = keybindings[key2].key;
-                }
-            });
-        }
-    });
+* Represents the options for a chat message.
+* 
+* @property {string} [answeringId] - The ID of the message being answered.
+* @property {boolean} [withFeedback] - Whether the message should include feedback.
+* @property {boolean} [inProgress] - Whether the message is in progress.
+*/
+export type TMessageOptions = {
+    answeringId?: string;
+    canFeedback?: boolean;
+    inProgress?: boolean;
+    disabledFeedback?: boolean;
 }
+
+type TCommandKey = keyof typeof commandsMap;
 
 /**
  * Provides methods for interacting with the chat API. 
@@ -177,8 +209,9 @@ export function completeCommandsMap(extension: vscode.Extension<any>) {
  * Dispatches events for new messages.
  */
 export class ChatApi {
-    static getCommand(_command: string): TCommand | undefined {
-        const commandId: string = _command.toLowerCase();
+
+    static getCommand(_command: TCommandKey): TCommand | undefined {
+        const commandId: TCommandKey = _command;
         let command: TCommand | undefined = commandsMap[commandId];
 
         if (!command) {
@@ -221,10 +254,6 @@ export class ChatApi {
     }
 
     protected sendMessage(message: TMessageModel): void {
-        if (!message.actions || message.actions.length == 0) {
-            message.actions = this.extractActions(message.message)
-        }
-
         this.queueMessages.enqueue(message);
 
         if (!this.messageGroup) {
@@ -232,35 +261,84 @@ export class ChatApi {
         }
     }
 
-    dito(message: string | string[], answeringId: string | undefined = undefined): string {
+    /**
+     * Sends a message to the message queue. 
+     * 
+     * @param message - The message text to send. Can be a string or string array, where each element is a paragraph. 
+     * @param answeringId - (Optional) The ID of the message this is answering.
+     * @returns The ID of the sent message.
+     */
+    gaia(message: string | string[], options: TMessageOptions): string {
         let workMessage: string = typeof message == "string"
             ? message
-            : message.join("\n");
+            : message.join("\n\n");
 
         //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
         const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
 
         this.sendMessage({
-            id: id,
-            answering: answeringId || "",
-            inProcess: (answeringId === undefined),
+            operation: MessageOperationEnum.Add,
+            messageId: id,
+            answering: options.answeringId || "",
+            inProcess: (options.answeringId || "") === "" && (options.inProgress || false),
             timeStamp: new Date(),
-            author: "Dito",
-            message: workMessage
+            author: "Gaia",
+            message: workMessage,
+            className: "tds-message-gaia",
+            feedback: (options.canFeedback || false),
+            disabled: (options.disabledFeedback || false)
         });
 
         return id;
     }
 
-    ditoInfo(message: string | string[]): void {
+    /**
+    * Updates an existing message in the Gaia chat interface.
+    *
+    * @param messageId - The unique identifier of the message to update.
+    * @param message - The updated message content, either as a single string or an array of strings. If an array, the lines will be joined with a newline.
+    * @returns The message ID of the updated message.
+    */
+    gaiaUpdateMessage(messageId: string, message: string | string[], options: TMessageOptions): string {
+        let workMessage: string = typeof message == "string"
+            ? message
+            : message.join("\n\n");
+
+        this.sendMessage({
+            operation: MessageOperationEnum.Update,
+            messageId: messageId,
+            answering: options.answeringId || "",
+            inProcess: false,
+            timeStamp: new Date(),
+            author: "Gaia",
+            message: workMessage,
+            className: "tds-message-gaia",
+            feedback: options.canFeedback || false,
+            disabled: (options.disabledFeedback || false)
+        });
+
+        return messageId;
+    }
+
+    /**
+    * Sends an informational message to the Gaia chat interface.
+    *
+    * @param message - The informational message to send, either as a single string or an array of strings. If an array, each line will be prefixed with '> '.
+    */
+    gaiaInfo(message: string | string[]): void {
         let workMessage: string | string[] = typeof message == "string"
             ? message
             : message.map((line: string) => `> ${line}`);
 
-        this.dito(workMessage, "");
+        this.gaia(workMessage, {});
     }
 
-    ditoWarning(message: string | string[]): void {
+    /**
+    * Sends a warning message to the Gaia chat interface.
+    *
+    * @param message - The warning message to send, either as a single string or an array of strings.
+    */
+    gaiaWarning(message: string | string[]): void {
         let workMessage: string | string[] = typeof message == "string"
             ? `[WARN] ${message}`
             : message.map((line: string, index: number) => {
@@ -271,49 +349,83 @@ export class ChatApi {
                 return line;
             });
 
-        this.dito(workMessage, "");
+        this.gaia(workMessage, {});
     }
 
-    private extractActions(message: string): TMessageActionModel[] {
-        let actions: TMessageActionModel[] = [];
-        let matches = undefined;
-        let workMessage: string = message;
-
-        while (matches = workMessage.match(COMMAND_IN_MESSAGE)) {
-            const commandId: string = matches[1];
-            const command: TCommand | undefined = ChatApi.getCommand(commandId);
-
-            if (command) {
-                actions.push({
-                    caption: command.caption || `< No caption > ${command.command} `,
-                    command: commandId
-                });
-            }
-
-            workMessage = workMessage.replace(commandId, "");
-        };
-
-        return actions;
-    }
-
-    checkUser(answeringId: string) {
-        if (isDitoReady()) {
-            if (!isDitoLogged()) {
-                if (isDitoFirstUse()) {
-                    this.dito(`Parece que é a primeira vez que nos encontramos. Quer saber como interagir comigo? ${this.commandText("hint_1")} `, answeringId);
+    /**
+    * Sends an error message to the Gaia chat interface.
+    *
+    * @param message - The error message to send, either as a single string or an array of strings.
+    */
+    gaiaError(message: string | string[]): void {
+        let workMessage: string | string[] = typeof message == "string"
+            ? `[ERR] ${message}`
+            : message.map((line: string, index: number) => {
+                if (index == 0) {
+                    return `[ERR] ${line}`;
                 }
-                this.dito(`Para começar, preciso conhecer você.Favor identifique-se  com o comando ${this.commandText('login')}.`, answeringId);
+
+                return line;
+            });
+
+        this.gaia(workMessage, {});
+
+    }
+
+    /**
+    * Checks the user's login state and provides appropriate responses based on the Gaia system's readiness 
+    * and the user's login status.
+    *
+    * @param answeringId - The ID of the message being answered.
+    * @returns Void
+    */
+    async checkUser(answeringId: string) {
+        if (isGaiaReady()) {
+            if (!isGaiaLogged()) {
+                this.gaia([
+                    vscode.l10n.t("To start, I need to know you."),
+                    vscode.l10n.t("Please, identify yourself with the command {0}.", this.commandText("login"))
+                ], { answeringId: answeringId });
             } else {
-                this.dito(
-                    `Olá, ** ${getDitoUser()?.displayName}**.\n\n` +
-                    `Estou pronto para ajudá-lo no que for possível!`
-                    , answeringId);
+                this.gaia([
+                    vscode.l10n.t("Hello, **{0}**.", getGaiaUser()?.displayName || "<unknown>"),
+                    vscode.l10n.t("I'm ready to help you in any way possible!"),
+                ], { answeringId: answeringId });
+
+                if (await isGaiaFirstUse()) {
+                    this.gaia([
+                        vscode.l10n.t("It seems like this is the first time we've met."),
+                        vscode.l10n.t("Want to know how to interact with me? {0}", this.commandText("hint_1"))
+                    ], { answeringId: answeringId });
+                } else if (await isGaiaUpdated()) {
+                    const version = vscode.extensions.getExtension("TOTVS.tds-gaia")?.packageJSON.version || "";
+                    this.gaia([
+                        vscode.l10n.t("There was an evolution in my processes. I recommend reading the topic **TDS-Gaia {0}** in {1}.", version, this.commandText("open-change-log"))
+                    ], { answeringId: answeringId });
+                }
+
+                updateGaiaLastLogin();
             }
         } else {
-            vscode.commands.executeCommand("tds-dito.health");
+            vscode.commands.executeCommand("tds-gaia.health");
         }
     }
 
+    logout() {
+        if (isGaiaLogged()) {
+            this.gaia([
+                vscode.l10n.t("**{0}**, thank you for working with me!", getGaiaUser()?.displayName || "<unknown>"),
+                vscode.l10n.t("See you soon!"),
+            ], {});
+        }
+    }
+
+    /**
+    * Sends a message to the chat, optionally echoing it to the user interface.
+    *
+    * @param message - The message to send.
+    * @param echo - If true, the message will be displayed in the user interface.
+    */
     user(message: string, echo: boolean): void {
         if (echo) {
             //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
@@ -322,12 +434,16 @@ export class ChatApi {
             this.beginMessageGroup();
 
             this.sendMessage({
-                id: id,
+                operation: MessageOperationEnum.Add,
+                messageId: id,
                 answering: "",
                 inProcess: false,
                 timeStamp: new Date(),
-                author: getDitoUser()?.displayName || "<Not Logged>",
+                author: getGaiaUser()?.displayName || "<unknown>",
                 message: message == undefined ? "???" : message,
+                className: "tds-message-user",
+                feedback: false,
+                disabled: true
             });
 
             this.processMessage(message);
@@ -338,20 +454,29 @@ export class ChatApi {
         }
     }
 
+    /**
+    * Generates a list of formatted command text for various chat commands.
+    *
+    * The list of commands is generated based on the current state of the Gaia system, 
+    * such as whether it is ready and whether the user is logged in.
+    *
+    * @returns A comma-separated string of formatted command text that can be used to execute the commands.
+    */
     commandList(): string {
         let commands: string[] = [];
 
         commands.push(`${this.commandText("help")}`);
-        commands.push(`${this.commandText("manual")}`);
+        commands.push(`${this.commandText("open-manual")}`);
+        commands.push(`${this.commandText("open-quick-guide")}`);
         commands.push(`${this.commandText("clear")}`);
 
-        if (!isDitoReady()) {
+        if (!isGaiaReady()) {
             commands.push(`${this.commandText("details")}`);
-        } else if (isDitoLogged()) {
+        } else if (isGaiaLogged()) {
             commands.push(`${this.commandText("logout")}`);
             commands.push(`${this.commandText("explain")}`);
-            commands.push(`${this.commandText("explain-word")}`);
-            commands.push(`${this.commandText("typify")}`);
+            commands.push(`${this.commandText("explain-world")}`);
+            commands.push(`${this.commandText("infer")}`);
         } else {
             commands.push(`${this.commandText("login")}`);
         }
@@ -359,16 +484,48 @@ export class ChatApi {
         return commands.join(", ");
     }
 
-    commandText(_command: string, ...args: string[]): string {
+    /**
+    * Generates a formatted command text for a given command key and optional arguments.
+    *
+    * @param _command - The command key to generate the text for.
+    * @param args - Any optional arguments to include in the command text. Use JSON format.
+    * @returns A formatted command text that can be used to execute the command.
+    * 
+    */
+    commandText(_command: TCommandKey, args?: any): string {
         const command: TCommand | undefined = ChatApi.getCommand(_command);
 
         if (command) {
-            return `[${command.caption}](command:${command.command}${args.length > 0 ? `&${args.join(";")}` : ""})${command.key ? " `" + command.key + "`" : ""} `;
+            args = {
+                ...args,
+                ...command.commandArgs
+            };
+            // const argsString: string[] = [];
+            // Object.keys(args).forEach((key: string) => {
+            //     argsString.push(`${key}=${encodeURI(args[key])}`);
+            // });
+            let encodedArgs: string = "";
+            if (args) {
+                //encodeArgs = `${argsString.join("&")}`;
+                encodedArgs = "?" + encodeURIComponent(
+                    JSON.stringify(args)
+                );
+
+            }
+
+            return `[${command.caption}](command:${command.commandId}${encodedArgs})${command.key ? " `" + command.key + "`" : ""} `;
         }
 
         return _command;
     }
 
+    /**
+     * Generates a formatted link to a source code location.
+     *
+     * @param source - The URI of the source file.
+     * @param range - The range within the source file to link to, specified as either a `vscode.Range` or a line number.
+     * @returns A formatted link to the specified source code location, or an error message if the workspace folder cannot be found.
+     */
     linkToSource(source: vscode.Uri, range: vscode.Range | number): string {
         const workspaceFolder: vscode.WorkspaceFolder | undefined = vscode.workspace.getWorkspaceFolder(source);
 
@@ -390,7 +547,28 @@ export class ChatApi {
             return `[${filename}(${position})](link:${source.fsPath}&${position})`;
         }
 
-        return `Workspace of \`${source.fsPath}\` not found.`;
+        return vscode.l10n.t("Workspace of \`{0}\` not found.", source.fsPath);
+    }
+
+    /**
+    * Generates a link to a specific range within a source file.
+    * 
+    * @param source - The URI of the source file.
+    * @param range - The range within the source file, specified as either a `vscode.Range` object or a line number.
+    * @returns A formatted string representing a link to the specified range in the source file.
+    */
+    linkToRange(source: vscode.Uri, range: vscode.Range | number): string {
+        let position: string = "";
+
+        if ((range instanceof vscode.Range)) {
+            const workRange: vscode.Range = (range as vscode.Range);
+            position = `${workRange.start.line + 1}:${workRange.start.character + 1}`;
+            position += `-${workRange.end.line + 1}:${workRange.end.character + 1}`;
+        } else {
+            position = `${(range as number) + 1}`;
+        }
+
+        return `[(${position})](link:${source.fsPath}&${position})`;
     }
 
     private processMessage(message: string) {
@@ -401,16 +579,23 @@ export class ChatApi {
 
             if (command.process) {
                 processResult = command.process(this, message);
-            }
-
-            if (processResult && command.commandId) {
-                vscode.commands.executeCommand(command.commandId);
             } else {
-                //this.dito(`Funcionalidade não implementada.Por favor, entre em contato com o desenvolvedor.`);
+                vscode.commands.executeCommand(command.commandId);
             }
         } else {
-            this.dito(`Não entendi.Você pode digitar ${this.commandText("help")} para ver os comandos disponíveis.`, "");
+            this.gaia(vscode.l10n.t("I didn't understand. You can type {0} to see available commands.",
+                this.commandText("help")), {});
         }
+    }
+
+    /**
+    * Return NEXT unique message ID for a chat message.
+    * The ID is a 6-character hexadecimal string starting with "FF0000".
+    * 
+    * @returns A next message ID.
+    */
+    nextMessageId(): string {
+        return `FF0000${(this.messageId).toString(16)}`.substring(-6);
     }
 }
 
@@ -426,34 +611,39 @@ function doHelp(chat: ChatApi, message: string): boolean {
     if (matches = message.match(commandsMap["help"].regex)) {
         if (matches[2]) {
             if (matches[2].trim() == "hint_1") {
-                chat.dito([
-                    "Para interagir comigo, você usará comandos que podem ser acionados por um desses modos:",
-                    "- Um atalho;",
-                    "- Pelo painel de comandos(`Ctrl + Shit - P` ou `F1`), filtrando por \"TDS-Dito\";",
-                    "- Por uma ligação apresentada nesse bate-papo;",
-                    "- Digitando o comando no prompt abaixo;",
-                    "- Menu de contexto do bate-papo ou fonte em edição.",
-                    `Se você possui familiaridade com o ** VS - Code **, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, a ${chat.commandText("manual")} (será aberto no seu navegador padrão).`,
-                    `Para saber os comandos, digite ${chat.commandText("help")}.`
-                ]);
-            } else if (matches[2].trim() == "hint_2") {
-                const messageId: string = chat.dito("Abrindo manual rápido do **TDS-Dito**.");
-                const url: string = "https://github.com/brodao2/tds-dito/blob/main/README.md#guia-ultra-r%C3%A1pido";
+                const commandAccess: string[] = [
+                    vscode.l10n.t("- A shortcut;"),
+                    vscode.l10n.t("- By the command panel (`shift+p` or `f1`), filtering by \"tds-gaia\";"),
+                    vscode.l10n.t("- By a link presented in this chat;"),
+                    vscode.l10n.t("- Typing the command in the prompt chat;"),
+                    vscode.l10n.t("- Context menu of the chat or source in edition.")
+                ];
 
-                vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
-                    chat.dito("Manual do Dito aberto.", messageId);
-                }, (reason) => {
-                    chat.dito("Não foi possível abrir manual rápido do **TDS-Dito**.", messageId);
-                    logger.error(reason);
-                });
+                chat.gaia([
+                    vscode.l10n.t("To interact with me, you will use commands that can be triggered by one of these modes:"),
+                    commandAccess.join("\n"),
+                    vscode.l10n.t("If you are familiar with **VS-Code**, see {0}, if you do not or want more details, see {1} (will open on your default browser).",
+                        chat.commandText("open-quick-guide"),
+                        chat.commandText("open-manual")),
+                ], {});
+                chat.gaia([
+                    vscode.l10n.t("To know the commands, type {0}.", chat.commandText("help")),
+                    vscode.l10n.t("If you want to know more about a specific command, type {0} `command`.", chat.commandText("help")),
+                ], {});
+                chat.gaia([
+                    vscode.l10n.t("In some messages of mine, there may be a block of **feedback**."),
+                    vscode.l10n.t("I thank you to give your opinion and comment, especially if You think I'm wrong."),
+                ], {});
             } else {
-                chat.dito(`AJUDA DO COMANDO ${matches[2]}.`);
+                chat.gaia(vscode.l10n.t("Command aid {0}.", matches[2]), {});
             }
         } else {
-            chat.dito([
-                `Os comandos disponíveis, no momento, são: ${chat.commandList()}.`,
-                `Se você possui familiaridade com o ** VS - Code **, veja o ${chat.commandText("hint_2")}, caso não ou queira mais detalhes, leia o ${chat.commandText("manual")} (será aberto no seu navegador padrão).`
-            ], "");
+            chat.gaia([
+                vscode.l10n.t("The commands available at the moment are: {0}.", chat.commandList()),
+                vscode.l10n.t("If you are familiar with **VS-Code**, see {0}, if you do not or want more details, see {1} (will open on your default browser).",
+                    chat.commandText("open-quick-guide"),
+                    chat.commandText("open-manual")),
+            ], {});
         }
 
         result = true;
@@ -461,25 +651,3 @@ function doHelp(chat: ChatApi, message: string): boolean {
 
     return result;
 }
-
-/**
- * Logs the user out by printing a logout message.
- * 
- * @returns Always returns true after printing the logout message.
- */
-function doLogout(chat: ChatApi): boolean {
-    chat.dito([
-        `** ${getDitoUser()?.displayName}**, até logo!`,
-        "Obrigado por trabalhar comigo!",
-        "Saindo..."
-    ]);
-
-    return true;
-}
-
-/**
- * Clears the chat history.
- */
-// function doClear(chat: ChatApi): any {
-//     chat.user("clear", true);
-// }

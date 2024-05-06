@@ -16,19 +16,12 @@ limitations under the License.
 
 import * as vscode from 'vscode';
 
-const processCodeDecorationType = vscode.window.createTextEditorDecorationType({
-    borderWidth: '1px',
-    borderStyle: 'solid',
+let currentTheme: string = vscode.workspace.getConfiguration().get('workbench.colorTheme') || "";
+let processCodeDecorationType: vscode.TextEditorDecorationType = vscode.window.createTextEditorDecorationType({
+    // Propriedades de estilo baseadas no tema
+    backgroundColor: new vscode.ThemeColor("editor.selectionBackground"),
     overviewRulerColor: 'blue',
     overviewRulerLane: vscode.OverviewRulerLane.Left,
-    light: {
-        // this color will be used in light color themes
-        borderColor: 'darkblue'
-    },
-    dark: {
-        // this color will be used in dark color themes
-        borderColor: 'lightblue'
-    }
 });
 
 /**

@@ -18,13 +18,14 @@ import * as vscode from 'vscode';
 import { CommonCommandFromWebViewEnum, CommonCommandToWebViewEnum, ReceiveMessage } from './utilities/common-command-panel';
 import { TChatModel } from '../model/chatModel';
 import { getExtraPanelConfigurations, getWebviewContent } from './utilities/webview-utils';
-import { TMessageModel } from '../model/messageModel';
+import { MessageOperationEnum, TMessageModel } from '../model/messageModel';
 import { TFieldErrors } from '../model/abstractMode';
-import { chatApi } from '../extension';
 import { TQueueMessages } from '../api/chatApi';
-import { getDitoUser } from '../config';
+import { getGaiaUser } from '../config';
 import { logger } from '../logger';
 import { highlightCode } from '../decoration';
+import { dataCache } from '../dataCache';
+import { chatApi, feedbackApi } from '../api';
 
 enum ChatCommandEnum {
 
@@ -34,7 +35,7 @@ enum ChatCommandEnum {
  * Regular expressions to match chat message formatting for links.
  * 
  */
-const LINK_COMMAND_RE = /\[([^\]]+)\]\(command:([^\)]+)\)/i
+//const LINK_COMMAND_RE = /\[([^\]]+)\]\(command:([^\)]+)\)/i
 const LINK_SOURCE_RE = /\[([^\]]+)\]\(link:([^\)]+)\)/i
 const LINK_POSITION_RE = /([^&]+)&(\d+)(:(\d+)?(\-(\d+):(\d+)))?/i
 
@@ -51,12 +52,12 @@ type ChatCommand = CommonCommandFromWebViewEnum & ChatCommandEnum;
  */
 export class ChatViewProvider implements vscode.WebviewViewProvider {
 
-  public static readonly viewType = 'tds-dito-view';
+  public static readonly viewType = 'tds-gaia-view';
 
   private _view?: vscode.WebviewView;
   private chatModel: TChatModel = {
     lastPublication: new Date(),
-    loggedUser: getDitoUser()?.displayName || "<Not logged>",
+    loggedUser: getGaiaUser()?.displayName || "<Not logged>",
     newMessage: "",
     messages: []
   };
@@ -85,16 +86,31 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   ) {
 
     chatApi.onMessage((queueMessage: TQueueMessages) => {
-      logger.info(`ChatViewProvider.onMessage=> ${queueMessage.size()}`);
+      logger.debug(`ChatViewProvider.onMessage=> ${queueMessage.size()}`);
 
       while (queueMessage.size() > 0) {
         const message: TMessageModel = queueMessage.dequeue() as TMessageModel;
 
         if (message.message == "clear") {
           this.chatModel.messages = [];
+          dataCache.clear();
         }
 
-        this.chatModel.messages.push(message);
+        if (message.operation === MessageOperationEnum.Add) {
+          this.chatModel.messages.push(message);
+        } else {
+          const index: number = this.chatModel.messages.findIndex(m => m.messageId === message.messageId);
+
+          if (index !== -1) {
+            if (message.operation === MessageOperationEnum.Update) {
+              this.chatModel.messages[index] = message;
+            } else {
+              this.chatModel.messages.splice(index, 1);
+            }
+          } else {
+            logger.error(`ChatViewProvider.onMessage=> Message not found: ${message.messageId}`);
+          }
+        }
       }
 
       this.sendUpdateModel(this.chatModel, undefined);
@@ -102,17 +118,15 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this._view = webviewView;
 
-    webviewView.webview.options = getExtraPanelConfigurations(this._extensionUri);
-    // {
-    //   // Allow scripts in the webview
-    //   enableScripts: true,
-    //   localResourceRoots: [this._extensionUri]
-    // };
+    webviewView.webview.options = {
+      ...getExtraPanelConfigurations(this._extensionUri),
+      enableCommandUris: true
+    };
 
-    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-dito-vscode');
+    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-gaia');
     const extensionUri: vscode.Uri = ext!.extensionUri;
 
-    webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView", { title: "Dito: Chat" });
+    webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView", { title: "Gaia: Chat" });
     webviewView.webview.onDidReceiveMessage(this._getWebviewMessageListener(webviewView.webview));
   }
 
@@ -139,17 +153,9 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
           case CommonCommandFromWebViewEnum.Save:
             if (data.model.newMessage.trim() !== "") {
               chatApi.user(data.model.newMessage, true);
+              data.model.newMessage = "";
             }
 
-            break;
-          case CommonCommandFromWebViewEnum.Execute:
-            matches = data.command.match(LINK_COMMAND_RE);
-
-            if (matches && matches.length > 1) {
-              chatApi.user(matches[2], true);
-            } else {
-              chatApi.user(data.command, true);
-            }
             break;
           case CommonCommandFromWebViewEnum.LinkMouseOver:
             let ok: boolean = false;
@@ -176,29 +182,37 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                 }
 
                 if (!ok) {
-                  const msg: string = `Link inválido em MouseOver: ${data.command}`;
-                  chatApi.dito(["Desculpe. Não entendi esse comando.",
-                    "\n",
+                  const msg: string = vscode.l10n.t("invalid link in MouseOver: {0}", data.command);
+
+                  chatApi.gaia([
+                    "Sorry.I didn't understand this command.",
                     `\`${msg}\``,
-                    "\n",
-                    `Favor abrir um ${chatApi.commandText("open_issue")}. Assim posso investigar melhor esse problema.`
-                  ], "");
+                    vscode.l10n.t("Please open a {0}. That way I can investigate this issue better.", chatApi.commandText("open_issue"))
+                  ], {});
                   logger.warn(msg);
                 }
               }
 
               break;
             }
+          case CommonCommandFromWebViewEnum.Feedback:
+            this.chatModel.messages
+              .filter((msg: TMessageModel) => msg.messageId == data.messageId)
+              .forEach((msg: TMessageModel) => {
+                msg.disabled = true;
+                feedbackApi.scoreMessage(msg.messageId, Number.parseInt(data.value));
+              });
+
+            this.sendUpdateModel(this.chatModel, undefined);
+            break;
         }
       }
     );
-
   }
 
   protected sendUpdateModel(model: TChatModel, errors: TFieldErrors<TChatModel> | undefined): void {
     let messagesToSend: TMessageModel[] = [];
 
-    //model.loggedUser = getDitoUser()!.displayName || "<Not logged>";
     model.newMessage = "";
 
     if (this.chatModel.messages.length > 0) {
@@ -207,9 +221,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
       this.chatModel.messages.forEach((message: TMessageModel) => {
         if (message.answering.length > 0) {
-          this.chatModel.messages.filter((answered: TMessageModel) => answered.id == message.answering)
+          this.chatModel.messages.filter((answered: TMessageModel) => answered.messageId == message.answering)
             .forEach((answered: TMessageModel) => {
               answered.inProcess = false;
+              answered.answering = message.answering;
             });
         }
       });

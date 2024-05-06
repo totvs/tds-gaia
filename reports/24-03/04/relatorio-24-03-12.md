@@ -26,3 +26,11 @@ Retornou :
 Essa explicação já foi efetuada diversas vezes anteriormente, com respostas diferentes mas válidas dentro do contexto. Nesse teste, retornou uma mensagem de que não havia uma solicitação clara de explicação.
 
 Como devo proceder?
+
+I'm sorry but I don't understand what you mean by "explain"Please rephrase your question and try again.
+You can also ask me to "show" you something or "list" things.
+
+For example:- show me how to define a function named myFunc
+
+- list all functions defined in this file
+"""

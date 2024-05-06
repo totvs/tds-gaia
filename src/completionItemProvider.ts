@@ -16,10 +16,13 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { delay } from "./util";
-import { getDitoConfiguration } from "./config";
-import { CompletionResponse } from "./api/interfaceApi";
-import { iaApi } from "./extension"
+import { TGaiaConfig, getGaiaConfiguration } from "./config";
+import { Completion, CompletionResponse } from "./api/interfaceApi";
 import { logger } from "./logger";
+import { llmApi, feedbackApi } from "./api";
+
+let textBeforeCursor: string = "";
+let textAfterCursor: string = "";
 
 /**
  * Provides inline completion items by making requests to the IA API. 
@@ -29,81 +32,95 @@ import { logger } from "./logger";
  * Handles errors and cancellation.
 */
 //acionamento manual: F1 + editor.action.inlineSuggest.trigger
-export function inlineCompletionItemProvider(context: vscode.ExtensionContext): vscode.InlineCompletionItemProvider {
 
+/**
+ * Registers the inline completion provider. 
+ * 
+*/
+let loading: boolean = false;
+
+export function registerInlineCompletionItemProvider(context: vscode.ExtensionContext) {
     const provider: vscode.InlineCompletionItemProvider = {
-        async provideInlineCompletionItems(document, position, innerContext, token) {
-
-            // if (context.workspaceState.get("tds-dito.readyFoUse") === false) {
-            //     return;
-            // }
-
-            const config = getDitoConfiguration();
-            const autoSuggest = config.enableAutoSuggest;
-            const requestDelay = config.requestDelay;
-
-            if (innerContext.triggerKind === vscode.InlineCompletionTriggerKind.Automatic && !autoSuggest) {
-                return;
-            }
-            if (position.line < 0) {
-                return;
-            }
-
-            if (requestDelay > 0) {
-                logger.debug("Delay " + requestDelay + "ms before requesting completions");
-                const cancelled = await delay(requestDelay * 10, token);
-                if (cancelled) {
-                    logger.debug("Request cancelled by user");
-                    return;
-                }
-            }
-
-            let textBeforeCursor: string = "";
-            let textAfterCursor: string = "";
-            const offset = document.offsetAt(position);
-
-            textBeforeCursor = document.getText().substring(0, offset);
-            textAfterCursor = document.getText().substring(offset + 1);
-
+        async provideInlineCompletionItems(document: vscode.TextDocument, position: vscode.Position, context: vscode.InlineCompletionContext, token: vscode.CancellationToken) {
+            //: Promise<vscode.InlineCompletionItem[]> {
             try {
-                const response: CompletionResponse =
-                    await iaApi.getCompletions(textBeforeCursor, textAfterCursor);
+                if (loading) {
+                    throw new Error("is currently loading");
+                }
+                loading = true;
 
-                const items: vscode.InlineCompletionItem[] = [];
-                if (token.isCancellationRequested) {
-                    logger.warn('Request cancelled by user');
-                    return;
+                const config: TGaiaConfig = getGaiaConfiguration();
+                const autoSuggest: boolean = config.enableAutoSuggest;
+                const requestDelay: number = config.requestDelay;
+
+                if (context.triggerKind === vscode.InlineCompletionTriggerKind.Automatic && !autoSuggest) {
+                    throw new Error("manual trigger");
+                }
+                if (position.line < 0) {
+                    throw new Error("invalid position");
                 }
 
-                if (response !== undefined && response.completions.length) {
-                    for (const completion of response.completions) {
-                        items.push({
-                            insertText: completion.generated_text,
-                            range: new vscode.Range(position, position),
-                            command: {
-                                title: 'afterInsert',
-                                command: 'tds-dito.afterInsert',
-                                arguments: [completion],
-                            }
-                        });
+                if (requestDelay > 0) {
+                    logger.debug("Delay " + requestDelay + "ms before requesting completions");
+                    const cancelled = await delay(requestDelay * 10, token);
+                    if (cancelled) {
+                        throw new Error("Request cancelled by user");
                     }
                 }
 
-                const list: vscode.InlineCompletionList = new vscode.InlineCompletionList(items);
-                return list;
+                const offset = document.offsetAt(position);
+
+                textBeforeCursor = document.getText().substring(0, offset);
+                textAfterCursor = document.getText().substring(offset + 1);
+
+                const response: CompletionResponse =
+                    await llmApi.getCompletions(textBeforeCursor, textAfterCursor);
+                const items: vscode.InlineCompletionItem[] = [];
+
+                if (response !== undefined && response.completions.length) {
+                    for (const completion of response.completions) {
+                        const item: vscode.InlineCompletionItem = new vscode.InlineCompletionItem(
+                            completion.generated_text,
+                            new vscode.Range(position, position),
+                            {
+                                title: 'afterInsert',
+                                command: 'tds-gaia.afterInsert',
+                                arguments: [items.length, response.completions],
+                            })
+                        items.push(item);
+                    }
+
+                    if (token.isCancellationRequested) {
+                        //feedback.eventCompletion({ selected: -1, completions: response.completions, textBefore: textBeforeCursor, textAfter: textAfterCursor });
+                    }
+                }
+                loading = false;
+
+                return { items: items };
             } catch (e) {
                 const err_msg = (e as Error);
 
                 if (err_msg.message.includes("is currently loading")) {
                     vscode.window.showWarningMessage(err_msg.message);
-                } else if (err_msg.message !== "Canceled") {
-                    vscode.window.showErrorMessage(err_msg.message);
+                } else {//if (err_msg.message !== "Canceled") {
+                    //vscode.window.showErrorMessage(err_msg.message);
+                    loading = false;
                 }
 
-                console.error(e);
+                logger.debug(err_msg.message);
+
+                return;
             }
         }
     };
 
-    return provider;
+    const config: TGaiaConfig = getGaiaConfiguration();
+    const documentFilter: vscode.DocumentFilter | vscode.DocumentFilter[] = config.documentFilter;
+    vscode.languages.registerInlineCompletionItemProvider(documentFilter, provider);
+
+    const afterInsert = vscode.commands.registerCommand('tds-gaia.afterInsert', async (selectedIndex: number, completions: Completion[]) => {
+        feedbackApi.eventCompletion({ selected: selectedIndex - 1, completions: completions, textBefore: textBeforeCursor, textAfter: textAfterCursor });
+    });
+    context.subscriptions.push(afterInsert);
 }
+

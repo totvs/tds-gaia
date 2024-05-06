@@ -1,6 +1,6 @@
 {
-  "name": "tds-dito-webview-ui",
-  "_version": "0.0.1",
+  "name": "tds-gaia-webview-ui",
+  "version": "0.0.6",
   "private": true,
   "scripts": {
     "-- COMPILE --": "",
@@ -34,7 +34,7 @@
     "terser-webpack-plugin": "^5.3.9",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",
-    "webpack": "^5.89.0",
+    "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4",
     "webpack-stream": "^7.0.0"
   }

@@ -1,12 +1,11 @@
-# Relato de conversão de Adv/PL em TLPP (04/03/24)
+# Relato de conversão de Adv/PL em TLPP (07/03/24)
 
 ## Resumo
 
 - A API ``explain``, respondeu em português (ao menos é a primeira vez que ocorre).
-- Reposta prolixa.
-  Falta de configuração para nível de detalhe.
+- Repostas prolixas.
 - Algumas inconsistências.
-  Falta um modo do usuário indicar a qualidade da resposta. Eu acredito que esses textos são gerados dinamicamente,
+  Falta um modo do usuário indicar a qualidade da resposta. Eu acregaia que esses textos são gerados dinamicamente,
   sendo impossível validar a qualidade antes de liberar o produto e o usuário acionar uma ação.
 - Pequenos erros de grafia.
   Há como passar o modelo por um corretor ortográfico, para eliminar erros mais comuns.

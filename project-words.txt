@@ -1,4 +1,6 @@
 advpl
+blockquote
+Blockquotes
 codicon
 codicons
 fullname
@@ -6,6 +8,7 @@ HOMEPATH
 huggingface
 Logform
 protheus
+tlpp
 TLPP
 totvs
 TOTVS

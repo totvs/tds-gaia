@@ -15,6 +15,8 @@ limitations under the License.
 */
 
 import { TAbstractModel } from "../../../src/model/abstractMode";
+import Feedback from "../chat/feedback";
+import { TModelData } from "../model/modelData";
 import { vscode } from "./vscodeWrapper";
 
 /**
@@ -24,7 +26,13 @@ import { vscode } from "./vscodeWrapper";
 export enum CommonCommandFromPanelEnum {
 	InitialData = "INITIAL_DATA",
 	UpdateModel = "UPDATE_MODEL",
-	//Configuration = "CONFIGURATION",
+	AfterSelectResource = "AFTER_SELECT_RESOURCE",
+	Close = "CLOSE",
+	Ready = "READY",
+	Reset = "RESET",
+	Save = "SAVE",
+	SaveAndClose = "SAVE_AND_CLOSE",
+	SelectResource = "SELECT_RESOURCE",
 }
 
 /**
@@ -54,12 +62,14 @@ export enum CommonCommandToPanelEnum {
 	Save = "SAVE",
 	SaveAndClose = "SAVE_AND_CLOSE",
 	Close = "CLOSE",
-	Execute = "EXECUTE",
 	Ready = "READY",
 	Reset = "RESET",
 	Validate = "VALIDATE",
 	UpdateModel = "UPDATE_MODEL",
-	LinkMouseOver = "LINK_MOUSE_OVER"
+	LinkMouseOver = "LINK_MOUSE_OVER",
+	Feedback = "FEEDBACK",
+	SelectResource = "SELECT_RESOURCE",
+	CopyToClipboard = "COPY_TO_CLIPBOARD"
 }
 
 export type CommonCommandToPanel = CommonCommandToPanelEnum;
@@ -216,3 +226,22 @@ export function sendClose() {
 
 	vscode.postMessage(message);
 }
+
+/**
+* Sends a message to the webview panel to select a resource.
+* 
+* @param firedBy - The string identifier of the entity that triggered the resource selection.
+* @param props - An object containing the properties related to the resource selection, including the model data.
+*/
+export function sendSelectResource(firedBy: string, props: TSendSelectResourceProps & { model: TModelData }) {
+	const message: SendMessage<CommonCommandToPanelEnum, TModelData> = {
+		command: CommonCommandToPanelEnum.SelectResource,
+		data: {
+			...props,
+			firedBy: firedBy
+		}
+	}
+
+	vscode.postMessage(message);
+}
+

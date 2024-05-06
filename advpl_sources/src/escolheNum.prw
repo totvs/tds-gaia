@@ -65,8 +65,6 @@ user function escolheNum(replay, replayPath, numbers)
 
 	enddo
 
-	substr
-
 	if replay
 		TDSReplay(.F.)
 	endif

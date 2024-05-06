@@ -1,11 +1,73 @@
-# TDS-Gaia, seu "par" na programação AdvPL/TLPP (**EXPERIMENTAL**)
+# TDS-Gaia, seu "par" na programação AdvPL/TLPP (**BETA**)
+
+> **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
+>
+> Por ser um projeto **BETA**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
+>
+> No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
+
+Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
+
+## TDS-Gaia 0.0.10
+
+### Melhorias
+
+- Visual UI
+  Melhorado tratamento de mensagem em processamento.
+
+- Adicionado verificação se a extensão foi atualizada, notificando o usuário.
+
+### Correções
+
+- Ao iniciar o **VS-Code** sem uma área de trabalho, extensão não é inicializada corretamente.
+  Corrigido.
+
+- Ligações (_links_) de ajuda quebrados.
+  Corrigido.
+
+## TDS-Gaia 0.0.9
+
+### Correção
+
+- Ajuste do valor padrão de número de respostas no código sugerido (_completion_).
+
+## TDS-Gaia 0.0.8
+
+### Novidades
+
+- Disponibilizado interface visual para a geração de código.
+  Com área para descrever as funcionalidades desejadas e visualização de código gerado. Este pode ser copiado para a área de transferência ou salvo em arquivo.
+
+## TDS-Gaia 0.0.7
+
+### Correção
+
+- Correção no processo de login, logout e geração de código
+
+## TDS-Gaia 0.0.6
+
+### Novos recursos
+
+- Opinião do usuário (_feedback)
+  Recurso que permite ao usuário opinar sobre a qualidade das respostas dados pela  IA.
+   Estas podem ser ``positivas`` (concorda com a resposta), ``negativas`` (não concorda) ou ``mais-ou-menos`` (pode melhorar ou há erros não significativos).
+
+### Melhorias
+
+- Indicação visual de processamento de qualquer requisição ao serviço IA (barra de progresso no topo da visão de bate-papo).
+- Adicionado _goto_ sobre uma ligação de posição.
+- Alterado _prompt_ de mensagem de única linha para múltiplas linhas e redimensionável.
+- Ao acionar `Enter` no _prompt_, aciona o envio deste para processamento
+- Indicação visualmente entre mensagem de resposta e a mensagem de solicitação (comando).
+  Ao efetuar  `MouseOver` sobre a mensagem de resposta ou de solicitação, as duas são destacadas.
+- Processo de autenticação
 
 ## TDS-Gaia 0.0.5
 
 ### Melhorias
 
 - Indicação visual de processamento de mensagens enviadas para o serviço de IA.
-- Comando `Ctrl+D Ctrl+W`` para explicar a palavra corrente.
+- Comando `Ctrl+D Ctrl+W` para explicar a palavra corrente.
 - Melhoria na interface visual do bate-papo.
 - Adicionado ligação com evento `MouseOver`. Passar o _mouse_ sobre uma ligação de posição.
 
@@ -32,11 +94,3 @@
 ## TDS-Gaia 0.0.2
 
 Liberação inicial.
-
-> **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
->
-> Por ser um projeto **experimental**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
->
-> No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
-
-Favor ler [GUIA RÁPIDO](https://github.com/brodao2/tds-gaia/blob/main/README.md#guia-ultra-r%C3%A1pido).

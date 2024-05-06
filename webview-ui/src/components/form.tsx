@@ -16,7 +16,7 @@ limitations under the License.
 
 import { ButtonAppearance } from "@vscode/webview-ui-toolkit";
 import "./form.css";
-import { ChangeHandler, FieldValues, FormState, RegisterOptions, UseFormReturn, UseFormSetError, UseFormSetValue, useFormContext } from "react-hook-form";
+import { FieldValues, RegisterOptions, UseFormReturn, UseFormSetError, UseFormSetValue, useFormContext } from "react-hook-form";
 import { VSCodeButton, VSCodeLink, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react";
 import { sendClose, sendReset } from "../utilities/common-command-webview";
 import React from "react";
@@ -35,8 +35,8 @@ export function getDefaultActionsForm(): IFormAction[] {
 			id: -1,
 			caption: "Save",
 			hint: "Salva as informações e fecha a página",
-			appearance: "primary",
-			type: "submit",
+			//appearance: "primary", evita que enter acione o botão
+			type: "button",
 			isProcessRing: true,
 			enabled: (isDirty: boolean, isValid: boolean) => {
 				return isDirty && isValid;
@@ -89,7 +89,7 @@ type TDSFormProps<DataModel extends FieldValues> = {
  * Defines the shape of action button configs used in TDS forms.
 */
 export interface IFormAction {
-	id: number;
+	id: number | string;
 	caption: string;
 	hint?: string;
 	onClick?: any;
@@ -98,6 +98,7 @@ export interface IFormAction {
 	isProcessRing?: boolean
 	type?: "submit" | "reset" | "button" | "link";
 	appearance?: ButtonAppearance;
+	href?: string;
 }
 
 /**
@@ -111,7 +112,8 @@ export type TdsFieldProps = {
 	readOnly?: boolean
 	className?: string;
 	rules?: RegisterOptions<FieldValues, string>;
-	onChange?: ChangeHandler;
+	//https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/react/README.md#use-oninput-instead-of-onchange-to-handle-keystrokes
+	onInput?: any;
 }
 
 /**
@@ -210,16 +212,6 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 			id={id}
 			onSubmit={props.methods.handleSubmit(props.onSubmit)}
 			onReset={() => sendReset(props.methods.getValues())}
-			onKeyUp={(ev: React.KeyboardEvent<HTMLElement>) => {
-				// console.log(ev.key, ev.ctrlKey, ev.metaKey, ev.altKey, ev.shiftKey);
-				// //TODO: ainda com erro, não envia newMessage
-				// if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) {
-				// 	ev.preventDefault();
-				// 	ev.stopPropagation();
-				// 	document.getElementById("btnSend")?.focus();
-				// 	document.getElementById("btnSend")?.click();
-				// }
-			}}
 			autoComplete="off"
 		>
 			<section className={"tds-form-content"}>
@@ -234,6 +226,10 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 					{actions.map((action: IFormAction) => {
 						let propsField: any = {};
 						let visible: string = "";
+
+						if (typeof action.id === "string") {
+							propsField["id"] = action.id;
+						}
 
 						propsField["key"] = action.id;
 						propsField["type"] = action.type || "button";
@@ -269,7 +265,9 @@ export function TdsForm<DataModel extends FieldValues>(props: TDSFormProps<DataM
 						}
 
 						return (action.type == "link" ?
-							<VSCodeLink onClick={() => action.onClick()}>{action.caption}</VSCodeLink>
+							<VSCodeLink key={action.id}
+								href={action.href}>{action.caption}
+							</VSCodeLink>
 							: <VSCodeButton
 								className={`tds-button-button ${visible}`}
 								{...propsField} >

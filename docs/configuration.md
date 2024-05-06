@@ -1,1 +1,1 @@
-# TDS-Dito: Configurações
+# TDS-Gaia: Configurações

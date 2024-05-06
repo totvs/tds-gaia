@@ -44,10 +44,10 @@ Explicação correta, mas devido a injeção de código, a explicação ficou co
 >
 > If you want more information about how to use the TDialog class, please visit <https://tdn.totvs.com/display/tec/TDialog+Class>.
 >
-> Please note that there's no need to install any software or download anything to run this example. Just copy-paste it into your favorite text editor and execute it by pressing Ctrl + R.
+> Please note that there's no need to install any software or download anything to run this example. Just copy-paste it into your favorite text editor and execute it by pressing ctrl+R.
 >
 
-Indicação de ligações, o ideal é fazer por uma marcação, preferencialmente MD. Assim posso tratar e efetuar correto direcionamento. A indicação de execução de procedimentos, acho temerário e que devemos evitar. No caso, ``Ctrl+R`` não executa programas AdvPL/TLPP, salvo se o usuário reconfigurar atalhos. Mesmo os atalhos padrão, acredito que não devem ser citados.
+Indicação de ligações, o ideal é fazer por uma marcação, preferencialmente MD. Assim posso tratar e efetuar correto direcionamento. A indicação de execução de procedimentos, acho temerário e que devemos evitar. No caso, ``Ctrl+R`` não executa programas AdvPL/TLPP, salvo se o usuário reconfigurar atalhos. Mesmo os atalhos padrão, acregaia que não devem ser citados.
 
 > Have fun!
 
@@ -493,17 +493,17 @@ Comentários:
 Solicitado a explicação do bloco não AdvPL:
 
 ```code
-2024-03-06 11:18:11.556 [info] TDS-Dito logger initialized at Wed Mar 06 2024 and file writes in C:\\Users\\acandido/.tds-dito/> logs
+2024-03-06 11:18:11.556 [info] TDS-Gaia logger initialized at Wed Mar 06 2024 and file writes in C:\\Users\\acandido/.tds-gaia/> logs
 ```
 
 Resposta:
 
 > The date and time on your system was set to Wed Mar 06 2024 11:18:11.556.
-> The log files will be created under C:\\Users\\acandido/.tds-dito/logs.
+> The log files will be created under C:\\Users\\acandido/.tds-gaia/logs.
 >
 > The following code was provided for explanation:
 >
-> 2024-03-06 11:18:11.556 [info] TDS-Dito logger initialized at Wed Mar 06 2024 and file writes in C:\\Users\\acandido/.tds-dito/> logs
+> 2024-03-06 11:18:11.556 [info] TDS-Gaia logger initialized at Wed Mar 06 2024 and file writes in C:\\Users\\acandido/.tds-gaia/> logs
 >
 > It seems like you're trying to use an advanced programming language (ADVPL). I'm sorry but this program can't handle it yet. > Please try another language or write me if you want support for it.
 >
