@@ -2,7 +2,7 @@
   "name": "tds-gaia",
   "displayName": "TDS-Gaia, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Gaia will assist you in AdvPL programming",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "publisher": "TOTVS",
   "preview": true,
   "author": {
@@ -158,21 +158,13 @@
         "command": "tds-gaia.login",
         "title": "Login",
         "category": "TDS-Gaia",
-        "enablement": "!tds-gaia.logged",
-        "icon": {
-          "dark": "icons/dark/_login.png",
-          "light": "icons/light/_login.png"
-        }
+        "enablement": "!tds-gaia.logged"
       },
       {
         "command": "tds-gaia.logout",
         "title": "Logout",
         "category": "TDS-Gaia",
-        "enablement": "tds-gaia.logged",
-        "icon": {
-          "dark": "icons/dark/_logout.png",
-          "light": "icons/light/_logout.png"
-        }
+        "enablement": "tds-gaia.logged"
       },
       {
         "command": "tds-gaia.external-open",
@@ -338,12 +330,6 @@
               "Avisos",
               "Erros"
             ]
-          },
-          "tds-gaia.lastLogin": {
-            "type": "string",
-            "default": "",
-            "description": "When last user logged",
-            "deprecationMessage": "For internal use. Don´t edit please."
           }
         }
       }

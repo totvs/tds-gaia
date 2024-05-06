@@ -8,11 +8,22 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
-## TDS-Gaia 0.1.0
+## TDS-Gaia 0.0.10
 
-### Melhoria
+### Melhorias
 
-- Em visões (_webView_) para a utilizar o pacote [TDS-Webtoolkit](https://github.com/totvs/TDS-WebToolKit)
+- Visual UI
+  Melhorado tratamento de mensagem em processamento.
+
+- Adicionado verificação se a extensão foi atualizada, notificando o usuário.
+
+### Correções
+
+- Ao iniciar o **VS-Code** sem uma área de trabalho, extensão não é inicializada corretamente.
+  Corrigido.
+
+- Ligações (_links_) de ajuda quebrados.
+  Corrigido.
 
 ## TDS-Gaia 0.0.9
 

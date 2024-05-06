@@ -19,6 +19,7 @@ import { ChatApi, TCommand } from '../../api/chatApi';
 import { registerClear } from "./cmdClear";
 import { registerOpenManual } from "./cmdOpenManual";
 import { registerHelp } from "./cmdHelp";
+import { registerShowHint } from "./cmdShowHint";
 
 export function registerChatCommands(context: vscode.ExtensionContext): void {
 
@@ -26,6 +27,7 @@ export function registerChatCommands(context: vscode.ExtensionContext): void {
     registerClear(context);
     registerOpenManual(context);
     registerHelp(context);
+    registerShowHint(context);
 }
 
 /**

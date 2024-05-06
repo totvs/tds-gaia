@@ -79,9 +79,9 @@ export function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.
           <meta name="theme-color" content="#000000">
           <meta http-equiv="Content-Security-Policy"
               content="default-src 'none';
-                      img-src https: 'unsafe-inline' ${webview.cspSource};
+                      img-src https: ${webview.cspSource} 'unsafe-inline';
                       font-src ${webview.cspSource};
-                      style-src 'unsafe-inline' ${webview.cspSource};
+                      style-src ${webview.cspSource} 'unsafe-inline' https:;
                       script-src 'nonce-${nonce}';"
           >
           ${stylesUri.map((uri: vscode.Uri) => {

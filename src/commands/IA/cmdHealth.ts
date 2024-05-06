@@ -90,7 +90,7 @@ export function registerHealth(context: vscode.ExtensionContext): void {
                     }
                 } else {
                     vscode.commands.executeCommand("tds-gaia.login", true).then(() => {
-                        //chatApi.checkUser(messageId);
+                        chatApi.checkUser(messageId);
                     });
                 }
             })

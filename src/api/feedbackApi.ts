@@ -76,7 +76,7 @@ export class FeedbackApi {
 
     private createTrace(): TraceElement {
         let result!: TraceElement;
-        logger.profile("createTrace");
+        //logger.profile("createTrace");
         this.user = getGaiaUser();
 
         if (this.user) {
@@ -88,12 +88,12 @@ export class FeedbackApi {
             logger.error("createTrace: user not found");
         }
 
-        logger.profile("createTrace");
+        //logger.profile("createTrace");
         return result;
     }
 
     private createEvent(trace: TraceElement, event: EventsFeedbackEnum): EventElement {
-        logger.profile("createEvent");
+        //logger.profile("createEvent");
         const result = this.traceApi.createEvent(trace);
 
         result.name = event;
@@ -101,15 +101,15 @@ export class FeedbackApi {
         //this.traceMap[result.id] = result;
         this.elementMap[event] = result;
 
-        logger.profile("createEvent");
+        //logger.profile("createEvent");
         return result;
     }
 
     private createScore(trace: TraceElement): ScoreElement {
-        logger.profile("scoreEvent");
+        //logger.profile("scoreEvent");
         const result = this.traceApi.createScore(trace);
 
-        logger.profile("createScore");
+        //logger.profile("createScore");
         return result;
     }
 
@@ -118,7 +118,7 @@ export class FeedbackApi {
     * @returns A Promise that resolves to a boolean indicating whether the login event was successfully logged.
     */
     eventLogin(): void {
-        logger.profile("eventLogin");
+        //logger.profile("eventLogin");
         if (this.user == undefined) {
             this.user = getGaiaUser();
         }
@@ -156,13 +156,13 @@ export class FeedbackApi {
             logger.error("eventLogin: user not found");
         }
 
-        logger.profile("eventLogin");
+        //logger.profile("eventLogin");
         return;
     }
 
     //curl -X POST https://langfuse-api.example.com/traces/trace_id/update -d 'updated_data=your_updated_data'
     eventLogout(): boolean {
-        logger.profile("eventLogout");
+        //logger.profile("eventLogout");
         const eventLogin: EventElement = this.elementMap[EventsFeedbackEnum.Login] as EventElement;
         let result: boolean = false;
 
@@ -185,12 +185,12 @@ export class FeedbackApi {
 
         this.user = undefined;
 
-        logger.profile("eventLogout");
+        //logger.profile("eventLogout");
         return result;
     }
 
     eventCompletion(argument: { selected: number, completions: Completion[]; textBefore: string; textAfter: string; }) {
-        logger.profile("eventCompletion");
+        //logger.profile("eventCompletion");
 
         if (this.user) {
             const trace: TraceElement = this.createTrace();
@@ -232,7 +232,7 @@ export class FeedbackApi {
     * @returns 
     */
     traceInferType(messageId: string, codeToAnalyze: string, types: InferType[]): string {
-        logger.profile("traceInferType");
+        //logger.profile("traceInferType");
         let result: string = "";
 
         if (this.user) {
@@ -257,12 +257,12 @@ export class FeedbackApi {
             logger.error("traceInferType: user not found");
         }
 
-        logger.profile("traceInferType");
+        //logger.profile("traceInferType");
         return result;
     }
 
     scoreInferType(messageId: string, types: InferType[], scoreValue: number, comment: string = "", unregister: boolean = false) {
-        logger.profile("scoreInferType");
+        //logger.profile("scoreInferType");
         let result: string = "";
 
         if (this.user) {
@@ -296,12 +296,12 @@ export class FeedbackApi {
             }
         }
 
-        logger.profile("scoreInferType");
+        //logger.profile("scoreInferType");
         return result;
     }
 
     scoreMessage(messageId: string, scoreValue: number) {
-        logger.profile("scoreMessage");
+        //logger.profile("scoreMessage");
 
         if (this.user) {
             const traceId: string = this.feedbackMap[messageId];
@@ -320,7 +320,7 @@ export class FeedbackApi {
             }
         }
 
-        logger.profile("scoreMessage");
+        //logger.profile("scoreMessage");
         return;
     }
 
@@ -332,7 +332,7 @@ export class FeedbackApi {
     * @param explain - The explanation for the code snippet.
     */
     traceExplain(messageId: string, codeToExplain: string, explain: string): void {
-        logger.profile("traceExplain");
+        //logger.profile("traceExplain");
         let result: string = "";
 
         if (this.user) {
@@ -358,12 +358,12 @@ export class FeedbackApi {
             logger.error("traceExplain: user not found");
         }
 
-        logger.profile("traceExplain");
+        //logger.profile("traceExplain");
         return;
     }
 
     traceGenerateCode(messageId: string, generateText: string, generateCode: string[]) {
-        logger.profile("traceGenerateCode");
+        //logger.profile("traceGenerateCode");
 
         if (this.user) {
             const trace: TraceElement = this.createTrace();
@@ -387,7 +387,7 @@ export class FeedbackApi {
             logger.error("traceGenerateCode: user not found");
         }
 
-        logger.profile("traceGenerateCode");
+        //logger.profile("traceGenerateCode");
         return;
     }
 

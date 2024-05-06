@@ -70,7 +70,7 @@ export class TraceApi extends AbstractApi {
     start(publicKey: string, secretKey: string): boolean {
         this.authorization = Buffer.from(`pk-lf-${publicKey}:sk-lf-${secretKey}`).toString("base64");
 
-        logger.info(vscode.l10n.t("Trace Service is using [{0}]", this.apiRequest));
+        logger.info(vscode.l10n.t("Trace Service is running"));
 
         return true;
     }

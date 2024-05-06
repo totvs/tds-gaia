@@ -131,7 +131,7 @@ export class AbstractApi {
      * along with the request end time and duration.
      */
     private logResponse(url: string, response: string) {
-        logger.profile(url);
+        //logger.profile(url);
         const execEndTime: Date = new Date();
         const duration: number = execEndTime.getMilliseconds() - execBeginTime.getMilliseconds();
 
@@ -145,7 +145,7 @@ export class AbstractApi {
      * elapsed time, message, cause, and stack trace.
      */
     private logError(url: string, error: any, complement: string) {
-        logger.profile(url);
+        //logger.profile(url);
         logger.error(error);
         logger.verbose(complement);
     }
@@ -161,8 +161,8 @@ export class AbstractApi {
     * @returns A Promise that resolves to the response text data or an Error object if the request fails.
     */
     private async fetch(partialUrl: string, method: string, headers: Record<string, string>, data: any): Promise<string | {} | Error> {
-        const url: string = `${this._apiRequest}${partialUrl.length > 0? "/" + partialUrl : ""}`;
-        logger.profile(`${url}-${this._requestId++}`);
+        const url: string = `${this._apiRequest}${partialUrl.length > 0 ? "/" + partialUrl : ""}`;
+        //logger.profile(`${url}-${this._requestId++}`);
         logger.http(url, { method, headers, data });
         this.logRequest(url, method, headers, data);
 
@@ -226,7 +226,7 @@ export class AbstractApi {
             this.logError(url, error, "");
         }
 
-        logger.profile(`${url}-${this._requestId++}`);
+        //logger.profile(`${url}-${this._requestId++}`);
         return result;
     }
 

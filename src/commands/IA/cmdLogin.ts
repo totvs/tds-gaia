@@ -18,7 +18,7 @@ import * as vscode from "vscode";
 import { PREFIX_GAIA, logger } from "../../logger";
 import { GaiaAuthenticationProvider, getGaiaSession } from "../../authenticationProvider";
 import { chatApi, feedbackApi, llmApi } from "../../api";
-import { isGaiaLogged, setGaiaUser } from "../../config";
+import { getGaiaUser, isGaiaLogged, setGaiaUser } from "../../config";
 
 export function registerLogin(context: vscode.ExtensionContext): void {
 
@@ -47,25 +47,29 @@ export function registerLogin(context: vscode.ExtensionContext): void {
 
         if (session !== undefined) {
             vscode.commands.executeCommand("tds-gaia.afterLogin");
-        } 
+        }
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.afterLogin', async (...args) => {
         let session: vscode.AuthenticationSession | undefined = await getGaiaSession();
 
         if (session !== undefined) {
+            logger.info(vscode.l10n.t("Logging in..."));
+
             if (await llmApi.login(session.account.id, session.accessToken)) {
-                logger.info(vscode.l10n.t('Logged in successfully'));
-                vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully", PREFIX_GAIA));
+                logger.info(vscode.l10n.t("{0} Logged in successfully as {1}",
+                    "", getGaiaUser()?.displayName || vscode.l10n.t("<unknown>")));
+
+                vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully as {1}",
+                    PREFIX_GAIA, getGaiaUser()?.displayName || vscode.l10n.t("<unknown>")));
+
                 const [_, publicKey, secretKey] = session.scopes[0].split(":");
                 feedbackApi.start(publicKey, secretKey);
-                feedbackApi.eventLogin();
+                //feedbackApi.eventLogin();
             } else {
                 logger.error(vscode.l10n.t('Failed to automatic login'));
                 vscode.window.showErrorMessage(vscode.l10n.t("{0} Failed to automatic login", PREFIX_GAIA));
             }
         };
-
-        chatApi.checkUser("");
     }));
 }
