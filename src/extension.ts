@@ -124,7 +124,7 @@ function showBanner(force: boolean = false): void {
  */
 export async function isGaiaFirstUse(): Promise<boolean> {
 	if ((getGaiaUser()?.email || "").startsWith("//")) {
-		await isGaiaUpdated(true);
+		await extensionContext.secrets.delete("tds-gaia.information");
 	}
 
 	const information: any = JSON.parse((await extensionContext.secrets.get("tds-gaia.information") || "{}"));
@@ -132,14 +132,10 @@ export async function isGaiaFirstUse(): Promise<boolean> {
 	return (information.lastLogin || "").length == 0;
 }
 
-export async function isGaiaUpdated(remove: boolean): Promise<boolean> {
-	if (remove) {
-		await extensionContext.secrets.delete("tds-gaia.information");
-		return false;
-	}
-
+export async function isGaiaUpdated(): Promise<boolean> {
 	const information: any = JSON.parse((await extensionContext.secrets.get("tds-gaia.information") || "{}"));
-	return (information.version || extensionContext.extension.packageJSON.version) == extensionContext.extension.packageJSON.version;
+
+	return (information.version || extensionContext.extension.packageJSON.version) !== extensionContext.extension.packageJSON.version;
 }
 
 export async function updateGaiaLastLogin(): Promise<void> {

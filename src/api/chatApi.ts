@@ -128,7 +128,7 @@ const commandsMap: Record<string, TCommand> = {
         command: "open-change-log",
         regex: OPEN_CHANGE_LOG_RE,
         commandId: "tds-gaia.external-open",
-        caption: "Open Change Log",
+        caption: "Change Log",
         commandArgs: {
             target: "CHANGELOG.md",
             title: vscode.l10n.t("Change Log")
@@ -397,9 +397,10 @@ export class ChatApi {
                         vscode.l10n.t("It seems like this is the first time we've met."),
                         vscode.l10n.t("Want to know how to interact with me? {0}", this.commandText("hint_1"))
                     ], { answeringId: answeringId });
-                } else if (!isGaiaUpdated(false)) {
+                } else if (await isGaiaUpdated()) {
+                    const version = vscode.extensions.getExtension("TOTVS.tds-gaia")?.packageJSON.version || "";
                     this.gaia([
-                        vscode.l10n.t("Houve uma evolução em meus processos. Recomendo que você leia {0}.", this.commandText("open-change-log"))
+                        vscode.l10n.t("There was an evolution in my processes. I recommend reading the topic **TDS-Gaia {0}** in {1}.", version, this.commandText("open-change-log"))
                     ], { answeringId: answeringId });
                 }
 
