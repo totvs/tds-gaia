@@ -63,6 +63,7 @@ export class FeedbackApi {
         this.traceApi.start(publicKey, secretKey);
 
         logger.info(vscode.l10n.t("Feedback Service is running"));
+        this.user = getGaiaUser();
 
         return true;
     }
@@ -77,7 +78,6 @@ export class FeedbackApi {
     private createTrace(): TraceElement {
         let result!: TraceElement;
         //logger.profile("createTrace");
-        this.user = getGaiaUser();
 
         if (this.user) {
             result = this.traceApi.createTrace();
