@@ -18,7 +18,8 @@ import { useController } from "react-hook-form";
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 import { TdsTextField } from "@totvs/tds-webtoolkit";
 
-export default function NewMessage(): JSX.Element {
+export default function NewMessage(props:{ methods: any }): JSX.Element {
+
     const { field, fieldState } = useController({
         name: "newMessage",
         defaultValue: "",
@@ -35,6 +36,7 @@ export default function NewMessage(): JSX.Element {
     return (
         <>
             <TdsTextField name="newMessage"
+                methods={props.methods}
                 label={""}
                 textArea={true}
                 placeholder={"Tell me what you need.."}

@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { CommonCommandToPanelEnum, TAbstractModel, tdsVscode } from "@totvs/tds-webtoolkit";
+import { CommonCommandToPanelEnum, TdsAbstractModel, tdsVscode } from "@totvs/tds-webtoolkit";
 
 /**
  * Sends a link mouse over event to the webview panel.
  * 
  * @param command - The command string associated with the link mouse over event.
  */
-export function sendGenerateCode(model: TAbstractModel) {
+export function sendGenerateCode(model: TdsAbstractModel) {
 	tdsVscode.postMessage({
 		command: "GENERATE_CODE",
 		data: {
@@ -36,7 +36,7 @@ export function sendGenerateCode(model: TAbstractModel) {
  * 
  * @param command - The command string associated with the link mouse over event.
  */
-export function sendCopyToClipboard(model: TAbstractModel) {
+export function sendCopyToClipboard(model: TdsAbstractModel) {
 	tdsVscode.postMessage({
 		command: CommonCommandToPanelEnum.CopyToClipboard,
 		data: {

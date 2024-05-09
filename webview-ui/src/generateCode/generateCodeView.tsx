@@ -2,18 +2,19 @@
 
 import "./generateCode.css";
 import React from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm, useFormContext } from "react-hook-form";
 import { sendCopyToClipboard, sendGenerateCode } from "./sendCommand";
-import { TAbstractModel, TdsPage, TdsTextField } from "@totvs/tds-webtoolkit";
+import { TdsAbstractModel, TdsPage, TdsTextField } from "@totvs/tds-webtoolkit";
 import { CommonCommandFromPanelEnum, ReceiveMessage, sendSaveAndClose } from "@totvs/tds-webtoolkit";
 import { IFormAction, TdsForm, getDefaultActionsForm, setDataModel } from "@totvs/tds-webtoolkit";
+import { setErrorModel } from "@totvs/tds-webtoolkit/dist/components/form/form";
 
 enum ReceiveCommandEnum {
   //Generate = "GENERATE"
 }
 type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
 
-type TFields = TAbstractModel & {
+type TFields = TdsAbstractModel & {
   description: string
   generateCode: string;
 }
@@ -38,10 +39,11 @@ export default function GenerateCodeView() {
       switch (command.command) {
         case CommonCommandFromPanelEnum.UpdateModel:
           const model: TFields = command.data.model;
-          //const errors: any = command.data.errors;
-
-          //setDataModel<TFields>(methods.setValue, model);
-          //setErrorModel(methods.setError, errors);
+          const errors: any = command.data.errors;
+          console.log("xxxxxxxxxxxxxxxxxxx");
+          console.dir(event);
+          setDataModel<TFields>(methods.setValue, model);
+          setErrorModel(methods.setError, errors);
 
           break;
         default:
@@ -80,18 +82,19 @@ export default function GenerateCodeView() {
     }
   });
 
-  //methods={methods}
   return (
     <main>
       <TdsPage title="Generate Code" linkToDoc="[Geração de Código]generateCode.md">
         <FormProvider {...methods} >
           <TdsForm<TFields>
             id="frmGenerateCode"
+            methods={methods}
             onSubmit={onSubmit}
             actions={actions}>
 
             <section className="tds-row-container" >
               <TdsTextField
+                methods={methods}
                 name="description"
                 label="Description"
                 info="Describe what you want the generated code to do."
@@ -104,6 +107,7 @@ export default function GenerateCodeView() {
 
             <section className="tds-row-container" >
               <TdsTextField
+                methods={methods}
                 name="generateCode"
                 label="Code"
                 readOnly={true}

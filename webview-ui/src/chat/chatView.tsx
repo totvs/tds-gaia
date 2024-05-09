@@ -16,21 +16,22 @@ limitations under the License.
 
 import "./chatView.css";
 import React from "react";
-import { FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { FormProvider, SubmitHandler, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { VSCodeDataGrid } from "@vscode/webview-ui-toolkit/react";
 import NewMessage from "./newMessage";
 import MessageRow from "./messageRow";
 import { TMessageModel } from "./chatModels";
-import { TAbstractModel, sendSave } from "@totvs/tds-webtoolkit";
+import { TdsAbstractModel, sendSave } from "@totvs/tds-webtoolkit";
 import { CommonCommandFromPanelEnum, ReceiveMessage } from "@totvs/tds-webtoolkit";
 import { IFormAction, TdsForm, setDataModel } from "@totvs/tds-webtoolkit";
+import { setErrorModel } from "@totvs/tds-webtoolkit/dist/components/form/form";
 
 enum ReceiveCommandEnum {
 }
 
 type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
 
-type TFields = TAbstractModel & {
+type TFields = TdsAbstractModel & {
   lastPublication: Date;
   loggedUser: string;
   newMessage: string;
@@ -123,7 +124,7 @@ export function ChatView() {
           const errors: any = command.data.errors;
 
           setDataModel<TFields>(methods.setValue, model);
-          //setErrorModel(methods.setError, errors);
+          setErrorModel(methods.setError, errors);
 
           break;
 
@@ -162,8 +163,6 @@ export function ChatView() {
     }
   });
 
-  //              methods={methods}
-
   return (
     <main>
       <section className="tds-chat">
@@ -181,12 +180,13 @@ export function ChatView() {
           <FormProvider {...methods} >
             <TdsForm<TFields>
               id="chatForm"
+              methods={methods}
               onSubmit={onSubmit}
               actions={actions}
               isProcessRing={false}
             >
               <section className="tds-row-container" >
-                <NewMessage />
+                <NewMessage methods={methods} />
               </section>
             </TdsForm>
           </FormProvider>

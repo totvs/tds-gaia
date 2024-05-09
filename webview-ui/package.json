@@ -13,14 +13,14 @@
     "-- BUILD --": "",
     "build": "webpack --mode=production",
     "-- MISC--": "",
-    "link": "npm link @totvs/tds-webtoolkit",
     "lint": "eslint \"src/**/*.tsx"
   },
   "dependencies": {
-    "@totvs/tds-webtoolkit": "^0.0.1",
+    "@totvs/tds-webtoolkit": "file:../../tds-webtoolkit",
     "@vscode/codicons": "^0.0.35",
     "@vscode/webview-ui-toolkit": "^1.4.0",
     "react": "^18.2.0",
+    "react-chat-elements": "^12.0.14",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.49.3"
   },

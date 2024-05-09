@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TAbstractModel } from "../../../src/model/abstractMode";
+import { TdsAbstractModel } from "../../../src/model/abstractMode";
 import Feedback from "../chat/feedback";
 import { TModelData } from "../model/modelData";
 import { vscode } from "./vscodeWrapper";
@@ -79,7 +79,7 @@ export type CommonCommandToPanel = CommonCommandToPanelEnum;
  * Contains the command name and data payload.
  * The data payload contains the updated model and any other data.
 */
-export type CommandFromPanel<C extends CommonCommandFromPanel, T = TAbstractModel> = {
+export type CommandFromPanel<C extends CommonCommandFromPanel, T = TdsAbstractModel> = {
 	readonly command: C,
 	data: {
 		model: T,
@@ -119,8 +119,8 @@ export function sendReady() {
  * Sends a reset message to the webview panel 
  * with the provided model to reset the state.
  */
-export function sendReset(model: TAbstractModel) {
-	const message: SendMessage<CommonCommandToPanelEnum, TAbstractModel> = {
+export function sendReset(model: TdsAbstractModel) {
+	const message: SendMessage<CommonCommandToPanelEnum, TdsAbstractModel> = {
 		command: CommonCommandToPanelEnum.Reset,
 		data: {
 			model: model
@@ -157,8 +157,8 @@ export type TSendSelectResourceProps = {
  * Sends a validate model message to the webview panel
  * containing the provided model to validate.
  */
-export function sendValidateModel(model: TAbstractModel) {
-	const message: SendMessage<CommonCommandToPanelEnum, TAbstractModel> = {
+export function sendValidateModel(model: TdsAbstractModel) {
+	const message: SendMessage<CommonCommandToPanelEnum, TdsAbstractModel> = {
 		command: CommonCommandToPanelEnum.Validate,
 		data: {
 			model: model
@@ -172,8 +172,8 @@ export function sendValidateModel(model: TAbstractModel) {
  * Sends a save model message to the webview panel
  * containing the provided model to save.
  */
-export function sendSave(model: TAbstractModel) {
-	const message: SendMessage<CommonCommandToPanelEnum, TAbstractModel> = {
+export function sendSave(model: TdsAbstractModel) {
+	const message: SendMessage<CommonCommandToPanelEnum, TdsAbstractModel> = {
 		command: CommonCommandToPanelEnum.Save,
 		data: {
 			model: model
@@ -188,7 +188,7 @@ export function sendSave(model: TAbstractModel) {
  * containing the provided model to save and close.
  */
 export function sendSaveAndClose(model: any) {
-	const message: SendMessage<CommonCommandToPanelEnum, TAbstractModel> = {
+	const message: SendMessage<CommonCommandToPanelEnum, TdsAbstractModel> = {
 		command: CommonCommandToPanelEnum.SaveAndClose,
 		data: {
 			model: model
@@ -203,7 +203,7 @@ export function sendSaveAndClose(model: any) {
  * containing the provided model to update.
  */
 export function sendUpdateModel(model: any) {
-	const message: SendMessage<CommonCommandToPanelEnum, TAbstractModel> = {
+	const message: SendMessage<CommonCommandToPanelEnum, TdsAbstractModel> = {
 		command: CommonCommandToPanelEnum.UpdateModel,
 		data: {
 			model: model
@@ -217,7 +217,7 @@ export function sendUpdateModel(model: any) {
  * Sends a close message to the webview panel.
  */
 export function sendClose() {
-	const message: SendMessage<CommonCommandToPanelEnum, TAbstractModel> = {
+	const message: SendMessage<CommonCommandToPanelEnum, TdsAbstractModel> = {
 		command: CommonCommandToPanelEnum.Close,
 		data: {
 			model: undefined
