@@ -4,15 +4,15 @@ import "./generateCode.css";
 import React from "react";
 import { FormProvider, SubmitHandler, useForm, useFormContext } from "react-hook-form";
 import { sendCopyToClipboard, sendGenerateCode } from "./sendCommand";
-import { TdsAbstractModel, TdsPage, TdsTextField } from "@totvs/tds-webtoolkit";
-import { CommonCommandFromPanelEnum, ReceiveMessage, sendSaveAndClose } from "@totvs/tds-webtoolkit";
+import { CommonCommandEnum, TdsAbstractModel, TdsPage, TdsTextField } from "@totvs/tds-webtoolkit";
+import { ReceiveMessage, sendSaveAndClose } from "@totvs/tds-webtoolkit";
 import { IFormAction, TdsForm, getDefaultActionsForm, setDataModel } from "@totvs/tds-webtoolkit";
 import { setErrorModel } from "@totvs/tds-webtoolkit/dist/components/form/form";
 
 enum ReceiveCommandEnum {
   //Generate = "GENERATE"
 }
-type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
+type ReceiveCommand = ReceiveMessage<CommonCommandEnum & ReceiveCommandEnum, TFields>;
 
 type TFields = TdsAbstractModel & {
   description: string
@@ -37,11 +37,10 @@ export default function GenerateCodeView() {
       const command: ReceiveCommand = event.data as ReceiveCommand;
 
       switch (command.command) {
-        case CommonCommandFromPanelEnum.UpdateModel:
+        case CommonCommandEnum.UpdateModel:
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
-          console.log("xxxxxxxxxxxxxxxxxxx");
-          console.dir(event);
+
           setDataModel<TFields>(methods.setValue, model);
           setErrorModel(methods.setError, errors);
 

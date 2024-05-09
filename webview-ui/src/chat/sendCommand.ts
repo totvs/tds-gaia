@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { CommonCommandToPanelEnum, tdsVscode } from "@totvs/tds-webtoolkit";
+import { CommonCommandEnum } from "@totvs/tds-webtoolkit";
+import { tdsVscode } from "@totvs/tds-webtoolkit";
+
 
 /**
  * Sends a link mouse over event to the webview panel.
@@ -23,7 +25,7 @@ import { CommonCommandToPanelEnum, tdsVscode } from "@totvs/tds-webtoolkit";
  */
 export function sendLinkMouseOver(command: string) {
 	tdsVscode.postMessage({
-		command: CommonCommandToPanelEnum.LinkMouseOver,
+		command: CommonCommandEnum.LinkMouseOver,
 		data: {
 			model: undefined,
 			messageId: "",
@@ -42,7 +44,7 @@ export function sendLinkMouseOver(command: string) {
 */
 export function sendFeedback(messageId: string, text: string, value: string, comment: string) {
 	tdsVscode.postMessage({
-		command: CommonCommandToPanelEnum.Feedback,
+		command: "FEEDBACK",
 		data: {
 			model: undefined,
 			messageId: messageId,

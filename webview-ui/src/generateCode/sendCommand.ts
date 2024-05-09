@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { CommonCommandToPanelEnum, TdsAbstractModel, tdsVscode } from "@totvs/tds-webtoolkit";
+import { CommonCommandEnum, TdsAbstractModel, tdsVscode } from "@totvs/tds-webtoolkit";
 
 /**
  * Sends a link mouse over event to the webview panel.
@@ -38,7 +38,7 @@ export function sendGenerateCode(model: TdsAbstractModel) {
  */
 export function sendCopyToClipboard(model: TdsAbstractModel) {
 	tdsVscode.postMessage({
-		command: CommonCommandToPanelEnum.CopyToClipboard,
+		command: CommonCommandEnum.CopyToClipboard,
 		data: {
 			model: model,
 			generateOnly: true,
@@ -56,7 +56,7 @@ export function sendCopyToClipboard(model: TdsAbstractModel) {
 */
 export function sendFeedback(messageId: string, text: string, value: string, comment: string) {
 	tdsVscode.postMessage({
-		command: CommonCommandToPanelEnum.Feedback,
+		command: "FEEDBACK",
 		data: {
 			model: undefined,
 			messageId: messageId,

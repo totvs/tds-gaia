@@ -15,12 +15,12 @@ limitations under the License.
 */
 
 import * as vscode from "vscode";
-import { getExtraPanelConfigurations, getWebviewContent } from "./utilities/webview-utils";
-import { CommonCommandFromWebViewEnum, ReceiveMessage } from "./utilities/common-command-panel";
-import { TGenerateCodeModel } from "../model/generateCodeModel";
-import { TFieldErrors, TdsPanel, isErrors } from "../model/field-model";
 import { logger } from "../logger";
 import { chatApi } from "../api";
+import { TGenerateCodeModel } from "../model/generateCodeModel";
+import { CommonCommandEnum, ReceiveMessage } from "../utilities/common-command-webview";
+import { TFieldErrors, TdsPanel, isErrors } from "./panel";
+import { getExtraPanelConfigurations, getWebviewContent } from "../utilities/webview-utils";
 
 var os = require('os');
 const fs = require("fs");
@@ -30,7 +30,7 @@ enum GenerateCodeCommandEnum {
   CopyToClipboard = "COPY_TO_CLIPBOARD"
 }
 
-type GenerateCodeCommand = CommonCommandFromWebViewEnum & GenerateCodeCommandEnum;
+type GenerateCodeCommand = CommonCommandEnum & GenerateCodeCommandEnum;
 
 export class GenerateCodePanel extends TdsPanel<TGenerateCodeModel> {
   public static currentPanel: GenerateCodePanel | undefined;
@@ -98,7 +98,7 @@ export class GenerateCodePanel extends TdsPanel<TGenerateCodeModel> {
     const errors: TFieldErrors<TGenerateCodeModel> = {};
 
     switch (command) {
-      case CommonCommandFromWebViewEnum.Ready:
+      case CommonCommandEnum.Ready:
         if (data.model == undefined) {
           this.sendUpdateModel({
             description: "",

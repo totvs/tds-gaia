@@ -393,7 +393,8 @@
     "undici": "^6.16.0",
     "vscode-languageclient": "^9.0.1",
     "webpack": "^5.91.0",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "@totvs/tds-webtoolkit": "file:../tds-webtoolkit"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

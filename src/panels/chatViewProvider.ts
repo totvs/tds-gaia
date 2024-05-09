@@ -15,20 +15,20 @@ limitations under the License.
 */
 
 import * as vscode from 'vscode';
-import { CommonCommandFromWebViewEnum, CommonCommandToWebViewEnum, ReceiveMessage } from './utilities/common-command-panel';
-import { TChatModel } from '../model/chatModel';
-import { getExtraPanelConfigurations, getWebviewContent } from './utilities/webview-utils';
-import { MessageOperationEnum, TMessageModel } from '../model/messageModel';
-import { TFieldErrors } from '../model/abstractMode';
 import { TQueueMessages } from '../api/chatApi';
 import { getGaiaUser } from '../config';
 import { logger } from '../logger';
 import { highlightCode } from '../decoration';
 import { dataCache } from '../dataCache';
 import { chatApi, feedbackApi } from '../api';
+import { TChatModel } from '../model/chatModel';
+import { MessageOperationEnum, TMessageModel } from '../model/messageModel';
+import { CommonCommandEnum, ReceiveMessage } from '../utilities/common-command-webview';
+import { getExtraPanelConfigurations, getWebviewContent } from '../utilities/webview-utils';
+import { TFieldErrors } from './panel';
 
-enum ChatCommandEnum {
-
+export enum ChatCommandEnum {
+  Feedback = "FEEDBACK",
 }
 
 /**
@@ -43,7 +43,7 @@ const LINK_POSITION_RE = /([^&]+)&(\d+)(:(\d+)?(\-(\d+):(\d+)))?/i
  * Type alias for chat commands that are both CommonCommandFromWebViewEnum 
  * and ChatCommandEnum. Allows handling commands from both enums in one type.
  */
-type ChatCommand = CommonCommandFromWebViewEnum & ChatCommandEnum;
+type ChatCommand = CommonCommandEnum & ChatCommandEnum;
 
 /**
  * ChatViewProvider implements the webview for the chat panel. 
@@ -56,6 +56,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
   private _view?: vscode.WebviewView;
   private chatModel: TChatModel = {
+    command: "",
     lastPublication: new Date(),
     loggedUser: getGaiaUser()?.displayName || "<Not logged>",
     newMessage: "",
@@ -138,29 +139,29 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
    */
   private _getWebviewMessageListener(webview: vscode.Webview) {
     return (
-      async (message: ReceiveMessage<CommonCommandFromWebViewEnum, TChatModel>) => {
-        const command: ChatCommand = message.command as ChatCommand;
+      async (message: ReceiveMessage<ChatCommand, TChatModel>) => {
+        const command: ChatCommand = message.command;
         const data = message.data;
-        let matches: string = "";
+        let matches: RegExpMatchArray | null = null;
 
         switch (command) {
-          case CommonCommandFromWebViewEnum.Ready:
+          case CommonCommandEnum.Ready:
             if (data.model == undefined) {
               this.sendUpdateModel(this.chatModel, undefined);
             }
 
             break;
-          case CommonCommandFromWebViewEnum.Save:
+          case CommonCommandEnum.Save:
             if (data.model.newMessage.trim() !== "") {
               chatApi.user(data.model.newMessage, true);
               data.model.newMessage = "";
             }
 
             break;
-          case CommonCommandFromWebViewEnum.LinkMouseOver:
+          case CommonCommandEnum.LinkMouseOver:
             let ok: boolean = false;
 
-            matches = data.command.match(LINK_SOURCE_RE);
+            matches = data.model.command.match(LINK_SOURCE_RE);
             if (matches && matches.length > 1) {
               if (matches[2] !== this.oldMouseOverPosition) {
                 const positionMatches: RegExpMatchArray | null = matches[2].match(LINK_POSITION_RE);
@@ -195,7 +196,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
               break;
             }
-          case CommonCommandFromWebViewEnum.Feedback:
+          case ChatCommandEnum.Feedback:
             this.chatModel.messages
               .filter((msg: TMessageModel) => msg.messageId == data.messageId)
               .forEach((msg: TMessageModel) => {
@@ -246,23 +247,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     }
 
     this._view!.webview.postMessage({
-      command: CommonCommandToWebViewEnum.UpdateModel,
+      command: CommonCommandEnum.UpdateModel,
       data: {
         model: { ...model, messages: messagesToSend },
         errors: errors
       }
     });
-  }
-
-  private logWarning(message: string) {
-    // Utils.logMessage(message, MESSAGE_TYPE.Warning, false);
-  }
-
-  private logInfo(message: string) {
-    //Utils.logMessage(message, MESSAGE_TYPE.Info, false);
-  }
-
-  private logError(message: string) {
-    // Utils.logMessage(message, MESSAGE_TYPE.Error, false);
   }
 }

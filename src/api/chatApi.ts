@@ -605,7 +605,7 @@ export class ChatApi {
  * otherwise prints the list of available commands.
 */
 function doHelp(chat: ChatApi, message: string): boolean {
-    let matches = undefined;
+    let matches: RegExpMatchArray | null = null;
     let result: boolean = false;
 
     if (matches = message.match(commandsMap["help"].regex)) {

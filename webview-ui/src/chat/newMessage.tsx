@@ -16,9 +16,10 @@ limitations under the License.
 
 import { useController } from "react-hook-form";
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
+import React from "react";
 import { TdsTextField } from "@totvs/tds-webtoolkit";
 
-export default function NewMessage(props:{ methods: any }): JSX.Element {
+export default function NewMessage(props: { methods: any }): JSX.Element {
 
     const { field, fieldState } = useController({
         name: "newMessage",

@@ -16,20 +16,18 @@ limitations under the License.
 
 import "./chatView.css";
 import React from "react";
-import { FormProvider, SubmitHandler, useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { VSCodeDataGrid } from "@vscode/webview-ui-toolkit/react";
 import NewMessage from "./newMessage";
 import MessageRow from "./messageRow";
 import { TMessageModel } from "./chatModels";
-import { TdsAbstractModel, sendSave } from "@totvs/tds-webtoolkit";
-import { CommonCommandFromPanelEnum, ReceiveMessage } from "@totvs/tds-webtoolkit";
-import { IFormAction, TdsForm, setDataModel } from "@totvs/tds-webtoolkit";
+import { CommonCommandEnum, ReceiveMessage, TdsAbstractModel, sendSave, setDataModel, IFormAction, TdsForm } from "@totvs/tds-webtoolkit";
 import { setErrorModel } from "@totvs/tds-webtoolkit/dist/components/form/form";
 
 enum ReceiveCommandEnum {
 }
 
-type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
+type ReceiveCommand = ReceiveMessage<CommonCommandEnum & ReceiveCommandEnum, TFields>;
 
 type TFields = TdsAbstractModel & {
   lastPublication: Date;
@@ -119,7 +117,7 @@ export function ChatView() {
       const command: ReceiveCommand = event.data as ReceiveCommand;
 
       switch (command.command) {
-        case CommonCommandFromPanelEnum.UpdateModel:
+        case CommonCommandEnum.UpdateModel:
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
 
