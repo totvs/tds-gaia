@@ -8,6 +8,13 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.0.11
+
+### Correções
+
+- Ao solicitar geração de código, não apresenta o código gerado.
+  Corrigido.
+
 ## TDS-Gaia 0.0.10
 
 ### Melhorias

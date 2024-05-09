@@ -2,7 +2,7 @@
   "name": "tds-gaia",
   "displayName": "TDS-Gaia, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Gaia will assist you in AdvPL programming",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "publisher": "TOTVS",
   "preview": true,
   "author": {
@@ -390,7 +390,7 @@
     "@vscode/l10n": "^0.0.18",
     "@vscode/l10n-dev": "^0.0.31",
     "fs-extra": "^11.2.0",
-    "undici": "^6.4.0",
+    "undici": "^6.16.0",
     "vscode-languageclient": "^9.0.1",
     "webpack": "^5.91.0",
     "winston": "^3.11.0"
