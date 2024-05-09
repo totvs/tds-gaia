@@ -390,7 +390,7 @@
     "@vscode/l10n": "^0.0.18",
     "@vscode/l10n-dev": "^0.0.31",
     "fs-extra": "^11.2.0",
-    "undici": "^6.4.0",
+    "undici": "^6.16.0",
     "vscode-languageclient": "^9.0.1",
     "webpack": "^5.91.0",
     "winston": "^3.11.0"
