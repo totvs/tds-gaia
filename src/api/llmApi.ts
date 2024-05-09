@@ -160,7 +160,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
         }
 
         logger.debug(vscode.l10n.t("Code explain end with {0} size", response.code.length));
-        logger.debug(response);
+        logger.debug(JSON.stringify(response));
 
         const result: string[] = response.code.trim().split("\n");
 
