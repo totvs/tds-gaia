@@ -65,7 +65,7 @@ export function registerLogin(context: vscode.ExtensionContext): void {
 
                 const [_, publicKey, secretKey] = session.scopes[0].split(":");
                 feedbackApi.start(publicKey, secretKey);
-                feedbackApi.eventLogin();
+                //feedbackApi.eventLogin();
             } else {
                 logger.error(vscode.l10n.t('Failed to automatic login'));
                 vscode.window.showErrorMessage(vscode.l10n.t("{0} Failed to automatic login", PREFIX_GAIA));

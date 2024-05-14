@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { CommonCommandToPanelEnum } from "../utilities/common-command-webview";
-import { vscode } from "../utilities/vscodeWrapper";
+import { CommonCommandEnum } from "@totvs/tds-webtoolkit";
+import { tdsVscode } from "@totvs/tds-webtoolkit";
 
 /**
  * Sends a link mouse over event to the webview panel.
@@ -23,8 +23,8 @@ import { vscode } from "../utilities/vscodeWrapper";
  * @param command - The command string associated with the link mouse over event.
  */
 export function sendLinkMouseOver(command: string) {
-	vscode.postMessage({
-		command: CommonCommandToPanelEnum.LinkMouseOver,
+	tdsVscode.postMessage({
+		command: CommonCommandEnum.LinkMouseOver,
 		data: {
 			model: undefined,
 			messageId: "",
@@ -42,8 +42,8 @@ export function sendLinkMouseOver(command: string) {
 * @param comment - Any additional comments for the feedback.
 */
 export function sendFeedback(messageId: string, text: string, value: string, comment: string) {
-	vscode.postMessage({
-		command: CommonCommandToPanelEnum.Feedback,
+	tdsVscode.postMessage({
+		command: "FEEDBACK",
 		data: {
 			model: undefined,
 			messageId: messageId,

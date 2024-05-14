@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TAbstractModel } from "./abstractMode";
+import { TModelPanel } from "../panels/panel";
 import { TMessageModel } from "./messageModel";
 
 /**
@@ -22,9 +22,10 @@ import { TMessageModel } from "./messageModel";
  * TAbstractModel and contains properties for lastPublication, 
  * loggedUser, newMessage, and messages.
  */
-export type TChatModel = TAbstractModel & {
-    lastPublication: Date;
-    loggedUser: string;
-    newMessage: string;
-    messages: TMessageModel[];
+export type TChatModel = TModelPanel & {
+  command: string;
+  lastPublication: Date;
+  loggedUser: string;
+  newMessage: string;
+  messages: TMessageModel[];
 }

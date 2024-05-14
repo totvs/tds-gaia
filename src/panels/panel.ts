@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
-import { CommonCommandFromWebViewEnum, CommonCommandToWebViewEnum, ReceiveMessage } from "../panels/utilities/common-command-panel";
-import { logger } from "../logger";
+import { CommonCommandEnum, ReceiveMessage } from "../utilities/common-command-webview";
 
 export type TErrorType =
 	"required"
@@ -22,10 +21,6 @@ export type TFieldErrors<M> = Partial<Record<keyof M | "root", TFieldError>>;
 export function isErrors<M>(errors: TFieldErrors<M>) {
 	return Object.keys(errors).length > 0
 };
-
-export type TIncludePath = {
-	path: string;
-}
 
 export type TModelPanel = {
 
@@ -106,7 +101,7 @@ export abstract class TdsPanel<M extends TModelPanel> {
 	 */
 	private _setWebviewMessageListener(webview: vscode.Webview) {
 		webview.onDidReceiveMessage(
-			async (message: ReceiveMessage<CommonCommandFromWebViewEnum, M>) => {
+			async (message: ReceiveMessage<any, M>) => {
 				const value: any = await this.defaultListener(message);
 				await this.panelListener(message, value);
 			},
@@ -122,7 +117,7 @@ export abstract class TdsPanel<M extends TModelPanel> {
 
 	protected sendUpdateModel(model: M, errors: TFieldErrors<M>): void {
 		this._panel.webview.postMessage({
-			command: CommonCommandToWebViewEnum.UpdateModel,
+			command: CommonCommandEnum.UpdateModel,
 			data: {
 				model: model,
 				errors: errors
@@ -130,20 +125,20 @@ export abstract class TdsPanel<M extends TModelPanel> {
 		});
 	}
 
-	protected abstract panelListener<C extends CommonCommandFromWebViewEnum, T>(message: ReceiveMessage<C, M>, result: any): Promise<T>;
+	protected abstract panelListener<C extends CommonCommandEnum, T>(message: ReceiveMessage<C, M>, result: any): Promise<T>;
 
-	private async defaultListener<T>(message: ReceiveMessage<CommonCommandFromWebViewEnum, M>): Promise<T> {
+	private async defaultListener<T>(message: ReceiveMessage<any, M>): Promise<T> {
 		let result: any = undefined;
 		const command: string = message.command;
 		const data = message.data;
 
 		switch (command) {
-			case CommonCommandFromWebViewEnum.Save:
-			case CommonCommandFromWebViewEnum.SaveAndClose:
+			case CommonCommandEnum.Save:
+			case CommonCommandEnum.SaveAndClose:
 				let errors: TFieldErrors<M> = {};
 				try {
 					if (await this.validateModel(data.model, errors)) {
-						if (await this.saveModel(data.model) && (command == CommonCommandFromWebViewEnum.SaveAndClose)) {
+						if (await this.saveModel(data.model) && (command == CommonCommandEnum.SaveAndClose)) {
 							this.dispose();
 						} else {
 							this.sendUpdateModel(data.model, errors);
@@ -158,11 +153,11 @@ export abstract class TdsPanel<M extends TModelPanel> {
 
 				break;
 
-			case CommonCommandFromWebViewEnum.Close:
+			case CommonCommandEnum.Close:
 				this.dispose();
 
 				break;
-			case CommonCommandFromWebViewEnum.SelectResource:
+			case CommonCommandEnum.SelectResource:
 				const selectionProps: TSendSelectResourceProps = data as unknown as TSendSelectResourceProps;
 				let filters = selectionProps.filters || {};
 
@@ -181,7 +176,7 @@ export abstract class TdsPanel<M extends TModelPanel> {
 				};
 
 				result = await vscode.window.showOpenDialog(options).then((fileUri) => {
-					message.command = CommonCommandFromWebViewEnum.AfterSelectResource;
+					message.command = CommonCommandEnum.AfterSelectResource;
 					return fileUri
 				});
 				break;
@@ -193,18 +188,10 @@ export abstract class TdsPanel<M extends TModelPanel> {
 		return result;
 	}
 
-	logWarning(message: string) {
-		logger.warn(message);
-		//Utils.logMessage(message, MESSAGE_TYPE.Warning, false);
-	}
+	/**
+	 * Provides translations for the Webview.
+	 * @returns An object containing the translated strings for the panel.
+	 */
+	protected abstract getTranslations(): Record<string, string>;
 
-	logInfo(message: string) {
-		logger.info(message);
-		//Utils.logMessage(message, MESSAGE_TYPE.Info, false);
-	}
-
-	logError(message: string) {
-		logger.error(message);
-		//Utils.logMessage(message, MESSAGE_TYPE.Error, false);
-	}
 }

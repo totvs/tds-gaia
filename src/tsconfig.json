@@ -11,7 +11,13 @@
 		"sourceMap": true,
 		"strict": true,
 		"skipDefaultLibCheck": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"baseUrl": "./",
+		"paths": {
+			"@common/*": [
+				"../common/*"
+			]
+		}
 	},
 	"exclude": [
 		"node_modules/",

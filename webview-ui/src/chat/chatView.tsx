@@ -17,20 +17,20 @@ limitations under the License.
 import "./chatView.css";
 import React from "react";
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { CommonCommandFromPanelEnum, ReceiveMessage, sendSave } from "../utilities/common-command-webview";
-import { VSCodeButton, VSCodeDataGrid, VSCodeLink } from "@vscode/webview-ui-toolkit/react";
-import { IFormAction, TdsForm, TdsTextField, setDataModel, setErrorModel } from "../components/form";
-import { sendLinkMouseOver } from "./sendCommand";
+import { VSCodeDataGrid } from "@vscode/webview-ui-toolkit/react";
 import NewMessage from "./newMessage";
 import MessageRow from "./messageRow";
 import { TMessageModel } from "./chatModels";
+import { CommonCommandEnum, ReceiveMessage, TdsAbstractModel, sendSave, setDataModel, IFormAction, TdsForm } from "@totvs/tds-webtoolkit";
+import { setErrorModel } from "@totvs/tds-webtoolkit/dist/components/form/form";
+import { tdsVscode } from '@totvs/tds-webtoolkit';
 
 enum ReceiveCommandEnum {
 }
 
-type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
+type ReceiveCommand = ReceiveMessage<CommonCommandEnum & ReceiveCommandEnum, TFields>;
 
-type TFields = {
+type TFields = TdsAbstractModel & {
   lastPublication: Date;
   loggedUser: string;
   newMessage: string;
@@ -74,7 +74,7 @@ function findLastIndex<T>(array: T[], predicate: (value: T) => boolean): number 
  * Handles receiving updates from the panel via postMessage.
  * Renders messages, form, and buttons.
  */
-export default function ChatView() {
+export function ChatView() {
   const methods = useForm<TFields>({
     defaultValues: {
       lastPublication: new Date(),
@@ -118,7 +118,7 @@ export default function ChatView() {
       const command: ReceiveCommand = event.data as ReceiveCommand;
 
       switch (command.command) {
-        case CommonCommandFromPanelEnum.UpdateModel:
+        case CommonCommandEnum.UpdateModel:
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
 
@@ -144,7 +144,7 @@ export default function ChatView() {
   const actions: IFormAction[] = [];
   actions.push({
     id: 0,
-    caption: "Clear",
+    caption: tdsVscode.l10n.t("Clear"),
     type: "link",
     href: "command:tds-gaia.clear",
     onClick: (sender: any) => {
@@ -153,7 +153,7 @@ export default function ChatView() {
   });
   actions.push({
     id: 1,
-    caption: "Help",
+    caption: tdsVscode.l10n.t("Help"),
     type: "link",
     href: "command:tds-gaia.help",
     onClick: (sender: any) => {
@@ -166,9 +166,6 @@ export default function ChatView() {
     <main>
       <section className="tds-chat">
         <section className="tds-content">
-          {
-            //fields.map((row: any, index: number) => MessageRow(row, model.messages))
-          }
           <VSCodeDataGrid id="messagesGrid"> {/*grid-template-columns=""*/}
             {model.messages.map((row: TMessageModel, index: number) => (
               <MessageRow key={`msgRow_${index}`} index={index} message={row} messages={model.messages} />
@@ -176,19 +173,17 @@ export default function ChatView() {
           </VSCodeDataGrid>
         </section >
         <section className="tds-footer">
-          <FormProvider {...methods} >
-            <TdsForm<TFields>
-              id="chatForm"
-              onSubmit={onSubmit}
-              methods={methods}
-              actions={actions}
-              isProcessRing={false}
-            >
-              <section className="tds-row-container" >
-                <NewMessage />
-              </section>
-            </TdsForm>
-          </FormProvider>
+          <TdsForm<TFields>
+            id="chatForm"
+            methods={methods}
+            onSubmit={onSubmit}
+            actions={actions}
+            isProcessRing={false}
+          >
+            <section className="tds-row-container" >
+              <NewMessage methods={methods} />
+            </section>
+          </TdsForm>
         </section>
       </section>
     </main >

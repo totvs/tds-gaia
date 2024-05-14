@@ -605,7 +605,7 @@ export class ChatApi {
  * otherwise prints the list of available commands.
 */
 function doHelp(chat: ChatApi, message: string): boolean {
-    let matches = undefined;
+    let matches: RegExpMatchArray | null = null;
     let result: boolean = false;
 
     if (matches = message.match(commandsMap["help"].regex)) {
@@ -613,7 +613,7 @@ function doHelp(chat: ChatApi, message: string): boolean {
             if (matches[2].trim() == "hint_1") {
                 const commandAccess: string[] = [
                     vscode.l10n.t("- A shortcut;"),
-                    vscode.l10n.t("- By the command panel (`shift+p` or `f1`), filtering by \"tds-gaia\";"),
+                    vscode.l10n.t("- By the command panel (`ctrl+shift+p` or `f1`), filtering by \"tds-gaia\";"),
                     vscode.l10n.t("- By a link presented in this chat;"),
                     vscode.l10n.t("- Typing the command in the prompt chat;"),
                     vscode.l10n.t("- Context menu of the chat or source in edition.")

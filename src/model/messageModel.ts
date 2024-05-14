@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TAbstractModel } from "./abstractMode";
+import { TModelPanel } from "../panels/panel";
+
 
 /**
 * Defines the possible operations that can be performed on a message.
@@ -37,7 +38,7 @@ export enum MessageOperationEnum {
  * 
  * UNMARKED attributes are ignored in the operation.
  */
-export type TMessageModel = TAbstractModel & {
+export type TMessageModel = TModelPanel & {
   operation: MessageOperationEnum, // Add | Update | Delete
   messageId: string;               //  X  |   X    |   X
   answering: string;               //  X  |        |   

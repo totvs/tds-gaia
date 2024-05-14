@@ -15,10 +15,10 @@ limitations under the License.
 */
 
 import React from "react";
-import ChatView from "./chatView";
+import { ChatView } from "./chatView";
 import { createRoot } from "react-dom/client";
 import "../css/main.css"
-import { sendReady } from "../utilities/common-command-webview";
+import { sendReady } from "@totvs/tds-webtoolkit";
 
 const root = createRoot(document.getElementById("root")!);
 root.render(
@@ -27,4 +27,4 @@ root.render(
   </React.StrictMode>,
 );
 
-sendReady();
+//sendReady();

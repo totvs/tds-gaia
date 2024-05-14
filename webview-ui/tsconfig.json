@@ -20,14 +20,15 @@
     //"noEmit": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "strict": true,
-    "target": "ES6",
+    "strict": false,
+    "target": "ES5",
     "useDefineForClassFields": true,
   },
   "include": [
     "./src"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "out"
   ]
 }

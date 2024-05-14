@@ -140,20 +140,20 @@ export class TraceApi extends AbstractApi {
             this.jsonRequest("POST", "", {}, { "batch": data })
                 .then(response => {
                     if (response instanceof Error) {
-                        logger.error(vscode.l10n.t("sendQueue: ERROR."));
+                        logger.error("sendQueue: ERROR.");
                         logger.error(response);
                     } else {
-                        logger.debug(vscode.l10n.t("sendQueue: SUCCESS. Messages sent: {0]", (response as any).successes.length));
+                        logger.debug("sendQueue: SUCCESS. Messages sent: {0}", (response as any).successes.length);
                         logger.debug(JSON.stringify(data));
                     }
                 })
                 .catch(error => {
-                    logger.error(vscode.l10n.t("sendQueue: ERROR. Messages count: {0]", data.length));
+                    logger.error("sendQueue: ERROR. Messages count: {0}", data.length);
                     logger.error(JSON.stringify(data));
                     logger.error(error);
                 });
         } else {
-            logger.debug(vscode.l10n.t("sendQueue: Empty queue."));
+            logger.debug("sendQueue: Empty queue.");
         }
     }
 

@@ -1,22 +1,20 @@
 //import { VSCodeButton, VSCodeDataGrid, VSCodeDataGridCell, VSCodeDataGridRow } from "@vscode/webview-ui-toolkit/react";
 
 import "./generateCode.css";
-import TdsPage from "../components/page";
 import React from "react";
-import { FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { CommonCommandFromPanelEnum, ReceiveMessage, sendReady, sendSaveAndClose } from "../utilities/common-command-webview";
-import { VSCodeButton, VSCodeDataGrid, VSCodeDataGridCell, VSCodeDataGridRow } from "@vscode/webview-ui-toolkit/react";
-import { IFormAction, TdsForm, TdsTextField, getDefaultActionsForm, setDataModel, setErrorModel } from "../components/form";
-import { TdsLabelField } from "../components/fields/labelField";
+import { FormProvider, SubmitHandler, useForm, useFormContext } from "react-hook-form";
 import { sendCopyToClipboard, sendGenerateCode } from "./sendCommand";
-
+import { CommonCommandEnum, TdsAbstractModel, TdsPage, TdsTextField, tdsVscode } from "@totvs/tds-webtoolkit";
+import { ReceiveMessage, sendSaveAndClose } from "@totvs/tds-webtoolkit";
+import { IFormAction, TdsForm, getDefaultActionsForm, setDataModel } from "@totvs/tds-webtoolkit";
+import { setErrorModel } from "@totvs/tds-webtoolkit/dist/components/form/form";
 
 enum ReceiveCommandEnum {
   //Generate = "GENERATE"
 }
-type ReceiveCommand = ReceiveMessage<CommonCommandFromPanelEnum & ReceiveCommandEnum, TFields>;
+type ReceiveCommand = ReceiveMessage<CommonCommandEnum & ReceiveCommandEnum, TFields>;
 
-type TFields = {
+type TFields = TdsAbstractModel & {
   description: string
   generateCode: string;
 }
@@ -39,7 +37,7 @@ export default function GenerateCodeView() {
       const command: ReceiveCommand = event.data as ReceiveCommand;
 
       switch (command.command) {
-        case CommonCommandFromPanelEnum.UpdateModel:
+        case CommonCommandEnum.UpdateModel:
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
 
@@ -85,41 +83,40 @@ export default function GenerateCodeView() {
 
   return (
     <main>
-      <TdsPage title="Generate Code" linkToDoc="[Geração de Código]generateCode.md">
-        <FormProvider {...methods} >
-          <TdsForm<TFields>
-            id="frmGenerateCode"
-            onSubmit={onSubmit}
-            methods={methods}
-            actions={actions}>
+      <TdsPage title={tdsVscode.l10n.t("Generate Code")} linkToDoc={tdsVscode.l10n.t("[Code generation]generateCode.md")} >
+        <TdsForm<TFields>
+          id="frmGenerateCode"
+          methods={methods}
+          onSubmit={onSubmit}
+          actions={actions}>
 
-            <section className="tds-row-container" >
-              <TdsTextField
-                name="description"
-                label="Description"
-                info="Describe what you want the generated code to do."
-                textArea={true}
-                cols={80}
-                rows={10}
-                rules={{ required: true }}
-              />
-            </section>
+          <section className="tds-row-container" >
+            <TdsTextField
+              methods={methods}
+              name="description"
+              label={tdsVscode.l10n.t("Description")}
+              info={tdsVscode.l10n.t("Describe what you want the generated code to do.")}
+              textArea={true}
+              cols={80}
+              rows={10}
+              rules={{ required: true }}
+            />
+          </section>
 
-            <section className="tds-row-container" >
-              <TdsTextField
-                name="generateCode"
-                label="Code"
-                readOnly={true}
-                info="Code generated from the description."
-                textArea={true}
-                cols={80}
-                rows={10}
-              />
+          <section className="tds-row-container" >
+            <TdsTextField
+              methods={methods}
+              name="generateCode"
+              label={tdsVscode.l10n.t("Code")}
+              info={tdsVscode.l10n.t("Code generated from the description.")}
+              readOnly={true}
+              textArea={true}
+              cols={80}
+              rows={10}
+            />
+          </section>
 
-            </section>
-
-          </TdsForm>
-        </FormProvider>
+        </TdsForm>
       </TdsPage>
     </main >
   );

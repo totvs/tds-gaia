@@ -30,7 +30,7 @@ export function registerGenerateCode(context: vscode.ExtensionContext): void {
       // chatApi.user(
       //   vscode.l10n.t("Generate code for description `{0}...`", description.substring(0, 20)), true);
       const messageId: string = chatApi.gaia(
-        vscode.l10n.t("Generating the code as requested."), {});
+        vscode.l10n.t("Generating the code as requested."), { inProgress: true });
 
       return llmApi.generateCode(description).then((generateCode: string[]) => {
         const responseId: string = chatApi.nextMessageId();

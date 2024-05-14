@@ -1,4 +1,4 @@
-import { TModelPanel } from "./field-model";
+import { TModelPanel } from "../panels/panel";
 
 export type TGenerateCodeModel = TModelPanel & {
     description: string;
