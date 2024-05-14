@@ -4,7 +4,7 @@ import "./generateCode.css";
 import React from "react";
 import { FormProvider, SubmitHandler, useForm, useFormContext } from "react-hook-form";
 import { sendCopyToClipboard, sendGenerateCode } from "./sendCommand";
-import { CommonCommandEnum, TdsAbstractModel, TdsPage, TdsTextField } from "@totvs/tds-webtoolkit";
+import { CommonCommandEnum, TdsAbstractModel, TdsPage, TdsTextField, tdsVscode } from "@totvs/tds-webtoolkit";
 import { ReceiveMessage, sendSaveAndClose } from "@totvs/tds-webtoolkit";
 import { IFormAction, TdsForm, getDefaultActionsForm, setDataModel } from "@totvs/tds-webtoolkit";
 import { setErrorModel } from "@totvs/tds-webtoolkit/dist/components/form/form";
@@ -83,43 +83,40 @@ export default function GenerateCodeView() {
 
   return (
     <main>
-      <TdsPage title="Generate Code" linkToDoc="[Geração de Código]generateCode.md">
-        <FormProvider {...methods} >
-          <TdsForm<TFields>
-            id="frmGenerateCode"
-            methods={methods}
-            onSubmit={onSubmit}
-            actions={actions}>
+      <TdsPage title={tdsVscode.l10n.t("Generate Code")} linkToDoc={tdsVscode.l10n.t("[Code generation]generateCode.md")} >
+        <TdsForm<TFields>
+          id="frmGenerateCode"
+          methods={methods}
+          onSubmit={onSubmit}
+          actions={actions}>
 
-            <section className="tds-row-container" >
-              <TdsTextField
-                methods={methods}
-                name="description"
-                label="Description"
-                info="Describe what you want the generated code to do."
-                textArea={true}
-                cols={80}
-                rows={10}
-                rules={{ required: true }}
-              />
-            </section>
+          <section className="tds-row-container" >
+            <TdsTextField
+              methods={methods}
+              name="description"
+              label={tdsVscode.l10n.t("Description")}
+              info={tdsVscode.l10n.t("Describe what you want the generated code to do.")}
+              textArea={true}
+              cols={80}
+              rows={10}
+              rules={{ required: true }}
+            />
+          </section>
 
-            <section className="tds-row-container" >
-              <TdsTextField
-                methods={methods}
-                name="generateCode"
-                label="Code"
-                readOnly={true}
-                info="Code generated from the description."
-                textArea={true}
-                cols={80}
-                rows={10}
-              />
+          <section className="tds-row-container" >
+            <TdsTextField
+              methods={methods}
+              name="generateCode"
+              label={tdsVscode.l10n.t("Code")}
+              info={tdsVscode.l10n.t("Code generated from the description.")}
+              readOnly={true}
+              textArea={true}
+              cols={80}
+              rows={10}
+            />
+          </section>
 
-            </section>
-
-          </TdsForm>
-        </FormProvider>
+        </TdsForm>
       </TdsPage>
     </main >
   );

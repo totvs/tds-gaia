@@ -17,7 +17,6 @@ limitations under the License.
 import { CommonCommandEnum } from "@totvs/tds-webtoolkit";
 import { tdsVscode } from "@totvs/tds-webtoolkit";
 
-
 /**
  * Sends a link mouse over event to the webview panel.
  * 

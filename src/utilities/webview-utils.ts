@@ -25,8 +25,9 @@ import * as vscode from "vscode";
  * @remarks Extra files is add after de main files and storage in 'webview-ui/src/js' or 'webview-ui/src/css'
  */
 export interface IWebviewContent {
+  translations: Record<string, string>;
   title?: string;
-  data?: {}
+  data?: Record<string, string>
 }
 
 const BASE_FOLDER: string[] = [
@@ -54,7 +55,7 @@ const JS_BASE_FOLDER: string[] = [
  * @returns A template string literal containing the HTML that should be
  * rendered within the webview panel
  */
-export function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri, entryPointName: string, options?: IWebviewContent): string {
+export function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri, entryPointName: string, options: IWebviewContent): string {
   // The CSS file from the React build output
   const stylesUri: vscode.Uri[] = [];
   const codIconsUri = webview.asWebviewUri(
@@ -88,7 +89,7 @@ export function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.
     return `<link rel="stylesheet" type="text/css" href="${stylesUri}">\n`;
   })}
           <link href="${codIconsUri}" rel="stylesheet" />
-          <title>${options!.title || "Webview Title"}</title>
+          <title>${options.title || "Webview Title"}</title>
         </head>
         <body>
           <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -96,6 +97,11 @@ export function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.
           ${scriptsUri.map((uri: vscode.Uri) => {
     return `<script nonce="${nonce}" src="${uri}"></script>\n`;
   })}
+          <script>
+            window.initialData = ${JSON.stringify(options.data || {})};  
+            window.translations = ${JSON.stringify(options.translations)};
+          </script>
+
         </body>
       </html>
     `;

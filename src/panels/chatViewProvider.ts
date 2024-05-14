@@ -127,8 +127,21 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-gaia');
     const extensionUri: vscode.Uri = ext!.extensionUri;
 
-    webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView", { title: "Gaia: Chat" });
+    webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView",
+      { title: "Gaia: Chat", translations: this.getTranslations() });
     webviewView.webview.onDidReceiveMessage(this._getWebviewMessageListener(webviewView.webview));
+  }
+
+  /**
+ * Provides translations for the "Chat View" webview.
+ * @returns An object containing the translated strings for the panel.
+ */
+  protected getTranslations(): Record<string, string> {
+    return {
+      "Clear": vscode.l10n.t("Clear"),
+      "Help": vscode.l10n.t("Help"),
+      "Tell me what you need...": vscode.l10n.t("Tell me what you need...")
+    };
   }
 
   /**

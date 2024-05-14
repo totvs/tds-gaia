@@ -98,7 +98,7 @@ module.exports = (env, argv) => {
             {
               loader: "ts-loader",
               options: {
-                //                configFile: path.join(REPLAY_PATH, "./app/tsconfig.json"),
+                //
               },
             },
           ],

@@ -14,35 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { useController } from "react-hook-form";
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 import React from "react";
-import { TdsTextField } from "@totvs/tds-webtoolkit";
+import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
+import { TdsTextField, tdsVscode } from "@totvs/tds-webtoolkit";
 
 export default function NewMessage(props: { methods: any }): JSX.Element {
 
-    const { field, fieldState } = useController({
-        name: "newMessage",
-        defaultValue: "",
-        rules: {
-            required: "Required"
-        }
-    });
-
-    // field.onChange = (e: any) => {
-    //     //necessário usar OnInput, pois o ENTER aciona submit e
-    //     //não há tempo de processar mensagens internas do React
-    //     field.setValue(e.target.name, e.target.value);
-    // };
     return (
         <>
             <TdsTextField name="newMessage"
                 methods={props.methods}
                 label={""}
                 textArea={true}
-                placeholder={"Tell me what you need.."}
+                placeholder={tdsVscode.l10n.t("Tell me what you need...")}
                 cols={45}
                 rows={2}
+                rules={{
+                    required: "Required"
+                }}
             />
 
             <VSCodeButton

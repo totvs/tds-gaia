@@ -187,4 +187,11 @@ export abstract class TdsPanel<M extends TModelPanel> {
 
 		return result;
 	}
+
+	/**
+	 * Provides translations for the Webview.
+	 * @returns An object containing the translated strings for the panel.
+	 */
+	protected abstract getTranslations(): Record<string, string>;
+
 }

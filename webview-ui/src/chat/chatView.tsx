@@ -23,6 +23,7 @@ import MessageRow from "./messageRow";
 import { TMessageModel } from "./chatModels";
 import { CommonCommandEnum, ReceiveMessage, TdsAbstractModel, sendSave, setDataModel, IFormAction, TdsForm } from "@totvs/tds-webtoolkit";
 import { setErrorModel } from "@totvs/tds-webtoolkit/dist/components/form/form";
+import { tdsVscode } from '@totvs/tds-webtoolkit';
 
 enum ReceiveCommandEnum {
 }
@@ -143,7 +144,7 @@ export function ChatView() {
   const actions: IFormAction[] = [];
   actions.push({
     id: 0,
-    caption: "Clear",
+    caption: tdsVscode.l10n.t("Clear"),
     type: "link",
     href: "command:tds-gaia.clear",
     onClick: (sender: any) => {
@@ -152,7 +153,7 @@ export function ChatView() {
   });
   actions.push({
     id: 1,
-    caption: "Help",
+    caption: tdsVscode.l10n.t("Help"),
     type: "link",
     href: "command:tds-gaia.help",
     onClick: (sender: any) => {
@@ -165,9 +166,6 @@ export function ChatView() {
     <main>
       <section className="tds-chat">
         <section className="tds-content">
-          {
-            //fields.map((row: any, index: number) => MessageRow(row, model.messages))
-          }
           <VSCodeDataGrid id="messagesGrid"> {/*grid-template-columns=""*/}
             {model.messages.map((row: TMessageModel, index: number) => (
               <MessageRow key={`msgRow_${index}`} index={index} message={row} messages={model.messages} />
@@ -175,19 +173,17 @@ export function ChatView() {
           </VSCodeDataGrid>
         </section >
         <section className="tds-footer">
-          <FormProvider {...methods} >
-            <TdsForm<TFields>
-              id="chatForm"
-              methods={methods}
-              onSubmit={onSubmit}
-              actions={actions}
-              isProcessRing={false}
-            >
-              <section className="tds-row-container" >
-                <NewMessage methods={methods} />
-              </section>
-            </TdsForm>
-          </FormProvider>
+          <TdsForm<TFields>
+            id="chatForm"
+            methods={methods}
+            onSubmit={onSubmit}
+            actions={actions}
+            isProcessRing={false}
+          >
+            <section className="tds-row-container" >
+              <NewMessage methods={methods} />
+            </section>
+          </TdsForm>
         </section>
       </section>
     </main >

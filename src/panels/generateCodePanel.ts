@@ -83,7 +83,8 @@ export class GenerateCodePanel extends TdsPanel<TGenerateCodeModel> {
    */
   protected getWebviewContent(extensionUri: vscode.Uri) {
 
-    return getWebviewContent(this._panel.webview, extensionUri, "generateCodeView", { title: this._panel.title });
+    return getWebviewContent(this._panel.webview, extensionUri, "generateCodeView",
+      { title: this._panel.title, translations: this.getTranslations() });
   }
 
   /**
@@ -174,5 +175,20 @@ export class GenerateCodePanel extends TdsPanel<TGenerateCodeModel> {
     }
 
     return Promise.resolve(false);
+  }
+
+  /**
+   * Provides translations for the "Generate Code" webview.
+   * @returns An object containing the translated strings for the panel.
+   */
+  protected getTranslations(): Record<string, string> {
+    return {
+      "Generate Code": vscode.l10n.t("Generate Code"),
+      "[Code generation]generateCode.md": vscode.l10n.t("[Code generation]generateCode.md"),
+      "Description": vscode.l10n.t("Description"),
+      "Describe what you want the generated code to do.": vscode.l10n.t("Describe what you want the generated code to do."),
+      "Code": vscode.l10n.t("Code"),
+      "Code generated from the description.": vscode.l10n.t("Code generated from the description.")
+    };
   }
 }
