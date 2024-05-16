@@ -46,7 +46,7 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
         const text: string[] = buildInferTextReturn.text;
 
         dataCache.set(messageId, inferData);
-        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: true, disabledFeedback: buildInferTextReturn.feedback });
+        chatApi.gaiaUpdateMessage(messageId, text.join("\n"), { canFeedback: true, disabledFeedback: buildInferTextReturn.feedback });
         feedbackApi.scoreInferType(messageId, inferTypes.filter(((type: InferType) => !type.active)),
             ScoreEnum.Relative,
             (inferTypes.length == processVars.length)
@@ -71,7 +71,7 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
         const text: string[] = buildInferTextReturn.text;
 
         dataCache.set(messageId, inferData);
-        chatApi.gaiaUpdateMessage(messageId, text, { canFeedback: true, disabledFeedback: buildInferTextReturn.feedback });
+        chatApi.gaiaUpdateMessage(messageId, text.join("\n"), { canFeedback: true, disabledFeedback: buildInferTextReturn.feedback });
         feedbackApi.scoreInferType(messageId, inferTypes.filter(((type: InferType) => !type.active)),
             ScoreEnum.Relative, vscode.l10n.t("User accept: {0}}", processVars.join(",")), false);
     }));

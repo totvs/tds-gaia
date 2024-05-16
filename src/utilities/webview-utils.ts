@@ -144,7 +144,8 @@ export function getExtraPanelConfigurations(extensionUri: vscode.Uri): {} {
     // Enable JavaScript in the webview
     enableScripts: true,
     // Restrict the webview to only load resources from the `out` and `webview-ui/build` directories
-    localResourceRoots: getCspSource(extensionUri)
+    localResourceRoots: getCspSource(extensionUri),
+    retainContextWhenHidden: true
   };
 }
 

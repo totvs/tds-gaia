@@ -174,7 +174,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
           case CommonCommandEnum.LinkMouseOver:
             let ok: boolean = false;
 
-            matches = data.model.command.match(LINK_SOURCE_RE);
+            matches = data.command.match(LINK_SOURCE_RE);
             if (matches && matches.length > 1) {
               if (matches[2] !== this.oldMouseOverPosition) {
                 const positionMatches: RegExpMatchArray | null = matches[2].match(LINK_POSITION_RE);

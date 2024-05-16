@@ -45,7 +45,7 @@ export abstract class TdsPanel<M extends TModelPanel> {
 	protected _disposables: vscode.Disposable[] = [];
 
 	/**
-	 * The  TdsPanel class protected constructor (called only from the render method).
+	 * The TdsPanel class protected constructor (called only from the render method).
 	 *
 	 * @param panel A reference to the webview panel
 	 * @param extensionUri The URI of the directory containing the extension
