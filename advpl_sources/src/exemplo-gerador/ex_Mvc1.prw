@@ -6,9 +6,6 @@
 #include "protheus.ch"
 #Include "FWMVCDef.ch"
 	
-//acandido:b8L7dgzQFYhnKP2k39VcsC:b1633e3c-c038-4dbe-af55-82bf21be0fd5:bdad2a8c-f646-4ab6-886a-66401033cc48
-//b1633e3c-c038-4dbe-af55-82bf21be0fd5
-//bdad2a8c-f646-4ab6-886a-66401033cc48
 
 user function MVC_CADASTRO()
 	Local aArea   := GetArea()
@@ -36,7 +33,7 @@ static Function ModelDef()
 	oModel:AddFields("FORMSA1",/*cOwner*/,oStSA1)
 	oModel:SetPrimaryKey({"A1_FILIAL","A1_CODIGO"})
 	oModel:SetDescription("Cadastro de Clientes")
-	oModel:GetModel("FORMSA1"):SetDescription("Formulário do Cadastro Cliente")
+	oModel:GetModel("FORMSA1"):SetDescription("Formulï¿½rio do Cadastro Cliente")
 
 Return oModel
 
