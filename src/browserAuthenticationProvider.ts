@@ -275,7 +275,7 @@ const getSession = async () => {
 
 const getMsSession = async () => {
     const session = await vscode.authentication.getSession('microsoft', [
-        "VSCODE_CLIENT_ID:f3164c21-b4ca-416c-915c-299458eba95b",
+        "VSCODE_CLIENT_ID:f3164c21-??????????????????????",
         "VSCODE_TENANT:common",
         "https://graph.microsoft.com/User.Read"
     ], { createIfNone: false });

@@ -32,7 +32,7 @@ No _log_ do LS:
 (  32.175s) [languageServer  ]       queue_manager.cc:187   | Handler found for message method '$totvsserver/deletePrograms'
 (  32.176s) [languageServer  ]      message_handler.h:70    | > [$totvsserver/deletePrograms] (start) 
 (  32.176s) [languageServer  ]msg_totvsserver_delete_:50    | DeletePrograms : with connectionToken djM6MGxkdG9xZjNidW9scndiOG03cX..., environment p12133, programs size 1
-(  32.176s) [languageServer  ]  connection_manager.cc:5147  | Searching for connection token: djM6MGxkdG9xZjNidW9scndiOG03cXQ5...
+(  32.176s) [languageServer  ]  connection_manager.cc:5147  | Searching for connection token: ???????????????????...
 (  32.176s) [languageServer  ]  connection_manager.cc:5152  | Connections thread size: 1
 (  32.176s) [languageServer  ]  connection_manager.cc:5162  | connection pointer address 000002ACE655CB10
 (  32.176s) [languageServer  ]  connection_manager.cc:2558  | retrievedConnectionThread status 2
@@ -46,7 +46,7 @@ No _log_ do LS:
 ```
 
 > Após desabilitar o _token de rpo_ no ambiente e reiniciado o VS-Code, o procedimento de remoção foi executado com sucesso.
-> *NOTA:*
+> _NOTA:_
 > . Melhorar as notificações ao usuário. Não é claro o motivo do erro.  
 > . Adicionar notificação para reiniciar o VS-Code após limpar/desabilitar o _token de rpo_. Acregaia que uma reconexão com o _appServer_ também resolva.
 
