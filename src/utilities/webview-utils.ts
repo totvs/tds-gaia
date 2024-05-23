@@ -94,13 +94,13 @@ export function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.
         <body>
           <noscript>You need to enable JavaScript to run this app.</noscript>
           <div id="root"></div>
-          ${scriptsUri.map((uri: vscode.Uri) => {
-    return `<script nonce="${nonce}" src="${uri}"></script>\n`;
-  })}
-          <script>
+          <script nonce="${nonce}">
             window.initialData = ${JSON.stringify(options.data || {})};  
             window.translations = ${JSON.stringify(options.translations)};
           </script>
+          ${scriptsUri.map((uri: vscode.Uri) => {
+    return `<script nonce="${nonce}" src="${uri}"></script>\n`;
+  })}
 
         </body>
       </html>
