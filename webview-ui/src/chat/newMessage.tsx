@@ -19,6 +19,10 @@ import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 import { TdsTextField, tdsVscode } from "@totvs/tds-webtoolkit";
 
 export default function NewMessage(props: { methods: any }): JSX.Element {
+    //     rules = {{
+    //         required: "Required"
+    //     }
+    // }
 
     return (
         <>
@@ -29,9 +33,6 @@ export default function NewMessage(props: { methods: any }): JSX.Element {
                 placeholder={tdsVscode.l10n.t("Tell me what you need...")}
                 cols={45}
                 rows={2}
-                rules={{
-                    required: "Required"
-                }}
             />
 
             <VSCodeButton

@@ -16,7 +16,7 @@
     "lint": "eslint \"src/**/*.tsx"
   },
   "dependencies": {
-    "@totvs/tds-webtoolkit": "^0.0.4",
+    "@totvs/tds-webtoolkit": "0.0.5",
     "@vscode/codicons": "^0.0.35",
     "@vscode/webview-ui-toolkit": "^1.4.0",
     "react": "^18.3.1",
