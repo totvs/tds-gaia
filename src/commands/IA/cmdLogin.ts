@@ -17,8 +17,9 @@ limitations under the License.
 import * as vscode from "vscode";
 import { PREFIX_GAIA, logger } from "../../logger";
 import { GaiaAuthenticationProvider, getGaiaSession } from "../../authenticationProvider";
-import { chatApi, feedbackApi, llmApi } from "../../api";
-import { getGaiaUser, isGaiaLogged, setGaiaUser } from "../../config";
+import { feedbackApi, llmApi } from "../../api";
+import { getGaiaUser, isGaiaLogged } from "../../config";
+import { updateContextKey } from '../../util';
 
 export function registerLogin(context: vscode.ExtensionContext): void {
 
@@ -66,6 +67,7 @@ export function registerLogin(context: vscode.ExtensionContext): void {
                 const [_, publicKey, secretKey] = session.scopes[0].split(":");
                 feedbackApi.start(publicKey, secretKey);
                 //feedbackApi.eventLogin();
+                updateContextKey("logged", isGaiaLogged());
             } else {
                 logger.error(vscode.l10n.t('Failed to automatic login'));
                 vscode.window.showErrorMessage(vscode.l10n.t("{0} Failed to automatic login", PREFIX_GAIA));
