@@ -1,0 +1,560 @@
+#include 'tlpp_core_dev.th'
+#include 'tlpp_date.th'
+
+Namespace tlpp.date
+Using Namespace tlpp.date
+Using Namespace tlpp.string.utils
+
+#define _SET_EPOCH         5
+#define _JWT_EPOCH       cToD('01/01/1970')
+
+/*---------------------------------------------------------------------------------------------/
+{tlpp.doc} dateTLPP
+@description Date control
+@type class
+@author Gabriel Manzoni
+@since 12/14/2018
+@param type [, format, value]
+@return object date control
+@example oDate := tlpp.dateTLPP():New("DATE", "01/01/2019", "99/99/9999")
+/---------------------------------------------------------------------------------------------*/
+Class DateTLPP
+	//Public Data
+	Public Data DateDelimiter
+	Public Data Format
+	Public Data Type
+	Public Data Value
+	Public Data varDate
+	Public Data varHour //miliseconds
+
+	//Private Methods
+	Method DateValidate(nMonth, nDay, cYear)
+	Method Get_UTC()
+	Method HourValidate(cHour)
+	Method IsBissexto(xAno)
+
+	//Public Methods
+	Public Method New(pType, pValue, pFormat)
+	Public Method set_format_date(pDateValue, pLenYear)
+	Public Method set_format_hour(pHour, pFormatHour)
+	Public Method UTC_Seconds(nSec)
+	Public Method Dt_2Epoch(aDtHr)
+	Public Method Epoch_2Dt(nSec)
+  Public Method dateValidateSimple(_dDateToValidate)
+
+Endclass
+
+/*---------------------------------------------------------------------------------------------/
+{tlpp.doc} New
+@description creates a new object
+@type Method of Class DateTLPP
+@author Gabriel Manzoni
+@since 12/2018
+@param type as string (Date, Datetime or DatetimeTz), pValue as string, pFormat as string
+@return object date control
+@example tlpp.dateTLPP():New("DATE", "01/01/2019", "99/99/9999")
+/---------------------------------------------------------------------------------------------*/
+Method New(pType, pValue, pFormat) Class DateTLPP
+	Local cDay
+	Local cMonth
+	Local cYear
+	Local nDay	 	:= 0
+	Local nMonth 	:= 0
+	Local nYear  	:= 0
+	Local cDateAux 	:= ""
+	Local lErrValid := .F.
+	Local cHour
+
+	// Trecho para a criacao de um date padrao, sem qualquer parametro. Adotei o datetime pois o toString de um date
+	// em Java eh um datetime
+	if(Valtype(pType) == 'U' .Or. pType == "")
+		pType  := "DATETIME"
+	endif
+
+	If (pType <> "DATE" .And. pType <> "DATETIME" .And. pType <> "DATETIMETZ")
+		tlpp.error.TlppError(10300)
+    Else
+    	::Type	:= pType
+    Endif
+
+    If (Valtype(pFormat) == 'U' .Or. pFormat == "")
+        If (::Type == "DATE")
+            ::Format := "99/99/99"
+        Elseif (::Type == "DATETIME")
+            ::Format := "99/99/9999 HH:MM:SS.SSS"
+        Else
+            ::Format := "99/99/9999 HH:MM:SS.SSS+HH:MM"
+        Endif
+    Else
+        ::Format := pFormat
+    Endif
+
+    ::DateDelimiter := Substr(::Format, 3,1)
+
+    If (Valtype(pValue) == 'U' .or. Empty(pValue) )
+    	::varDate := DtoS(Date())
+    	::Value   := ::set_format_date(::varDate, ::Type, ::Format)
+
+        If (! ::Type == "DATE")
+        	cHour 		:= IIF(num_entries(::Value, " ") > 1, entry(2, ::Value, " "), "")
+        	lErrValid 	:= ::HourValidate(cHour)
+
+			If (lErrValid)
+				tlpp.error.TlppError(10301)
+        	Endif
+
+        	// Se a hora chega aqui vazia, quer dizer que nao foi setada, portanto deve ter um comportamento padrao
+        	if(Len(cHour) == 0)
+        		cHour := TIME()
+        	endif
+
+        	::Value += " " + ::set_format_hour(cHour, IIF(num_entries(::Format, " ") > 1, entry(2, ::Format, " "), ""))
+
+        	If (::Type == "DATETIMETZ")
+        		::Value += ::Get_utc()
+        	Endif
+
+        	::varHour 	:= mtime(::value)
+        Endif
+    Else
+    	If (Valtype(pValue) == 'D')
+    		::varDate := DtoS(pValue)
+
+    	Elseif (Valtype(pValue) == 'C')
+    		If (num_entries(pValue, " ") > 1)
+    			cDateAux := entry(1, pValue, " ")
+    		Else
+    			cDateAux := pValue
+    		Endif
+
+    		If (num_entries(cDateAux, ::DateDelimiter) > 0)
+    			cDay 	:= Entry(1, cDateAux, ::DateDelimiter)
+    			cMonth 	:= Entry(2, cDateAux, ::DateDelimiter)
+    			cYear  	:= Entry(3, cDateAux, ::DateDelimiter)
+
+    			Set(_SET_EPOCH, 1980)
+
+				If (! IsDigit(cDay))
+					tlpp.error.TlppError(10302)
+				Endif
+
+				If (! IsDigit(cMonth))
+					tlpp.error.TlppError(10303)
+				Endif
+
+    			If (! IsDigit(cYear))
+					tlpp.error.TlppError(10304)
+				Endif
+
+    			nDay	:= Val(cDay)
+    			nMonth	:= Val(cMonth)
+    			nYear	:= Val(cYear)
+
+    			lErrValid := ::DateValidate(nMonth, nDay, nYear)
+
+				If (lErrValid)
+					tlpp.error.TlppError(10305)
+    			Else
+    				::varDate := cToD(cValToChar(nMonth) + "/" + cValToChar(nDay) + "/" + cValToChar(nYear))
+    				::varDate := dToS(::varDate)
+    			Endif
+    		Endif
+    	Endif
+
+    	::Value := ::set_format_date(::varDate, ::Type, ::Format)
+
+        If (! ::Type == "DATE")
+        	cHour := IIF(num_entries(pValue, " ") > 1, entry(2, pValue, " "), "")
+        	lErrValid := ::HourValidate(cHour)
+			If (lErrValid)
+				tlpp.error.TlppError(10306)
+        	Endif
+
+        	::Value += " " + ::set_format_hour(cHour, IIF(num_entries(::Format, " ") > 1, entry(2, ::Format, " "), ""))
+
+        	If (::Type == "DATETIMETZ")
+        		::Value += ::Get_utc()
+        	Endif
+        Endif
+    Endif
+Return self
+
+/*---------------------------------------------------------------------------------------------/
+{tlpp.doc} set_format_date
+@description Set date format
+@type Method of Class DateTLPP
+@author Gabriel Manzoni
+@since 12/14/2018
+@param Date Value, Type, Format
+@return formatted data
+@example ::set_format_date("01/01/2019", "Date", "99/99/9999")
+/---------------------------------------------------------------------------------------------*/
+Method set_format_date(pDateValue, pType, pFormat) Class DateTLPP
+    Local cDate		:= ""
+    Local dDate	:= Nil
+    Local cMask     := ""
+    Local cReturn	:= Nil
+    Local nYear2Dig := 0
+    Local nYear4Dig := 0
+
+    If (Valtype(pDateValue) <> 'U' .And. Valtype(pDateValue) == 'C')
+
+		dDate := cValToChar(s2d(pDateValue))
+
+		If (num_entries(dDate, "/") > 2)
+			nYear2Dig := entry(3, dDate, ::DateDelimiter)
+		Endif
+
+		nYear4Dig := Substr(pDateValue, 1, 4)
+
+        If (pType == "DATE")
+            cMask := "@R " + pFormat
+        Elseif(pType == "DATETIME" .Or. pType == "DATETIMETZ")
+            cMask := "@R " + entry(1, ::Format, " ")
+        Endif
+
+        cDate := Substr(pDateValue, 7, 2) + "" + Substr(pDateValue, 5, 2) + ""
+
+        If (num_entries(pFormat, "/") > 2)
+        	If(Len(entry(3, pFormat, "/")) == 2)
+        		 cDate += nYear2Dig
+        	Else
+        		cDate += nYear4Dig
+        	Endif
+        Endif
+
+        cReturn := Transform(cDate, cMask)
+
+    Endif
+Return cReturn
+
+/*---------------------------------------------------------------------------------------------/
+{tlpp.doc} set_format_hour
+@description Set hour format
+@type Method of Class DateTLPP
+@author Gabriel Manzoni
+@since 12/14/2018
+@param Hour value, Hour format
+@return formatted hour
+@example ::set_format_hour("10:33:00.333", "HH:MM:SS.SSS")
+/---------------------------------------------------------------------------------------------*/
+Method set_format_hour(pHour, pFormatHour) Class DateTLPP
+	Local cHour   	:= ""
+	Local cFormat 	:= pFormatHour
+	Local nEntries	:= 0
+	Local i			:= 0
+
+	If (cFormat == Nil .or. cFormat == "")
+		cFormat := "HH:MM:SS.SSS"
+	Endif
+
+	nEntries := num_entries(cFormat, ":")
+
+	If (pHour == Nil .Or. pHour == "")
+		For i := 1 To nEntries
+			cHour += IIF(cHour == "", "00", ":00")
+		Next
+
+		If (nEntries > 2)
+			If (num_entries(entry(3, cFormat, ":"), ".") > 1)
+				cHour += ".000"
+			Endif
+		Endif
+	Else
+		If (num_entries(pHour, ":") > 0)
+			For i := 1 To nEntries
+				cHour += IIF(! cHour == "", ":", "")
+				If (num_entries(pHour, ":") > (i - 1))
+					cHour += entry(i, pHour, ":")
+				Else
+					cHour += "00"
+				Endif
+			Next
+
+			If (num_entries(cFormat, ":") > 2)
+				If (num_entries(entry(3, cFormat, ":"), ".") > 1)
+					If (num_entries(cHour, ".") < 2)
+						cHour += ".000"
+					Endif
+				Else
+					If (num_entries(cHour, ".") > 1)
+						cHour := entry(1, cHour, ".")
+					Endif
+				Endif
+			Endif
+		Endif
+	Endif
+Return cHour
+
+/*---------------------------------------------------------------------------------------------/
+{tlpp.doc} set_format_hour
+@description Set hour format
+@type Method of Class DateTLPP
+@author ADVPL FRAMEWORK
+@since 12/14/2018
+@param without parameter
+@return UTC (Universal Time Coordinated) of system time
+@example ::get_utc()
+/---------------------------------------------------------------------------------------------*/
+Method Get_UTC() Class DateTLPP
+    Local nDST        := 0 //Indica Horário de Verão para a função
+    Local cServerDate := "20160101"
+    Local cServerTime := "12:00:00"
+    Local aLocalToUtc := LocalToUTC(cServerDate, cServerTime, nDST)
+    Local cUTCDate    := aLocalToUtc[1]
+    Local cUTCTime    := aLocalToUtc[2]
+    Local cRetUTC     := ""
+
+    aLocalToUtc := ASize(aLocalToUtc,0)
+    aLocalToUtc := Nil
+
+    If (cServerTime > cUTCTime) .and. (s2d(cServerDate) == s2d(cUTCDate))
+        //UTC Positivo com Data LOCAL e UTC iguais
+        cRetUTC := "+" + Left(ElapTime(cServerTime,cUTCTime),5)
+    ElseIf (cServerTime < cUTCTime) .and. (s2d(cServerDate) > s2d(cUTCDate))
+        //UTC Positivo com Data Local a Frente da UTC
+        cRetUTC := "+" + Left(ElapTime(cUTCTime,cServerTime),5)
+    ElseIf (cServerTime > cUTCTime) .and. (s2d(cServerDate) < s2d(cUTCDate))
+        //UTC Negativo com Data Local abaixo da data UTC
+        cRetUTC := "-" + Left(ElapTime(cServerTime,cUTCTime),5)
+    ElseIf (cServerTime < cUTCTime) .and. (s2d(cServerDate) == s2d(cUTCDate))
+        //UTC Negativo com Data LOCAL e UTC iguais
+        cRetUTC := "-" + Left(ElapTime(cServerTime,cUTCTime),5)
+    ElseIf (cServerTime == cUTCTime)
+        //UTC igual a 0 = mesmo fuso horario de Londres
+        cRetUTC := "+00:00"
+    EndIf
+Return cRetUTC
+
+/*---------------------------------------------------------------------------------------------/
+{tlpp.doc} DateValidate
+@description Apply date validation
+@type Method of Class DateTLPP
+@author Gabriel Manzoni
+@since 12/14/2018
+@param Month as integer, Day as integer, Year as integer
+@return if an error occurred (.T.) or not (.F.)
+@example ::DateValidate(12,01,2018)
+/---------------------------------------------------------------------------------------------*/
+Method DateValidate(nMonth, nDay, nYear) Class DateTLPP
+    Local lError := .F.
+
+    If (! (nMonth >= 1 .And. nMonth <= 12))
+        lError := .T.
+    Endif
+
+    lYBisexto := ::IsBissexto(nYear)
+    If (lYBisexto)
+        If (nMonth == 2 .And. ! (nDay >= 1 .And. nDay <= 29))
+            lError := .T.
+        Endif
+    Else
+    	If (nMonth == 2 .And. ! (nDay >= 1 .And. nDay <= 28))
+    		lError := .T.
+    	Endif
+    Endif
+
+    If (! (nDay >= 1 .And. nDay <= 31))
+        lError := .T.
+    Endif
+
+    If (nDay > 30)
+        If (! nMonth == 1 .And. ! nMonth == 3 .And. ! nMonth == 5 .And. ! nMonth == 7 .And. ! nMonth == 8 .And. ! nMonth == 10 .And. ! nMonth == 12)
+            lError := .T.
+        Endif
+    Endif
+Return lError
+
+/*---------------------------------------------------------------------------------------------/
+{tlpp.doc} Hour validate
+@description Apply hour validation
+@type Method of Class DateTLPP
+@author Gabriel Manzoni
+@since 12/14/2018
+@param hour
+@return if an error occurred (.T.) or not (.F.)
+@example ::HourValidate("10:00:00.000")
+/---------------------------------------------------------------------------------------------*/
+Method HourValidate(pHour) Class DateTLPP
+	Local cHour 		:= ""
+	Local cMiliseconds	:= ""
+	Local cMinutes	   	:= ""
+	Local cSeconds		:= ""
+	Local lError 		:= .F.
+	Local nSearch2p		:= 1
+
+	If (! pHour == "" .And. ! pHour == Nil .And. Len(pHour) > 2)
+		nSearch2p := Rat(":", pHour)
+	Endif
+
+	If (nSearch2p == 0)
+		lError := .T.
+	Endif
+
+	If (num_entries(pHour, ":") > 0)
+		cHour := entry(1, pHour, ":")
+		If (! IsDigit(cHour))
+			lError := .T.
+			tlpp.error.TlppError(10307)
+		Endif
+	Endif
+
+	If (num_entries(pHour, ":") > 1)
+		cMinutes := entry(2, pHour, ":")
+		If (! IsDigit(cMinutes))
+			lError := .T.
+			tlpp.error.TlppError(10308)
+		Endif
+	Endif
+
+	If (num_entries(pHour, ":") > 2)
+		If (num_entries(entry(3, pHour, ":"), ".") > 1)
+			cSeconds 	 := entry(1, entry(3, pHour, ":"), ".")
+			cMiliseconds := entry(2, entry(3, pHour, ":"), ".")
+			If (! IsDigit(cMiliseconds))
+				lError := .T.
+				tlpp.error.TlppError(10310)
+			Endif
+		Else
+			cSeconds := entry(3, pHour, ":")
+		Endif
+
+		If (! IsDigit(cSeconds))
+			lError := .T.
+			tlpp.error.TlppError(10309)
+		Endif
+	Endif
+Return lError
+
+/*---------------------------------------------------------------------------------------------/
+{tlpp.doc} IsBissexto
+@description Checks whether the year is leap year
+@type Method of Class DateTLPP
+@author Cristiano Denardi
+@since 06/2018
+@param year
+@return whether the year is leap or not
+@example ::IsBissexto(2019)
+/---------------------------------------------------------------------------------------------*/
+Method IsBissexto(xAno) Class DateTLPP
+    Local lRet  := .F.
+    Local nAno  := 0
+    Local lVld  := .T.
+    Local lM4   := .F.
+    Local lM100 := .F.
+    Local lM400 := .F.
+
+    If (Valtype(xAno) == 'C')
+        nAno := Val( xAno )
+    ElseIf (Valtype(xAno) == 'N')
+        nAno := xAno
+    Else
+        lVld := .F.
+    EndIf
+
+    If (lVld)
+        lM4     := Mod(nAno,004) == 0
+        lM100   := Mod(nAno,100) == 0
+        lM400   := Mod(nAno,400) == 0
+
+        If (lM4)
+            If (lM100)
+                lRet := lM400
+            Else
+                lRet := .T.
+            EndIf
+        Else
+            lRet := lM400
+        EndIf
+    EndIf
+Return lRet
+
+/*
+@method_hidden UTC_Seconds
+@description Função semelhante a Seconds() porém com o horário universal UTC (GMT)
+@param N nSec Segundos decorridos desde as 00:00 do horário local
+@return N nSecUTC	Segundos decorridos desde às 00:00 UTC
+@author tlppCore
+@since 11/2020
+@version 1.0
+@obs método criado por necessidade de validação dos tokens oAuth2
+*/
+Method UTC_Seconds(nSec) class DateTLPP
+
+	Local nDif	AS NUMERIC
+
+	DEFAULT nSec := Seconds()
+
+	nDif := -3600 * Val(::Get_UTC())
+
+Return nSec + nDif
+
+/*
+@method_hidden Dt_2Epoch
+@description Método de conversão de data no formato Data e UTC_Seconds para epoch
+@param A aDtHr Array contendo a data na primeira posição e os segundos restantes na segunda
+@return N nSec Numérico contendo o segundos decorridos desde 00:00:00 de 01/01/1970 até a data informada
+@author tlppCore
+@since 11/2020
+@version v1
+*/
+Method Dt_2Epoch(aDtHr) class dateTLPP
+
+Local nSec := 0
+Local dBase := _JWT_EPOCH
+
+nSec += (aDtHr[1] - dBase) * 86400
+nSec += aDtHr[2]
+
+Return Int(nSec)
+
+/*
+@method_hidden Epoch_2Dt
+@description Função de conversão de data no formato epoch para Data e UTC_Seconds
+@param nSec	Numérido contendo o segundos decorridos desde 00:00:00 de 01/01/1970
+@return aDtHr	Array contendo a data na primeira posição e os segundos restantes na segunda
+@author tlppCore
+@since 11/2020
+@version v1
+*/
+Method Epoch_2Dt(nSec) class dateTLPP
+
+Local aDtHr := Array(2)
+Local dBase := _JWT_EPOCH
+
+aDtHr[1] := dBase + Int(nSec/86400)
+aDtHr[2] := Int(nSec%86400)
+
+Return aDtHr
+
+/*
+@method_hidden dateValidSimple
+@description Método que verifica se a data passada é valida dentro dos padrões atuais
+@param D _dDateToValidate Date contendo a data a ser avaliada
+@return L lIsValidDate Logical contendo .T. se é uma data válida ou .F. caso contrário.
+@author tlppCore
+@since 11/2020
+@version v1
+*/
+Method dateValidateSimple(_dDateToValidate) class dateTLPP
+
+  local lIsValidDate := .T. AS LOGICAL
+  local nDay := 0 AS NUMERIC
+  local nMonth := 0 AS NUMERIC
+  local nYear := 0 AS NUMERIC
+
+  if empty(_dDateToValidate) .or. valtype(_dDateToValidate) <> 'D'
+    return .F.
+  endif
+
+  nDay := Day(_dDateToValidate)
+  nMonth := Month(_dDateToValidate)
+  nYear := Year(_dDateToValidate)
+
+  if nDay == 0 ;
+    .or. nMonth == 0 ;
+    .or. nYear == 0
+    return .F.
+  endif
+
+return lIsValidDate
