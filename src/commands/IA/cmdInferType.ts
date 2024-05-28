@@ -46,7 +46,7 @@ export function registerInfer(context: vscode.ExtensionContext): void {
             }
 
             const selection: vscode.Selection = editor.selection;
-            const function_re: RegExp = /(function|method(...)class)\s*(\w+)/i
+            const function_re: RegExp = /(function|method(.*)class)\s*(\w+)/i
             const return_re: RegExp = /^\s*(Return|EndClass)/i
             const curPos: vscode.Position = selection.start;
             let whatAnalyze: string = "";
