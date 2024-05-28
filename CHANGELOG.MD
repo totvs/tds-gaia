@@ -8,6 +8,12 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.0.NEXT
+
+### Correções
+
+- Tipificação: identificação da implementação de métodos.
+
 ## TDS-Gaia 0.0.11
 
 ### Correções
