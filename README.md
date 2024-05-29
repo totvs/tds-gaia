@@ -61,7 +61,7 @@ posicione o cursor em algum local do fonte, comece a digitar código AdvPL/TLPP 
 |                 |               | **Dica:** Ao ser apresentada a sugestão posicione o _mouse_ sobre ela para obter uma lista de opções.  |
 | Explicação*     | Ctrl+D Ctrl+E | Explica o código da linha corrente ou bloco. |
 |                 | Ctrl+D Ctrl+W | Explica a palavra corrente (sob o cursor). |
-| Tipificação*    | Ctrl+D Ctrl+T | Tipifica variáveis de uma função/método. |
+| Tipificação     | Ctrl+D Ctrl+T | Tipifica variáveis de uma função/método. |
 | Geração Código* | Ctrl+D Ctrl+G | Geração de código a partir de uma descrição selecionada no fonte corrente. |
 
 _* Funcionalidades ainda em desenvolvimento. Podem levar 1 minuto ou mais para responder e apresentar respostas inesperadas._
