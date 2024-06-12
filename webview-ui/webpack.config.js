@@ -89,6 +89,9 @@ module.exports = (env, argv) => {
         ".bundle.json",
         ".bundle.*.json"
       ],
+      alias: {
+        react: path.resolve('./node_modules/react')
+      }
     },
     module: {
       rules: [
