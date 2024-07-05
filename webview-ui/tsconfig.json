@@ -1,11 +1,5 @@
 {
   "compilerOptions": {
-    // "allowSyntheticDefaultImports": true,
-    // "experimentalDecorators": true,
-    //"allowJs": true,
-    //"declaration": true,
-    //"declarationMap": true,
-    //"esModuleInterop": false,
     "forceConsistentCasingInFileNames": false,
     "isolatedModules": true,
     "esModuleInterop": true,
@@ -17,11 +11,10 @@
     ],
     "module": "CommonJS",
     "moduleResolution": "node",
-    //"noEmit": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
-    "target": "ES5",
+    "target": "es2020",
     "useDefineForClassFields": true,
   },
   "include": [

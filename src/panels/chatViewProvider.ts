@@ -21,11 +21,9 @@ import { logger } from '../logger';
 import { highlightCode } from '../decoration';
 import { dataCache } from '../dataCache';
 import { chatApi, feedbackApi } from '../api';
-import { TChatModel } from '../model/chatModel';
-import { MessageOperationEnum, TMessageModel } from '../model/messageModel';
-import { CommonCommandEnum, ReceiveMessage } from '../utilities/common-command-webview';
 import { getExtraPanelConfigurations, getWebviewContent } from '../utilities/webview-utils';
-import { TFieldErrors } from './panel';
+import { CommonCommandFromWebViewEnum, CommonCommandToWebViewEnum, ReceiveMessage, TChatModel, TFieldErrors, TMessageModel } from 'tds-shared/lib';
+import { MessageOperationEnum } from 'tds-shared/lib/models/messageModel';
 
 export enum ChatCommandEnum {
   Feedback = "FEEDBACK",
@@ -43,7 +41,7 @@ const LINK_POSITION_RE = /([^&]+)&(\d+)(:(\d+)?(\-(\d+):(\d+)))?/i
  * Type alias for chat commands that are both CommonCommandFromWebViewEnum 
  * and ChatCommandEnum. Allows handling commands from both enums in one type.
  */
-type ChatCommand = CommonCommandEnum & ChatCommandEnum;
+type ChatCommand = CommonCommandFromWebViewEnum & ChatCommandEnum;
 
 /**
  * ChatViewProvider implements the webview for the chat panel. 
@@ -119,6 +117,13 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this._view = webviewView;
 
+    webviewView.onDidChangeVisibility(() => {
+      if (this._view?.visible) {
+        chatApi.gaia("refresh", {});
+        //this._view.webview.reveal(); //vscode.ViewColumn.One
+      }
+    })
+
     webviewView.webview.options = {
       ...getExtraPanelConfigurations(this._extensionUri),
       enableCommandUris: true
@@ -158,20 +163,20 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         let matches: RegExpMatchArray | null = null;
 
         switch (command) {
-          case CommonCommandEnum.Ready:
+          case CommonCommandFromWebViewEnum.Ready:
             if (data.model == undefined) {
               this.sendUpdateModel(this.chatModel, undefined);
             }
 
             break;
-          case CommonCommandEnum.Save:
+          case CommonCommandFromWebViewEnum.Save:
             if (data.model.newMessage.trim() !== "") {
               chatApi.user(data.model.newMessage, true);
               data.model.newMessage = "";
             }
 
             break;
-          case CommonCommandEnum.LinkMouseOver:
+          case CommonCommandFromWebViewEnum.LinkMouseOver:
             let ok: boolean = false;
 
             matches = data.command.match(LINK_SOURCE_RE);
@@ -260,7 +265,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     }
 
     this._view!.webview.postMessage({
-      command: CommonCommandEnum.UpdateModel,
+      command: CommonCommandToWebViewEnum.UpdateModel,
       data: {
         model: { ...model, messages: messagesToSend },
         errors: errors

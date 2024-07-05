@@ -1,6 +1,7 @@
 #include "protheus.ch"
 
-// gerar diálogo solicitando usuário e senha
+//acandido:b8L7dgzQFYhnKP2k39VcsC:de6fda60-44ba-4f4f-b775-2220f15b10b6:6fd49b28-bbca-41b3-a694-de5f5a61cfcb
+
 user function dlglogin()
 	local oDlg
 	local oButton1

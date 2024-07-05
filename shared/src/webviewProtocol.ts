@@ -1,5 +1,5 @@
 /*
-Copyright 2024 TOTVS S.A
+Copyright 2021 TOTVS S.A
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TModelPanel } from "../panels/panel";
-import { TMessageModel } from "./messageModel";
-
-/**
- * Defines the shape of the chat model interface which extends 
- * TAbstractModel and contains properties for lastPublication, 
- * loggedUser, newMessage, and messages.
- */
-export type TChatModel = TModelPanel & {
-  command: string;
-  lastPublication: Date;
-  loggedUser: string;
-  newMessage: string;
-  messages: TMessageModel[];
+export enum CommonCommandFromWebViewEnum {
+	AfterSelectResource = "AFTER_SELECT_RESOURCE",
+	Close = "CLOSE",
+	Ready = "READY",
+	Reset = "RESET",
+	Save = "SAVE",
+	SaveAndClose = "SAVE_AND_CLOSE",
+	SelectResource = "SELECT_RESOURCE",
+	LinkMouseOver = "LINK_MOUSE_OVER",
+	CopyToClipboard = "COPY_TO_CLIPBOARD"
 }
+
+export type CommonCommandFromWebView = CommonCommandFromWebViewEnum;
+
+export enum CommonCommandToWebViewEnum {
+	InitialData = "INITIAL_DATA",
+	UpdateModel = "UPDATE_MODEL",
+}
+

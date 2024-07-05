@@ -1,57 +1,37 @@
+/*
+Copyright 2024 TOTVS S.A
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http: //www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import * as vscode from "vscode";
-import { CommonCommandEnum, ReceiveMessage } from "../utilities/common-command-webview";
+import { ReceiveMessage, TAbstractModelPanel, TFieldErrors, CommonCommandToWebViewEnum, CommonCommandFromWebViewEnum, TSendSelectResourceProps } from "tds-shared/lib";
 
-export type TErrorType =
-	"required"
-	| "min"
-	| "max"
-	| "minLength"
-	| "maxLength"
-	| "pattern"
-	| "validate"
-	| "warning";
-
-export type TFieldError = {
-	type: TErrorType;
-	message?: string
-};
-
-export type TFieldErrors<M> = Partial<Record<keyof M | "root", TFieldError>>;
-
-export function isErrors<M>(errors: TFieldErrors<M>) {
-	return Object.keys(errors).length > 0
-};
-
-export type TModelPanel = {
-
-}
-
-export type TSendSelectResourceProps = TModelPanel & {
-	firedBy: string;
-	canSelectMany: boolean,
-	canSelectFiles: boolean,
-	canSelectFolders: boolean,
-	currentFolder: string,
-	title: string,
-	openLabel: string,
-	filters: {
-		[key: string]: string[]
-	}
-}
-
-export abstract class TdsPanel<M extends TModelPanel> {
+export abstract class TdsPanel<M extends TAbstractModelPanel, O extends any = {}> {
 
 	protected readonly _panel: vscode.WebviewPanel;
 	protected _disposables: vscode.Disposable[] = [];
+	protected _options: O;
 
 	/**
-	 * The TdsPanel class protected constructor (called only from the render method).
+	 * The  TdsPanel class protected constructor (called only from the render method).
 	 *
 	 * @param panel A reference to the webview panel
 	 * @param extensionUri The URI of the directory containing the extension
 	 */
-	protected constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+	protected constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, options: any = {}) {
 		this._panel = panel;
+		this._options = options;
 
 		// Set an event listener to listen for when the panel is disposed (i.e. when the user closes
 		// the panel or when the panel is closed programmatically)
@@ -88,7 +68,7 @@ export abstract class TdsPanel<M extends TModelPanel> {
 	 * are created and inserted into the webview HTML.
 	 *
 	 * @param extensionUri The URI of the directory containing the extension
-	 * @returns A template string literal containing the HTML that should be
+	 * @returns A _template_ string literal containing the HTML that should be
 	 * rendered within the webview panel
 	 */
 	protected abstract getWebviewContent(extensionUri: vscode.Uri): string;
@@ -117,7 +97,7 @@ export abstract class TdsPanel<M extends TModelPanel> {
 
 	protected sendUpdateModel(model: M, errors: TFieldErrors<M>): void {
 		this._panel.webview.postMessage({
-			command: CommonCommandEnum.UpdateModel,
+			command: CommonCommandToWebViewEnum.UpdateModel,
 			data: {
 				model: model,
 				errors: errors
@@ -125,7 +105,7 @@ export abstract class TdsPanel<M extends TModelPanel> {
 		});
 	}
 
-	protected abstract panelListener<C extends CommonCommandEnum, T>(message: ReceiveMessage<C, M>, result: any): Promise<T>;
+	protected abstract panelListener<C extends CommonCommandFromWebViewEnum, T>(message: ReceiveMessage<C, M>, result: any): Promise<T>;
 
 	private async defaultListener<T>(message: ReceiveMessage<any, M>): Promise<T> {
 		let result: any = undefined;
@@ -133,12 +113,12 @@ export abstract class TdsPanel<M extends TModelPanel> {
 		const data = message.data;
 
 		switch (command) {
-			case CommonCommandEnum.Save:
-			case CommonCommandEnum.SaveAndClose:
+			case CommonCommandFromWebViewEnum.Save:
+			case CommonCommandFromWebViewEnum.SaveAndClose:
 				let errors: TFieldErrors<M> = {};
 				try {
 					if (await this.validateModel(data.model, errors)) {
-						if (await this.saveModel(data.model) && (command == CommonCommandEnum.SaveAndClose)) {
+						if (await this.saveModel(data.model) && (command == CommonCommandFromWebViewEnum.SaveAndClose)) {
 							this.dispose();
 						} else {
 							this.sendUpdateModel(data.model, errors);
@@ -147,17 +127,17 @@ export abstract class TdsPanel<M extends TModelPanel> {
 						this.sendUpdateModel(data.model, errors);
 					}
 				} catch (error) {
-					errors.root = { type: "validate", message: `Internal error: ${error}` }
+					//errors.root = { type: "validate", message: `Internal error: ${error}` }
 					this.sendUpdateModel(data.model, errors);
 				}
 
 				break;
 
-			case CommonCommandEnum.Close:
+			case CommonCommandFromWebViewEnum.Close:
 				this.dispose();
 
 				break;
-			case CommonCommandEnum.SelectResource:
+			case CommonCommandFromWebViewEnum.SelectResource:
 				const selectionProps: TSendSelectResourceProps = data as unknown as TSendSelectResourceProps;
 				let filters = selectionProps.filters || {};
 
@@ -165,18 +145,22 @@ export abstract class TdsPanel<M extends TModelPanel> {
 					filters["All files"] = ["*"];
 				}
 
+				//selectionProps.fileSystem = "serverFS";
+
 				const options: vscode.OpenDialogOptions = {
 					canSelectMany: selectionProps.canSelectMany,
 					canSelectFiles: selectionProps.canSelectFiles,
 					canSelectFolders: selectionProps.canSelectFolders,
-					defaultUri: vscode.Uri.file(selectionProps.currentFolder),
+					defaultUri: selectionProps.fileSystem
+						? vscode.Uri.parse(`${selectionProps.fileSystem}:///${selectionProps.currentFolder}`)
+						: vscode.Uri.file(selectionProps.currentFolder),
 					title: selectionProps.title,
 					openLabel: selectionProps.openLabel,
 					filters: filters
 				};
 
 				result = await vscode.window.showOpenDialog(options).then((fileUri) => {
-					message.command = CommonCommandEnum.AfterSelectResource;
+					message.command = CommonCommandFromWebViewEnum.AfterSelectResource;
 					return fileUri
 				});
 				break;

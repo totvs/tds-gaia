@@ -86,13 +86,12 @@ export default function GenerateCodeView() {
       <TdsPage title={tdsVscode.l10n.t("Generate Code")} linkToDoc={tdsVscode.l10n.t("[Code generation]generateCode.md")} >
         <TdsForm<TFields>
           id="frmGenerateCode"
-          methods={methods}
+          methods={methods as any}
           onSubmit={onSubmit}
           actions={actions}>
 
           <section className="tds-row-container" >
             <TdsTextField
-              methods={methods}
               name="description"
               label={tdsVscode.l10n.t("Description")}
               info={tdsVscode.l10n.t("Describe what you want the generated code to do.")}
@@ -105,7 +104,6 @@ export default function GenerateCodeView() {
 
           <section className="tds-row-container" >
             <TdsTextField
-              methods={methods}
               name="generateCode"
               label={tdsVscode.l10n.t("Code")}
               info={tdsVscode.l10n.t("Code generated from the description.")}

@@ -75,7 +75,7 @@ export function registerHealth(context: vscode.ExtensionContext): void {
                                 },
                                 (reason: string) => {
                                     vscode.window.showErrorMessage(`${PREFIX_GAIA} ${reason}`);
-                                    logger.info(reason)
+                                logger.info(reason)
                                 }
                             );
                         } else if (totalAttempts != 0) {

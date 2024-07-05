@@ -175,13 +175,13 @@ export function ChatView() {
         <section className="tds-footer">
           <TdsForm<TFields>
             id="chatForm"
-            methods={methods}
+            methods={methods as any}
             onSubmit={onSubmit}
             actions={actions}
             isProcessRing={false}
           >
             <section className="tds-row-container" >
-              <NewMessage methods={methods} />
+              <NewMessage />
             </section>
           </TdsForm>
         </section>

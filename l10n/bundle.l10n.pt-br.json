@@ -37,7 +37,7 @@
   "Error requesting [type: {0}, url: {1}]": "Erro solicitando [Tipo: {0}, url: {1}]",
   "Explaining word **{0}** {1}": "Explicando palavra ** {0} ** {1}",
   "Failed to automatic login": "Falhou em fazer login automático",
-  "Feedback Service is running": "O serviço de feedback está em execução",
+  "Feedback Service is running": "O serviço de Feedback em execução",
   "Generate Code": "Gerar código",
   "Generating code...": "Gerando código...",
   "Generating the code as requested.": "Gerando o código conforme solicitado.",

@@ -18,9 +18,10 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { getGaiaUser, isGaiaLogged, isGaiaReady } from "../config";
 import { Queue } from "../queue";
-import { MessageOperationEnum, TMessageModel } from "../model/messageModel";
 import { exit } from "process";
 import { isGaiaFirstUse, isGaiaUpdated, updateGaiaLastLogin } from "../extension";
+import { TMessageModel } from "tds-shared/lib";
+import { MessageOperationEnum } from "tds-shared/lib/models/messageModel";
 
 /**
  * Defines the queue message type for chat messages.
