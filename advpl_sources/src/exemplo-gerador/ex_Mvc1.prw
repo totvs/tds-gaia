@@ -35,6 +35,8 @@ static Function ModelDef()
 	oModel:SetDescription("Cadastro de Clientes")
 	oModel:GetModel("FORMSA1"):SetDescription("Formul�rio do Cadastro Cliente")
 
+
+		
 Return oModel
 
 Static Function ViewDef()

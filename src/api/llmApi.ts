@@ -188,11 +188,11 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
      */
     async getCompletions(textBeforeCursor: string, textAfterCursor: string): Promise<CompletionResponse> {
         //logger.profile("getCompletions");
-        logger.info(vscode.l10n.t("Code completions..."));
-
         if (!this.ready) {
             return Promise.resolve({ completions: [] });
         }
+
+        logger.info(vscode.l10n.t("Code completions..."));
 
         const config: TGaiaConfig = getGaiaConfiguration();
         const body: {} = {

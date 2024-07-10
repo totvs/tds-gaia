@@ -17,6 +17,17 @@ limitations under the License.
 import * as vscode from "vscode";
 import { ReceiveMessage, TAbstractModelPanel, TFieldErrors, CommonCommandToWebViewEnum, CommonCommandFromWebViewEnum, TSendSelectResourceProps } from "tds-shared/lib";
 
+/**
+ * A message sent from the extension host to the webview.
+ */
+export type TPostMessage<M> = {
+	command: CommonCommandToWebViewEnum.UpdateModel;
+	data: {
+		model: M,
+		errors: TFieldErrors<M>
+	}
+}
+
 export abstract class TdsPanel<M extends TAbstractModelPanel, O extends any = {}> {
 
 	protected readonly _panel: vscode.WebviewPanel;
@@ -96,13 +107,24 @@ export abstract class TdsPanel<M extends TAbstractModelPanel, O extends any = {}
 	protected abstract saveModel(model: M): Promise<boolean> | boolean;
 
 	protected sendUpdateModel(model: M, errors: TFieldErrors<M>): void {
-		this._panel.webview.postMessage({
+		this.post<M>({
 			command: CommonCommandToWebViewEnum.UpdateModel,
 			data: {
 				model: model,
 				errors: errors
 			}
 		});
+	}
+
+	private post<M>(pkg: TPostMessage<M>): void {
+		this._panel.webview.postMessage(pkg)
+			.then((result: boolean) => {
+				if (result) {
+					console.log("Message posted");
+				} else {
+					console.log("Message not posted");
+				}
+			});
 	}
 
 	protected abstract panelListener<C extends CommonCommandFromWebViewEnum, T>(message: ReceiveMessage<C, M>, result: any): Promise<T>;
