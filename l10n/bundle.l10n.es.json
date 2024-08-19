@@ -2,7 +2,7 @@
   "- {0} as **{1}** {2}": "- {0} como **{1}** {2}",
   "- A shortcut;": "- Un atajo;",
   "- By a link presented in this chat;": "- Por un enlace presentado en este chat;",
-  "- By the command panel (`ctrl+shift+p` or `f1`), filtering by 'tds-gaia';": "- Por el panel de comando(`ctrl+shift+p` or `f1`), Filtrado por `tds-gaia`;",
+  "- By the command panel (`Ctrl`+`Shift`+`P`), filtering by 'tds-gaia';": "- Por el panel de comando(`Ctrl`+`Shift`+`P`), Filtrado por `tds-gaia`;",
   "- Context menu of the chat or source in edition.": "- Menú contextual del chat o fuente en la edición.",
   "- Typing the command in the prompt chat;": "- Escribiendo el comando en el chat de inmediato;",
   "{0} Failed to automatic login": "{0} No se pudo inicio de sesión automático",

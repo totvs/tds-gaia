@@ -125,14 +125,14 @@ The extension is already set ready for use, not requiring any additional setting
 
 #### Login
 
-- Practice the authentication in **TDS-Gaia** (`f1` `TDS-Gaia: login`) or `accounts` (below) and acts` `sign in to TDS-Gaia ...` `
+- Practice the authentication in **TDS-Gaia** (`Ctrl`+`Shift`+`P`, `TDS-Gaia: login`) or `accounts` (below) and acts` `sign in to TDS-Gaia ...` `
 - Enter _Token_ Access. 
 
 ![Authentication](docs/login.png)
 
 #### Disconnect (não é obrigatório)
 
-- Practice the procedure in **TDS-Gaia** (`f1` `TDS-Gaia: logout`) or `accounts` (below)) and in your identification, trigger` `sign out``
+- Practice the procedure in **TDS-Gaia** (`Ctrl`+`Shift`+`P`, `TDS-Gaia: logout`) or `accounts` (below)) and in your identification, trigger` `sign out``
 
 ![Disconnect](docs/logout.png)
 
@@ -141,7 +141,7 @@ The extension is already set ready for use, not requiring any additional setting
 You can use the features through commands, which can be triggered in various ways.
 
 - Triggering a shortcut;
-- Triggering the command panel (`ctrl+shift+p` or` f1`), start typing the command to filter and activate it when located;
+- Triggering the command panel (`Ctrl`+`Shift`+`P` or` f1`), start typing the command to filter and activate it when located;
 - Triggering links in chat;
 - Typing the command by the chat prompt;
 - Triggering the chat context menu or edition source. 

@@ -87,7 +87,7 @@ Acione  o botão `Instalar`. Após completar a instalação, o botão `Instalar`
 
 ### Instalando de um arquivo VSIX
 
-Você pode instalar manualmente uma extensão do **VS Code** que foi empacotada em um arquivo `.vsix`. Utilize o comando `Instalar do VSIX...` na visão de extensões após acionar `Modo de Exibição e Mais Ações...` (ícone com "...") ou acione o comando `Extensões: Instalar do VSIX...` no painel de comandos (`CTRL+SHIFT+P`) e selecione o arquivo `.vsix`.
+Você pode instalar manualmente uma extensão do **VS Code** que foi empacotada em um arquivo `.vsix`. Utilize o comando `Instalar do VSIX...` na visão de extensões após acionar `Modo de Exibição e Mais Ações...` (ícone com "...") ou acione o comando `Extensões: Instalar do VSIX...` no painel de comandos (`Ctrl`+`Shift`+`P`) e selecione o arquivo `.vsix`.
 
 Acesse [releases](https://github.com/totvs/tds-gaia/releases) para baixar a última versão liberada.
 
@@ -122,14 +122,14 @@ A extensão já vem configurada pronto para uso, não requerendo nenhuma configu
 
 #### Login
 
-- Acione a autenticação no **TDS-Gaia** (`F1` `TDS-Gaia: Login`) ou `Accounts` (abaixo) e acione ``Sign In to TDS-Gaia...``
+- Acione a autenticação no **TDS-Gaia** (`Ctrl`+`Shift`+`P`, `TDS-Gaia: Login`) ou `Accounts` (abaixo) e acione ``Sign In to TDS-Gaia...``
 - Informe o _token_ de acesso. 
 
 ![Autenticação](docs/login.png)
 
 #### Desconectar (não é obrigatório)
 
-- Acione o procedimento no **TDS-Gaia** (`F1` `TDS-Gaia: Logout`) ou `Accounts` (abaixo)) e na sua identificação, acione ``Sign Out``
+- Acione o procedimento no **TDS-Gaia** (`Ctrl`+`Shift`+`P`, `TDS-Gaia: Logout`) ou `Accounts` (abaixo)) e na sua identificação, acione ``Sign Out``
 
 ![Desconexão](docs/logout.png)
 
@@ -138,7 +138,7 @@ A extensão já vem configurada pronto para uso, não requerendo nenhuma configu
 Você pode utilizar  as funcionalidades através de comandos, que podem ser acionados de diversas formas. 
 
 - Acionando um atalho;
-- Acionando o painel de comandos (`ctrl+shit+p` ou `F1`), comece a digitar o comando para filtrar e acione-o quando localizado;
+- Acionando o painel de comandos (`Ctrl`+`Shift`+`P`), comece a digitar o comando para filtrar e acione-o quando localizado;
 - Acionando ligações no bate-papo;
 - Digitando o comando pelo _prompt_ do bate-bato;
 - Acionando o menu de contexto do bate-papo ou fonte em edição. 

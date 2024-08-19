@@ -28,7 +28,7 @@ export function registerLogout(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.logout', async (...args) => {
         if (isGaiaLogged()) {
             chatApi.gaia(
-                vscode.l10n.t("To logout of the **TDS-Gaia**, please click in ``Accounts`` and in your identification, click in ``Sign Out``"),
+                vscode.l10n.t("To logout of the **TDS-Gaia**, please click in `Accounts` and in your identification, click in `Sign Out`"),
                 { answeringId: "" });
         }
     }));
