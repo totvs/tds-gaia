@@ -18,7 +18,7 @@ User Function WFBloqueioAcessoFerias()
 
 	BEGINSQL ALIAS cAliasControle
         SELECT * FROM VW_WF_BLOQUEIO_FERIAS ORDER BY RF_MAT ASC
-    ENDIF 
+    ENDSQL 
 		//Posicionando na tabela para gravar informação no novo campo criado 
 		dbSelectArea(cAliasControle)
 		(cAliasControle)->dbSetOrder(1)
