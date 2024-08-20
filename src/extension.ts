@@ -79,12 +79,9 @@ export function deactivate() {
 function handleConfigChange(context: vscode.ExtensionContext) {
 	const listener: vscode.Disposable = vscode.workspace.onDidChangeConfiguration(async event => {
 		if (event.affectsConfiguration('tds-gaia')) {
-			updateContextKey("logged", isGaiaLogged());
 			logger.level = getGaiaLogLevel();
 		}
 	});
-
-	updateContextKey("logged", isGaiaLogged());
 
 	context.subscriptions.push(listener);
 }

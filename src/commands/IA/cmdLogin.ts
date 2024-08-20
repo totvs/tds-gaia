@@ -17,9 +17,8 @@ limitations under the License.
 import * as vscode from "vscode";
 import { PREFIX_GAIA, logger } from "../../logger";
 import { GaiaAuthenticationProvider, getGaiaSession } from "../../authenticationProvider";
-import { feedbackApi, llmApi } from "../../api";
-import { getGaiaUser, isGaiaLogged } from "../../config";
-import { updateContextKey } from '../../util';
+import { chatApi, feedbackApi, llmApi } from "../../api";
+import { getGaiaUser } from "../../config";
 
 export function registerLogin(context: vscode.ExtensionContext): void {
 
@@ -36,18 +35,23 @@ export function registerLogin(context: vscode.ExtensionContext): void {
         let session: vscode.AuthenticationSession | undefined = await getGaiaSession();
 
         if (session !== undefined) { // If a session is already stored, attempt auto-login.
-            await vscode.commands.executeCommand("tds-gaia.afterLogin");
+            vscode.commands.executeCommand("tds-gaia.afterLogin", true).then(() => {
+                chatApi.checkUser("");
+            });
             return;
         };
 
         if (args.length > 0 && args[0] === true) { //login automático
+            chatApi.checkUser("");
             return;
         }
 
         session = await vscode.authentication.getSession(GaiaAuthenticationProvider.AUTH_TYPE, [], { createIfNone: true });
 
         if (session !== undefined) {
-            vscode.commands.executeCommand("tds-gaia.afterLogin");
+            vscode.commands.executeCommand("tds-gaia.afterLogin", true).then(() => {
+                chatApi.checkUser("");
+            });
         }
     }));
 
@@ -66,8 +70,7 @@ export function registerLogin(context: vscode.ExtensionContext): void {
 
                 const [_, publicKey, secretKey] = session.scopes[0].split(":");
                 feedbackApi.start(publicKey, secretKey);
-                //feedbackApi.eventLogin();
-                updateContextKey("logged", isGaiaLogged());
+                feedbackApi.eventLogin();
             } else {
                 logger.error(vscode.l10n.t('Failed to automatic login'));
                 vscode.window.showErrorMessage(vscode.l10n.t("{0} Failed to automatic login", PREFIX_GAIA));

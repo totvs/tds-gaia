@@ -72,9 +72,9 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
         let result: boolean = false;
         const parts: string[] = email.split("@");
 
-        if (!this.ready) {
-            return Promise.resolve(false);
-        }
+        // if (!this.ready) {
+        //     return Promise.resolve(false);
+        // }
 
         this.authorization = authorization;
         //obter informações usuário 

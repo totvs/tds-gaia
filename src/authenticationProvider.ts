@@ -16,7 +16,7 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { Disposable } from "vscode";
-import { PromiseAdapter, promiseFromEvent } from "./util";
+import { PromiseAdapter, promiseFromEvent, updateContextKey } from "./util";
 import { LoggedUser, getGaiaUser } from "./config";
 import { randomUUID } from "crypto";
 import { chatApi, feedbackApi, llmApi } from "./api";
@@ -83,8 +83,6 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
                     id: userInfo?.email || "unknown",
                 },
                 scopes: [
-                    //pk-lf-b1633e3c-c038-4dbe-af55-82bf21be0fd5
-                    //sk-lf-bdad2a8c-f646-4ab6-886a-66401033cc48
                     `feedback:${feedbackPK}:${feedbackSK}`
                 ]
             };
@@ -224,13 +222,9 @@ export function registerAuthentication(context: vscode.ExtensionContext) {
         vscode.authentication.onDidChangeSessions(async e => {
             if (e.provider.id === AUTH_TYPE) {
                 const session: vscode.AuthenticationSession | undefined = await getGaiaSession();
+                updateContextKey("logged", session !== undefined);
 
                 if (session) {
-                    // //chatApi.checkUser("");
-
-                    // const [_, publicKey, secretKey] = session.scopes[0].split(":");
-                    // feedbackApi.start(publicKey, secretKey);
-                    // feedbackApi.eventLogin();
                     vscode.commands.executeCommand('tds-gaia.afterLogin');
                 } else {
                     vscode.commands.executeCommand('tds-gaia.afterLogout');

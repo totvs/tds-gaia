@@ -54,7 +54,7 @@ export function registerHealth(context: vscode.ExtensionContext): void {
 
                 if (error !== undefined) {
                     let message: string[] = [
-                        vscode.l10n.t("Sorry, I have technical difficulties."),
+                        vscode.l10n.t("Sorry, I have technical difficulties. Attempt {0} of {1}.", attempt, totalAttempts),
                         vscode.l10n.t("See console log for more details."),
                     ];
                     vscode.window.showErrorMessage(`${PREFIX_GAIA} ${message.join(" ")}`);
@@ -75,7 +75,7 @@ export function registerHealth(context: vscode.ExtensionContext): void {
                                 },
                                 (reason: string) => {
                                     vscode.window.showErrorMessage(`${PREFIX_GAIA} ${reason}`);
-                                logger.info(reason)
+                                    logger.info(reason)
                                 }
                             );
                         } else if (totalAttempts != 0) {
@@ -90,7 +90,7 @@ export function registerHealth(context: vscode.ExtensionContext): void {
                     }
                 } else {
                     vscode.commands.executeCommand("tds-gaia.login", true).then(() => {
-                        chatApi.checkUser(messageId);
+                        //chatApi.checkUser(messageId);
                     });
                 }
             })
