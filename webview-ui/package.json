@@ -10,6 +10,7 @@
   "scripts": {
     "-- COMPILE --": "",
     "compile": "webpack --mode=development",
+    "start:vite": "vite",
     "-- BUILD --": "",
     "build": "webpack --mode=production"
   },
@@ -21,7 +22,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.52.1",
     "react-intl": "^6.6.8",
-    "tds-shared": "file:./shared"
+    "tds-shared": "file:../shared"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -35,6 +36,8 @@
     "typescript": "^5.5.3",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4",
-    "webpack-stream": "^7.0.0"
+    "webpack-stream": "^7.0.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.3.5"
   }
 }

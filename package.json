@@ -366,6 +366,8 @@
     ]
   },
   "scripts": {
+    "clean-node": "npx -y rimraf -v node_modules webview-ui/node_modules",
+    "clean": "npx -y rimraf -v build out webview-ui/build",
     "--BUILD--": "",
     "compile": "npm-run-all compile:*",
     "compile:shared": "cd shared && npm run compile",
