@@ -8,8 +8,7 @@
 
 ## Inteligência Artificial (AdvPL++ LLM Web API)
 
-- :walking: API para uso da inteligência artificial.
-
+- :white_check_mark: API para uso da inteligência artificial.
 - :white_check_mark: :alarm_clock: Identificação de usuário (_login_).
   Efetuado parcialmente. Necessita de revisão de todo o processo.
 
@@ -29,7 +28,7 @@
 
 ## API: Inteligência Artificial (interface IaApiInterface)
 
-- :walking: API para a inteligência artificial.
+- :white_check_mark: API para a inteligência artificial.
 
 - :white_square_button: Mensagens associadas a processamento.
   Encapsular o processamento e passar como _callback_ para ChatApi.Gaia e esse passa a tratar o retorno da mensagem (`messageId`).
@@ -56,8 +55,8 @@
 
 ## API: Bate-papo (classe ChatApi)
 
-- :walking: API para bate-papo.
-- :walking: Implementar substituição de texto ao fazer o typify
+- :white_check_mark: API para bate-papo.
+- :white_check_mark: Implementar substituição de texto ao fazer o typify
 
 - :white_square_button: Detalhar a `ajuda`(_help_) dos comandos.
 - :white_square_button: Melhorar/implementar tratamento de argumentos em comandos.
