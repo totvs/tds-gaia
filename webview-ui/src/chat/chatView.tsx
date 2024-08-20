@@ -16,7 +16,7 @@ limitations under the License.
 
 import "./chatView.css";
 import React from "react";
-import { FormProvider, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { VSCodeDataGrid } from "@vscode/webview-ui-toolkit/react";
 import NewMessage from "./newMessage";
 import MessageRow from "./messageRow";
@@ -90,22 +90,73 @@ export function ChatView() {
       name: "messages"
     });
 
+  const scrollIntoViewIfNeeded = (target: HTMLElement) => {
+    function getScrollParent(node: HTMLElement): HTMLElement | undefined {
+      if (node === null) {
+        return undefined;
+      }
+
+      if (node.scrollHeight > node.clientHeight) {
+        return node;
+      } else {
+        return getScrollParent(node.parentNode as HTMLElement);
+      }
+    }
+
+    const parent = getScrollParent(target.parentNode as HTMLElement);
+
+    if (!parent) return;
+
+    const parentComputedStyle = window.getComputedStyle(parent, null),
+      parentBorderTopWidth = parseInt(
+        parentComputedStyle.getPropertyValue("border-top-width")
+      ),
+      overTop = target.offsetTop - parent.offsetTop < parent.scrollTop,
+      overBottom =
+        target.offsetTop -
+        parent.offsetTop +
+        target.clientHeight -
+        parentBorderTopWidth >
+        parent.scrollTop + parent.clientHeight;
+
+    if (overTop) {
+      target.scrollIntoView({ block: "start", behavior: "smooth" });
+    } else if (overBottom) {
+      target.scrollIntoView({ block: "end", behavior: "smooth" });
+    }
+  };
+
+  const scrollToLineIfNeeded = (id: string) => {
+    const targetRow = document.getElementById(id);
+
+    if (targetRow) {
+      scrollIntoViewIfNeeded(targetRow);
+    }
+  };
+  const model: TFields = methods.getValues();
+
   React.useEffect(() => {
+    const model: TFields = methods.getValues();
+
+    console.log("ChatView.useEffect", model.messages);
+
     if (model.messages.length > 0) {
       const lastMessage: TMessageModel = model.messages[model.messages.length - 1];
-      //const lastMessageIndex: number = findLastIndex(model.messages, 
-      //  (message: TMessageModel) => message.author !== "Gaia");
+      const lastMessageIndex: number = findLastIndex(model.messages,
+        (message: TMessageModel) => message.author !== "Gaia");
+      console.log("lastMessageIndex: ", lastMessageIndex, lastMessage.messageId);
 
-      //document.getElementById(lastMessage.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
-      //scrollIntoView({
-      //  behavior: 'auto',
-      //  block: 'start',
-      //  inline: 'nearest',
-      //})
+      scrollToLineIfNeeded(lastMessage.messageId);
+      //document.getElementById(lastMessage.messageId)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      // scrollIntoView({
+      //   behavior: 'auto',
+      //   block: 'start',
+      //   inline: 'nearest',
+      // })
 
       flashMessage(lastMessage, model.messages);
     }
-  }, ["messages"]);
+  }, [model.messages]);
 
   const onSubmit: SubmitHandler<TFields> = (data) => {
     data.newMessage = data.newMessage.trim().toLowerCase();
@@ -122,8 +173,11 @@ export function ChatView() {
           const model: TFields = command.data.model;
           const errors: any = command.data.errors;
 
+          console.log("UpdateModel received");
+          console.dir(model);
           setDataModel<TFields>(methods.setValue, model);
           setErrorModel(methods.setError, errors);
+          //scroll();
 
           break;
 
@@ -140,7 +194,6 @@ export function ChatView() {
     }
   }, []);
 
-  const model: TFields = methods.getValues();
   const actions: IFormAction[] = [];
   actions.push({
     id: 0,
@@ -156,22 +209,43 @@ export function ChatView() {
     caption: tdsVscode.l10n.t("Help"),
     type: "link",
     href: "command:tds-gaia.help",
-    onClick: (sender: any) => {
-      model.newMessage = "Help";
-      (document.getElementsByName("newMessage")[0] as any).control.value = "Help";
-    }
+    // onClick: (sender: any) => {
+    //   model.newMessage = "Help";
+    //   (document.getElementsByName("newMessage")[0] as any).control.value = "Help";
+    // }
   });
 
   return (
     <main>
       <section className="tds-chat">
         <section className="tds-content">
-          <VSCodeDataGrid id="messagesGrid"> {/*grid-template-columns=""*/}
-            {model.messages.map((row: TMessageModel, index: number) => (
-              <MessageRow key={`msgRow_${index}`} index={index} message={row} messages={model.messages} />
-            ))}
+
+          <VSCodeDataGrid id="messagesGrid">
+            {
+              model.messages.map((row: TMessageModel, index: number) => (
+                <MessageRow key={`msgRow_${index}`} index={index} message={row} messages={model.messages} />
+              ))
+            }
           </VSCodeDataGrid>
-        </section >
+
+          {
+            //columns ?: TTdsTableColumn[],
+            //highlightRows?: number[];
+            //highlightGroups?: Record<string, number[]> | Record<string, (row: any[], index: number) => boolean>;
+          }
+          {
+            // <TdsTable
+            //   id="messagesGrid"
+            //   dataSource={model.messages}
+            //   onCustomRows={(messages: any[]): React.ReactElement[] => {
+            //     return messages.map((row: TMessageModel, index: number) => (
+            //       <MessageRow key={`msgRow_${index}`} index={index} message={row} messages={model.messages} />
+            //     ))
+            //   }
+            //   }
+            // />
+          }
+        </section>
         <section className="tds-footer">
           <TdsForm<TFields>
             id="chatForm"

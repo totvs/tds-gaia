@@ -181,7 +181,10 @@ export default function MessageRow(props: IMessageRowProps): any {
     const row: TMessageModel = props.message;
 
     return (
-        <VSCodeDataGridRow key={row.messageId.toString()} className={`tds-message-row ${row.className}`}>
+        <VSCodeDataGridRow
+            id={row.messageId.toString()}
+            key={row.messageId.toString()}
+            className={`tds-message-row ${row.className}`}>
             <VSCodeDataGridCell grid-column="1">
                 <>
                     <Message {...row} isHovering={false} />

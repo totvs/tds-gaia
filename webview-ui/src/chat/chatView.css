@@ -18,7 +18,7 @@ section.tds-chat {
 	display: flex;
 	flex-direction: column;
 	margin: 0px;
-	height: 90vh;
+	height: 99vh;
 }
 
 section.tds-chat section.tds-header {
@@ -97,6 +97,10 @@ section.tds-chat vscode-data-grid-row.tds-message-row div.tds-message-author #op
 
 section.tds-chat vscode-data-grid-row.tds-message-row div.tds-message-author #timeStamp {
 	font-style: italic;
+}
+
+section.tds-chat section.tds-form-footer {
+	margin-top: 0px;
 }
 
 section.tds-chat vscode-data-grid-row.tds-message-row-flash {

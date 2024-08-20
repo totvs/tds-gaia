@@ -5,7 +5,7 @@ export enum MessageOperationEnum {
 }
 
 export type TMessageModel = {
-    _id: string; //utilizado pelo React.UseArray;
+    //_id: string; //utilizado pelo React.UseArray;
     operation: MessageOperationEnum;
     messageId: string;
     answering: string;

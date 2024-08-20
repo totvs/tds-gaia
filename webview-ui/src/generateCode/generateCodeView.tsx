@@ -83,7 +83,7 @@ export default function GenerateCodeView() {
 
   return (
     <main>
-      <TdsPage title={tdsVscode.l10n.t("Generate Code")} linkToDoc={tdsVscode.l10n.t("[Code generation]generateCode.md")} >
+      <TdsPage title={tdsVscode.l10n.t("Generate Code")} >
         <TdsForm<TFields>
           id="frmGenerateCode"
           methods={methods as any}
