@@ -124,7 +124,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
     async checkHealth(detail: boolean): Promise<Error | undefined> {
         //logger.profile("checkHealth");
         let result: any = undefined
-        logger.info(vscode.l10n.t("Getting health check..."));
+        logger.info(vscode.l10n.t("Getting health check. EndPoint: {0}", this.endPoint));
 
         let resp: any = await this.jsonRequest("GET", "health_check", {});
 
@@ -137,7 +137,7 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
             logger.error(result);
         } else {
             this.ready = true;
-            logger.info(vscode.l10n.t("TDS-Gaia IA Service is running"));
+            logger.info(vscode.l10n.t("TDS-Gaia IA Service is running. Endpoint: {0}", this.endPoint));
         }
 
         //logger.profile("checkHealth");
