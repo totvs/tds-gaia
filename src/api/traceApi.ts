@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import * as vscode from "vscode";
-import { LoggedUser } from "../config";
+import { getGaiaConfiguration, LoggedUser, TGaiaConfig } from "../config";
 import { AbstractApi } from "./interfaceApi";
 import { PREFIX_GAIA, logger } from "../logger";
 import { Queue } from "../queue";
@@ -33,8 +33,8 @@ enum TypeFeedbackEnum {
     ObservationCreate = "observation-create",
     ObservationUpdate = "observation-update",
 }
-
-const END_POINT: string = "https://events.dta.totvs.ai";
+const config: TGaiaConfig = getGaiaConfiguration();
+const END_POINT: string = config.endPointEvent;
 
 type TQueueData = TraceElement | EventElement | ScoreElement;
 
@@ -70,7 +70,7 @@ export class TraceApi extends AbstractApi {
     start(publicKey: string, secretKey: string): boolean {
         this.authorization = Buffer.from(`pk-lf-${publicKey}:sk-lf-${secretKey}`).toString("base64");
 
-        logger.info(vscode.l10n.t("Trace Service is running"));
+        logger.info(vscode.l10n.t("Trace Service is running. EndPoint: {0}", this.endPoint));
 
         return true;
     }

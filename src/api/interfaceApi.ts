@@ -100,6 +100,15 @@ export class AbstractApi {
     }
 
     /**
+     * Gets the base URL of the API endpoint.
+     * 
+     * @returns The base URL of the API endpoint.
+     */
+    get endPoint(): string {
+        return this._endPoint;
+    }
+
+    /**
     * Gets the API request string.
     * 
     * @returns The API request string.

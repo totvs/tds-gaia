@@ -77,7 +77,12 @@ export function registerInlineCompletionItemProvider(context: vscode.ExtensionCo
                     await llmApi.getCompletions(textBeforeCursor, textAfterCursor);
                 const items: vscode.InlineCompletionItem[] = [];
 
-                if (response !== undefined && response.completions.length) {
+                if (response !== undefined) {
+                    if (response.completions.length == 0) {
+                        logger.info(vscode.l10n.t("Sorry. No code found in the stack."));
+                        feedbackApi.eventCompletion({ selected: -1, completions: response.completions, textBefore: textBeforeCursor, textAfter: textAfterCursor });
+                    }
+
                     for (const completion of response.completions) {
                         const item: vscode.InlineCompletionItem = new vscode.InlineCompletionItem(
                             completion.generated_text,

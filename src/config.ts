@@ -50,6 +50,7 @@ export type TGaiaConfig = {
   showBanner: boolean;
   logLevel: "off" | "error" | "warn" | "info" | "http" | "verbose" | "debug";
   endPoint: string;
+  endPointEvent: string;
   apiVersion: string;
   documentFilter: {
     [key: string]: string;
