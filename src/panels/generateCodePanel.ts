@@ -128,9 +128,10 @@ export class GenerateCodePanel extends TdsPanel<TGenerateCodeModel> {
           if (generateCode && generateCode.length > 0) {
             message.data.model.generateCode = generateCode.join("\n").replace(/\t/g, "  ");
           } else {
-            errors.root = { type: "validate", message: vscode.l10n.t("Error generating code. See log for details.") };
+            errors.description = { type: "validate", message: vscode.l10n.t("Error generating code. See log for details.") };
+            message.data.model.generateCode = vscode.l10n.t("Sorry. I couldn't generate the code. Check the log for more details.");
           }
-          vscode.window.setStatusBarMessage("");
+          //vscode.window.setStatusBarMessage("");
         }
 
         this.sendUpdateModel(message.data.model, errors);

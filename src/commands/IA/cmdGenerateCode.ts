@@ -16,30 +16,62 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { chatApi, feedbackApi, llmApi } from "../../api";
-import { getGaiaConfiguration } from "../../config";
 import { GenerateCodePanel } from "../../panels/generateCodePanel";
 
 export function registerGenerateCode(context: vscode.ExtensionContext): void {
 
   vscode.commands.registerCommand("tds-gaia.generateCode", () => {
+    const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+    let description: string = "";
+
+    if (editor !== undefined) {
+      const selection: vscode.Selection = editor.selection;
+      let whatDescription: string = "";
+
+      if (selection && !selection.isEmpty) {
+        const selectionRange: vscode.Range = new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character);
+
+        description = editor.document.getText(selectionRange).trim();
+        whatDescription = chatApi.linkToSource(editor.document.uri, selectionRange);
+      } else {
+        const curPos: vscode.Position = selection.start;
+        const contentLine: string = editor.document.lineAt(curPos.line).text.trim();
+        const re: RegExp = /^\/\//gi;
+
+        if (contentLine.match(re)) {
+          const firstLine: number = getLine(curPos.line, editor.document, -1);
+          const lastLine: number = getLine(curPos.line, editor.document, 1);
+          const range: vscode.Range = new vscode.Range(firstLine, 0, lastLine, 0);
+
+          whatDescription = chatApi.linkToSource(editor.document.uri, range);
+          description = editor.document.getText(range).replace("//", "").trim()
+        }
+      }
+
+      if (description.length > 0) {
+        vscode.commands.executeCommand("tds-gaia.processGenerateCode", description, whatDescription);
+        return;
+      };
+    }
+
     GenerateCodePanel.render(context);
   });
 
-  context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.processGenerateCode', (description: string) => {
+  context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.processGenerateCode', (description: string, whatDescription: string) => {
     if (description.length > 0) {
-      // chatApi.user(
-      //   vscode.l10n.t("Generate code for description `{0}...`", description.substring(0, 20)), true);
       const messageId: string = chatApi.gaia(
-        vscode.l10n.t("Generating the code as requested."), { inProgress: true });
+        vscode.l10n.t("Generating the code as requested.{0}", whatDescription || ""), { inProgress: true });
 
       return llmApi.generateCode(description).then((generateCode: string[]) => {
         const responseId: string = chatApi.nextMessageId();
-        if (getGaiaConfiguration().clearBeforeExplain) {
-          chatApi.user("clear", true);
-        }
 
-        chatApi.gaia(vscode.l10n.t("Code generated with {0} lines.", generateCode.length), { canFeedback: true, answeringId: messageId });
         feedbackApi.traceGenerateCode(responseId, description, generateCode);
+
+        if (whatDescription) {
+          chatApi.gaia(`@code-box{${generateCode.join("\\n")}}`, { canFeedback: true, answeringId: messageId });
+        } else {
+          chatApi.gaia(vscode.l10n.t("Code generated with {0} lines.", generateCode.length), { canFeedback: true, answeringId: messageId });
+        }
 
         return generateCode
       });
@@ -49,4 +81,16 @@ export function registerGenerateCode(context: vscode.ExtensionContext): void {
       return [];
     }
   }));
+}
+
+function getLine(line: number, document: vscode.TextDocument, step: number): number {
+  const re: RegExp = /^\/\//gi;
+  let contentLine: string = document.lineAt(line).text.trim();
+
+  while ((line > -1) && (line < document.lineCount) && contentLine.match(re)) {
+    line += step;
+    contentLine = document.lineAt(line).text.trim();
+  }
+
+  return line - (step == 1 ? 0 : step);
 }
