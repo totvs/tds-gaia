@@ -45,6 +45,9 @@ const EXPLAIN_WORD_RE = /^explain\sword\s(source)?$/i;
 const INFER_TYPE_RE = /^infer\s(source)?$/i;
 const UPDATE_ALL_TYPE_RE = /^updateAllTypify\s(source)?$/i;
 const UPDATE_TYPE_RE = /^updateTypify\s(source)?$/i;
+const GENERATE_CODE_RE = /^generateCode\s(source)?$/i;
+const GENERATE_EDIT_CODE_RE = /^generateEditCode\s(source)?$/i;
+const GENERATE_COPY_CODE_RE = /^generateEditCode\s(source)?$/i;
 
 const HINT_1_RE = /^(hint_1)$/i;
 const OPEN_QUICK_GUIDE = /^(open )?(quick guide)$/i;
@@ -168,7 +171,6 @@ const commandsMap: Record<string, TCommand> = {
         commandId: "tds-gaia.infer",
     },
     "updateTypeAll": {
-        //caption: vscode.l10n.t("Update All Typified Variables"),
         command: "update",
         regex: UPDATE_TYPE_RE,
         commandId: "tds-gaia.updateTypifyAll",
@@ -180,10 +182,21 @@ const commandsMap: Record<string, TCommand> = {
         commandId: "tds-gaia.updateTypify",
     },
     "generateCode": {
-        //caption: vscode.l10n.t("Generate Code"),
         command: "generate",
-        regex: UPDATE_TYPE_RE,
+        regex: GENERATE_CODE_RE,
         commandId: "tds-gaia.generateCode",
+    },
+    "generateEdit": {
+        //caption: vscode.l10n.t("Generate Code"),
+        command: "generateEdit",
+        regex: GENERATE_EDIT_CODE_RE,
+        commandId: "tds-gaia.generateEditCode",
+    },
+    "generateCopy": {
+        //caption: vscode.l10n.t("Generate Code"),
+        command: "generateCopy",
+        regex: GENERATE_COPY_CODE_RE,
+        commandId: "tds-gaia.generateCopyCode",
     }
 };
 
@@ -210,7 +223,6 @@ type TCommandKey = keyof typeof commandsMap;
  * Dispatches events for new messages.
  */
 export class ChatApi {
-
     static getCommand(_command: TCommandKey): TCommand | undefined {
         const commandId: TCommandKey = _command;
         let command: TCommand | undefined = commandsMap[commandId];
@@ -497,17 +509,12 @@ export class ChatApi {
         const command: TCommand | undefined = ChatApi.getCommand(_command);
 
         if (command) {
+            let encodedArgs: string = "";
             args = {
                 ...args,
                 ...command.commandArgs
             };
-            // const argsString: string[] = [];
-            // Object.keys(args).forEach((key: string) => {
-            //     argsString.push(`${key}=${encodeURI(args[key])}`);
-            // });
-            let encodedArgs: string = "";
             if (args) {
-                //encodeArgs = `${argsString.join("&")}`;
                 encodedArgs = "?" + encodeURIComponent(
                     JSON.stringify(args)
                 );
@@ -598,6 +605,23 @@ export class ChatApi {
     nextMessageId(): string {
         return `FF0000${(this.messageId).toString(16)}`.substring(-6);
     }
+
+    /**
+     * Renders a code block with a start and end marker.
+     * 
+     * @param code - An array of strings representing the lines of code to be displayed.
+     * @returns A string containing the formatted code block with the start and end markers.
+     */
+    codeBox(code: string[]): string {
+        let result: string = "";
+
+        result += ":code-box-start:\\n";
+        result += code.join("\\n").replace(/\n/g, "");
+        result += ":code-box-end:\\n";
+
+        return result;
+    }
+
 }
 
 /**

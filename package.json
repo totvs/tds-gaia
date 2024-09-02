@@ -228,6 +228,16 @@
         "title": "Generate Code",
         "shortTitle": "Generate",
         "category": "TDS-Gaia"
+      },
+      {
+        "command": "tds-gaia.generateEditCode",
+        "title": "Edit",
+        "category": "TDS-Gaia"
+      },
+      {
+        "command": "tds-gaia.generateCopyCode",
+        "title": "Copy",
+        "category": "TDS-Gaia"
       }
     ],
     "configuration": [

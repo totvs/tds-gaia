@@ -15,13 +15,14 @@ limitations under the License.
 */
 
 import { MessageOperationEnum, TMessageModel } from "./chatModels";
-import { VSCodeLink } from "@vscode/webview-ui-toolkit/react";
+import { VSCodeLink, VSCodeTextArea } from "@vscode/webview-ui-toolkit/react";
 import { sendLinkMouseOver } from "./sendCommand";
 
 const PARAGRAPH_RE = /\n\n/i
 const PHRASE_RE = /\n/i
 const LINK_COMMAND_RE = /\[([^\]]+)\]\((command:[^\)]+)\)/i
 const LINK_SOURCE_RE = /\[([^\]]+)\]\(link:([^\)]+)\)/i
+const CODE_BOX_RE: RegExp = /(:code-box-start:)\s*([\s\S]*?)\s*(:code-box-end:)/i
 
 type InlineTagName = "code" | "bold" | "italic" | "link" | "blockquote";
 type BlockTagName = "code";
@@ -68,7 +69,8 @@ function mdToHtml(text: string): any[] {
         const part: string = parts[index];
 
         if (part) {
-            //A ordem de teste deve ser: Code, Link e demais tags (cuidado ao alterar)
+            console.log(part);
+            //A ordem de teste deve ser: CodeCode, Link e demais tags (cuidado ao alterar)
             if (part.match(mdTags.code)) {
                 index++;
                 children.push(<code key={spanSeq++}>{parts[index]}</code>);
@@ -124,37 +126,46 @@ function mdToHtml(text: string): any[] {
     return children;
 }
 
+function textToCodeBox(text: string): React.ReactElement {
+    let matchesBlocks: any = text.match(CODE_BOX_RE);
+    let code: string = "ERROR";
+    let lines: string[] = [];
+
+    if (matchesBlocks) {
+        code = matchesBlocks[2];
+        lines = code.split("\\n");
+    }
+
+    return (
+        <VSCodeTextArea className="tds-code-box"
+            value={lines.join("\n")}
+            readOnly={true}
+            rows={lines.length > 5 ? 5 : lines.length}
+        />
+    )
+}
+
 function mdTextToHtml(text: string): any[] {
     const children: any[] = [];
-    const blocks: string[] = [text]; //text.split(tagsBlockMap["code"]);
+    const paragraphs: string[] = text.split(PARAGRAPH_RE);
 
-    for (let index = 0; index < blocks.length; index++) {
-        const block: string = blocks[index];
+    paragraphs.forEach((paragraph: string) => {
+        const phrases: string[] = paragraph.split(PHRASE_RE);
 
-        // if (block.match(tagsBlockMap["code"])) {
-        //   children.push(<code>{block}</code>);
-        // } else {
-        const paragraphs: string[] = text.split(PARAGRAPH_RE);
-
-        paragraphs.forEach((paragraph: string) => {
-            const phrases: string[] = paragraph.split(PHRASE_RE);
-
-            phrases.forEach((phrase: string, index: number) => {
-                phrase = phrase.trim();
-                if (phrase.length > 0) {
-                    //if (index == (phrases.length - 1)) {
-                    if (phrases.length == 1) {
-                        children.push(<p key={spanSeq++}>{mdToHtml(phrase)}</p>);
-                    } else { //if (index > 0) {
-                        children.push(mdToHtml(phrase));
-                        children.push(<br key={spanSeq++} />);
-                    } //else {
-                       // children.push(<>{mdToHtml(phrase)}</>);
-                    //}
+        phrases.forEach((phrase: string, index: number) => {
+            phrase = phrase.trim();
+            if (phrase.length > 0) {
+                if (phrase.match(CODE_BOX_RE)) {
+                    children.push(textToCodeBox(phrase));
+                } else if (phrases.length == 1) {
+                    children.push(<p key={spanSeq++}>{mdToHtml(phrase)}</p>);
+                } else { //if (index > 0) {
+                    children.push(mdToHtml(phrase));
+                    children.push(<br key={spanSeq++} />);
                 }
-            });
+            }
         });
-    };
+    });
 
     return children;
 }

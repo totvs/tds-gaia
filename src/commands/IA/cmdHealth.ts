@@ -53,10 +53,18 @@ export function registerHealth(context: vscode.ExtensionContext): void {
                 setGaiaReady(error === undefined);
 
                 if (error !== undefined) {
-                    let message: string[] = [
-                        vscode.l10n.t("Sorry, I have technical difficulties. Attempt {0} of {1}.", attempt, totalAttempts),
+                    let message: string[] = [];
+                    if (totalAttempts > 1) {
+                        message = [vscode.l10n.t("Sorry, I have technical difficulties. Attempt {0} of {1}.", attempt, totalAttempts),
                         vscode.l10n.t("See console log for more details."),
-                    ];
+                        ];
+                    } else {
+                        message = [vscode.l10n.t("Sorry, I have technical difficulties."),
+                        vscode.l10n.t("See console log for more details."),
+                        vscode.l10n.t("To restart the validation of the service, execute {0}.", chatApi.commandText("health"))
+                        ];
+                    }
+
                     vscode.window.showErrorMessage(`${PREFIX_GAIA} ${message.join(" ")}`);
                     logger.error(error);
 
@@ -68,7 +76,7 @@ export function registerHealth(context: vscode.ExtensionContext): void {
                         }
                         chatApi.gaia(message, {});
 
-                        if ((attempt <= totalAttempts) && (time !== null)) {
+                        if ((attempt < totalAttempts) && (time !== null)) {
                             tryAgain(attempt, totalAttempts, Number.parseInt(time[1])).then(
                                 () => {
                                     vscode.commands.executeCommand("tds-gaia.health", false, ++attempt);
@@ -78,7 +86,7 @@ export function registerHealth(context: vscode.ExtensionContext): void {
                                     logger.info(reason)
                                 }
                             );
-                        } else if (totalAttempts != 0) {
+                        } else if (totalAttempts > 1) {
                             chatApi.gaia([
                                 vscode.l10n.t("Sorry, even after **{0} attempts**, I still have technical difficulties.", totalAttempts),
                                 vscode.l10n.t("To restart the validation of the service, execute {0}.", chatApi.commandText("health"))

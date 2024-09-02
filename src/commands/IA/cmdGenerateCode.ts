@@ -67,10 +67,34 @@ export function registerGenerateCode(context: vscode.ExtensionContext): void {
 
         feedbackApi.traceGenerateCode(responseId, description, generateCode);
 
-        if (whatDescription) {
-          chatApi.gaia(`@code-box{${generateCode.join("\\n")}}`, { canFeedback: true, answeringId: messageId });
-        } else {
-          chatApi.gaia(vscode.l10n.t("Code generated with {0} lines.", generateCode.length), { canFeedback: true, answeringId: messageId });
+        if (generateCode.length == 0) {
+          chatApi.gaia(vscode.l10n.t("Sorry. I could not generate the code with the information past. See log for details."), { canFeedback: true, answeringId: messageId });
+          generateCode = [
+            "//line 1\n",
+            "//line 2\n",
+            "//line 3\n",
+            "//line 4\n",
+            "//line 5\n",
+          ];
+        }// else 
+        {
+          if (whatDescription) {
+            chatApi.gaia([
+              vscode.l10n.t("Code generated with {0} lines.", generateCode.length),
+              `${chatApi.codeBox(generateCode)}`,
+              chatApi.commandText("generateEdit",
+                {
+                  cacheId: messageId,
+                  code: Buffer.from(generateCode.join("\n")).toString("base64"),
+                }).concat(" ").concat(chatApi.commandText("generateCopy",
+                  {
+                    cacheId: messageId,
+                    code: Buffer.from(generateCode.join("\n")).toString("base64"),
+                  }))
+            ], { canFeedback: true, answeringId: messageId });
+          } else {
+            chatApi.gaia(vscode.l10n.t("Code generated with {0} lines.", generateCode.length), { canFeedback: true, answeringId: messageId });
+          }
         }
 
         return generateCode
@@ -81,6 +105,27 @@ export function registerGenerateCode(context: vscode.ExtensionContext): void {
       return [];
     }
   }));
+
+  vscode.commands.registerCommand("tds-gaia.generateEditCode", (args: any) => {
+    const code: string = Buffer.from(args.code, "base64").toString("utf8");
+
+    vscode.workspace.openTextDocument({
+      language: "advpl",
+      content: code,
+    }).then((document: vscode.TextDocument) => {
+      vscode.window.showTextDocument(document);
+    });
+
+  });
+
+  vscode.commands.registerCommand("tds-gaia.generateCopyCode", (args: any) => {
+    const messageId: string = args.cacheId;
+    const code: string = Buffer.from(args.code, "base64").toString("utf8");
+
+    vscode.env.clipboard.writeText(code);
+
+    chatApi.gaia(vscode.l10n.t("Its code was copied to the clipboard. Bytes: {%0}", code.length), { answeringId: messageId });
+  });
 }
 
 function getLine(line: number, document: vscode.TextDocument, step: number): number {

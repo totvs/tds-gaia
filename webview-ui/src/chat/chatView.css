@@ -143,3 +143,8 @@ div.tds-feedback #comment {
 	flex-grow: 0;
 	flex-shrink: 0;
 }
+
+vscode-text-area.tds-code-box {
+	width: 100%;
+	font-family: Consolas, "Courier New", monospace;
+}

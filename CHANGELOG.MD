@@ -10,6 +10,14 @@ Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#g
 
 ## TDS-Gaia 0.0.NEXT
 
+### Novidades
+
+- Geração de código a partir de blocos comentados no código.
+
+### Melhorias
+
+- Melhoria na formatação das respostas apresentadas no bate-papo.
+
 ### Correções
 
 - Tipificação: identificação da implementação de métodos.

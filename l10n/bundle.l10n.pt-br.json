@@ -75,7 +75,7 @@
   "Sorry, I couldn't make the typification because of an internal problem.": "Desculpe, não pude fazer a tipificação por causa de um problema interno.",
   "Sorry, I have technical difficulties. Attempt {0} of {1}.": "Sorry, I have technical difficulties. Attempt {0} of {1}.",
   "TDS-Gaia IA is using [{0}]": "TDS-Gaia IA está usando [{0}]",
-  "TDS-Gaia IA Service is running. Endpoint: {0}": "Serviço Gaia IA on-line",
+  "TDS-Gaia IA Service is running.": "Serviço Gaia IA on-line",
   "The commands available at the moment are: {0}.": "Os comandos disponíveis no momento são: {0}.",
   "The following variables were inferred:": "As seguintes variáveis foram inferidas:",
   "There was an evolution in my processes. I recommend reading the topic **TDS-Gaia {0}** in {1}.": "Houve uma evolução em meus processos.Eu recomendo ler o tópico **TDS-Gaia {0}** em {1}.",

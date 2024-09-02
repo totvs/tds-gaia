@@ -34,7 +34,7 @@
   "Explaining word **{0}** {1}": "Explicando la palabra**{0}** {1}",
   "Failed to automatic login": "No se pudo inicio de sesión automático",
   "Feedback Service is running": "El servicio de retroalimentación se está ejecutando",
-  "TDS-Gaia IA Service is running. Endpoint: {0}": "Gaia IA Servicio en línea",
+  "TDS-Gaia IA Service is running.": "Gaia IA Servicio en línea",
   "Getting health check. EndPoint: {0}": "Obtener un control de salud...",
   "Hello, **{0}**.": "Hola, **{0}**.",
   "Help": "Ayuda",
