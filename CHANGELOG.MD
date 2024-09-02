@@ -4,11 +4,11 @@
 >
 > Por ser um projeto **BETA**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
 >
-> No momento, o serviço está **disponível** das **09h00** as **17h00**, em dias úteis.
+> No momento, o serviço está **disponível** das **08h00** as **18h00**, em dias úteis.
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
-## TDS-Gaia 0.0.NEXT
+## TDS-Gaia 0.0.12
 
 ### Novidades
 
