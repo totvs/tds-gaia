@@ -419,7 +419,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/mocha": "^10.0.7",
     "@types/node": "20.14.10",
-    "@types/vscode": "^1.91.0",
+    "@types/vscode": "^1.85.0",
     "@vscode/test-electron": "^2.4.0",
     "@vscode/vsce": "^2.29.0",
     "glob": "^10.4.2",

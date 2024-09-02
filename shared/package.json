@@ -21,7 +21,5 @@
     "l10n:export": "npx @vscode/l10n-dev export -o ./l10n ./src"
   },
   "dependencies": {},
-  "devDependencies": {
-    "typescript": "^5.4.5"
-  }
+  "devDependencies": {}
 }
