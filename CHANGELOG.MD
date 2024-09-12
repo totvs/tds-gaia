@@ -8,6 +8,19 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.0.13
+
+### Melhorias
+
+- Melhoria no envio de ocorrências para serviço de `Trace`.
+- Adicionado limite de tamanho para análise de auto-completar.
+
+### Correções
+
+- Tipificação:
+  - Correção na operação de aplicação em todas as variáveis.
+  - Ajuste na edição de definições com atribuição.
+
 ## TDS-Gaia 0.0.12
 
 ### Novidades
