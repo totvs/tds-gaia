@@ -34,7 +34,7 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.updateTypifyAll', async (...args) => {
         const messageId: string = args[0].cacheId;
         const inferData: InferData = dataCache.get(messageId) as InferData;
-        const processVars: string[] = await updateType(inferData, undefined);
+        const processVars: string[] = await updateType(inferData, "");
         const inferTypes: InferType[] = inferData.types.map(type => {
             return {
                 var: type.var,
@@ -77,7 +77,7 @@ export function registerUpdateType(context: vscode.ExtensionContext): void {
     }));
 }
 
-async function updateType(inferData: InferData, targetSymbol: string | undefined): Promise<string[]> {
+async function updateType(inferData: InferData, targetSymbol: string): Promise<string[]> {
     const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
     const processVars: string[] = [];
 
@@ -97,12 +97,38 @@ async function updateType(inferData: InferData, targetSymbol: string | undefined
                                     && ((targetSymbol === "" || targetSymbol === symbol.name)));
                             })
                             .forEach(symbol => {
-                                const changeRange: vscode.Range = new vscode.Range(
+                                let changeRange: vscode.Range = new vscode.Range(
                                     symbol.range.start.line,
                                     symbol.range.start.character,
                                     symbol.range.start.line,
                                     symbol.range.start.character + infer.var.length);
-                                editBuilder.replace(changeRange, `${infer.var} as ${infer.type}`);
+
+                                if (!symbol.detail) {
+                                    editBuilder.replace(changeRange, `${infer.var} as ${infer.type}`);
+                                } else {
+                                    const contentLine: string = editor.document.lineAt(symbol.range.start.line).text;
+                                    const re: RegExp = createRegExp(symbol.detail);
+
+                                    let matches: RegExpMatchArray | null = contentLine.match(re);
+                                    if (matches) {
+                                        changeRange = new vscode.Range(
+                                            symbol.range.start.line,
+                                            symbol.range.start.character,
+                                            symbol.range.end.line,
+                                            symbol.range.end.character + matches[2].length);
+                                        editBuilder.replace(changeRange, `${infer.var} as ${infer.type}`);
+
+                                        let lastBlock: vscode.Position = documentSymbols[0].range.end;
+                                        documentSymbols.forEach((value: vscode.DocumentSymbol) => {
+                                            if (value.range.end.isAfter(lastBlock)) {
+                                                lastBlock = value.range.end;
+                                            }
+                                        })
+
+                                        lastBlock.translate(2);
+                                        editBuilder.insert(lastBlock, `\n\t${infer.var} ${matches[2]}`);
+                                    }
+                                }
 
                                 processVars.push(infer.var);
                             });
@@ -121,4 +147,19 @@ async function updateType(inferData: InferData, targetSymbol: string | undefined
     }
 
     return processVars;
+}
+
+function createRegExp(content: string): RegExp {
+    //TODO: Verificar a montagem de documentSymbol.detail no LS. Encurtando o detalhe e limpando espaços.
+    content = content.replace(/\(/g, "\\(");
+    content = content.replace(/\)/g, "\\)");
+    content = content.replace(/\[/g, "\\[");
+    content = content.replace(/\]/g, "\\]");
+    content = content.replace(/\,/g, ",\\s*");
+
+    if (content.endsWith("...")) {
+        content = content.replace("...", ".*")
+    }
+
+    return new RegExp(`(.*)(:=.*${content})`)
 }

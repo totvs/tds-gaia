@@ -37,11 +37,15 @@ export async function buildInferText(documentUri: vscode.Uri, range: vscode.Rang
         range: range,
         types: []
     }
-    const getSymbolsReturn: TGetSymbolsReturn = await getSymbols(inferData.documentUri, inferData.range);
+    const getSymbolsReturn: TGetSymbolsReturn = await getSymbols(inferData.documentUri, inferData.range);    
     const documentSymbols: vscode.DocumentSymbol[] | undefined = getSymbolsReturn.symbols;
 
     let someTipped: boolean = false;
     dataCache.set(messageId, inferData);
+
+    if (getSymbolsReturn.status == 2) { //possível erro
+        text.push(vscode.l10n.t("WARNING: {0}", getSymbolsReturn.message || "Error trying to get a list of symbols." ));
+    }
 
     text.push(vscode.l10n.t("The following variables were inferred:"));
     text.push("");

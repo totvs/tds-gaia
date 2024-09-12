@@ -104,7 +104,7 @@ export function registerInfer(context: vscode.ExtensionContext): void {
 
                     const messageId: string = chatApi.gaia(
                         vscode.l10n.t("Analyzing the code for infer type variables. {0} ", whatAnalyze)
-                        , {});
+                        , { inProgress: true });
 
                     return llmApi.inferType(codeToAnalyze).then(async (response: InferTypeResponse) => {
                         if (response !== undefined && response.types !== undefined && response.types.length) {
