@@ -21,6 +21,7 @@ import { Completion, CompletionResponse } from "./api/interfaceApi";
 import { logger } from "./logger";
 import { llmApi, feedbackApi } from "./api";
 
+const LIMIT_SOURCE_TO_SEND_IA: number = 20_480 //20K
 let textBeforeCursor: string = "";
 let textAfterCursor: string = "";
 
@@ -72,6 +73,15 @@ export function registerInlineCompletionItemProvider(context: vscode.ExtensionCo
 
                 textBeforeCursor = document.getText().substring(0, offset);
                 textAfterCursor = document.getText().substring(offset + 1);
+                const textLen: number = textBeforeCursor.length + textAfterCursor.length;
+
+                if (textLen > LIMIT_SOURCE_TO_SEND_IA) {
+                    const lenBeforeCursor: number = Math.floor((textBeforeCursor.length / textLen) * LIMIT_SOURCE_TO_SEND_IA);
+                    const lenAfterCursor: number = Math.floor((textAfterCursor.length / textLen) * LIMIT_SOURCE_TO_SEND_IA);
+
+                    textBeforeCursor = textBeforeCursor.substring(textBeforeCursor.length - lenBeforeCursor);
+                    textAfterCursor = textAfterCursor.substring(0, lenAfterCursor);
+                }
 
                 const response: CompletionResponse =
                     await llmApi.getCompletions(textBeforeCursor, textAfterCursor);
