@@ -14,10 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import * as vscode from "vscode";
-import { ExtensionContext } from "vscode";
 import { logger } from "../logger";
-import { TGaiaConfig, getGaiaConfiguration } from "../config";
-import { ChatApi } from "./chatApi";
+import { feedbackApi } from "./index";
 
 let execBeginTime: Date;
 
@@ -196,6 +194,7 @@ export class AbstractApi {
                     statusText = "\n" + bodyResp.substring(pos_s + 4, pos_e).replace(/<p>/g, " ");
                 } else {
                     this.logError(url, resp.statusText, resp.statusText);
+                    feedbackApi.traceRequestError(resp.status, resp.statusText, url, method, headers, data);
                 }
 
                 result = new Error();

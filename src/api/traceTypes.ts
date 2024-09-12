@@ -65,7 +65,7 @@ export class TraceElement implements ITraceElement {
                 "userId": this.userId,
                 "input": this.input == "" ? undefined : this.input,
                 "output": this.output == "" ? undefined : this.output,
-                "metadata": this.metadata === undefined ? undefined : this.metadata,
+                "metadata": this.metadata === undefined ? undefined : this.metadata
             }
         }
     }
@@ -79,6 +79,7 @@ export class EventElement implements ITraceElement {
     name: string = "";
     input: string = "";
     output: string = "";
+    level: "DEBUG" | "DEFAULT" | "WARNING" | "ERROR" | "" = "";
 
     constructor(trace: TraceElement) {
         this.trace = trace;
@@ -96,6 +97,7 @@ export class EventElement implements ITraceElement {
                 "name": this.name,
                 "input": this.input == "" ? undefined : this.input,
                 "output": this.output == "" ? undefined : this.output,
+                "level": this.level == "" ? undefined : this.level,
             }
         };
     }

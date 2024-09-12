@@ -29,6 +29,7 @@ enum EventsFeedbackEnum {
     // Completion = "completion",
     // Score = "score",
     // Infer = "infer",
+    Request = "request"
 }
 
 export enum ScoreEnum {
@@ -388,6 +389,46 @@ export class FeedbackApi {
         }
 
         //logger.profile("traceGenerateCode");
+        return;
+    }
+
+    traceRequestError(status: number, statusText: string, url: string, method: string, headers: {}, body: string | object): void {
+        //logger.profile("traceExplain");
+        let result: string = "";
+
+        if (this.user) {
+            const trace: TraceElement = this.createTrace();
+            trace.input = JSON.stringify({
+                url: url,
+                method: method,
+            });
+            trace.output = JSON.stringify({
+                status: status,
+                statusText: statusText,
+            });
+            trace.metadata = {
+                headers: headers,
+                body: body,
+            }
+            this.traceApi.enqueue(trace);
+
+            const event: EventElement = this.createEvent(trace, EventsFeedbackEnum.Request);
+            event.level = "ERROR";
+            event.input = JSON.stringify({
+                url: url,
+                method: method,
+            });
+            event.output = JSON.stringify({
+                status: status,
+                statusText: statusText,
+            });
+
+            this.traceApi.enqueue(event);
+            this.traceApi.sendQueue();
+        } else {
+            logger.error("traceRequestError: user not found");
+        }
+
         return;
     }
 

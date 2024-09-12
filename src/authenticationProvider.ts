@@ -19,7 +19,7 @@ import { Disposable } from "vscode";
 import { PromiseAdapter, promiseFromEvent, updateContextKey } from "./util";
 import { LoggedUser, getGaiaUser } from "./config";
 import { randomUUID } from "crypto";
-import { chatApi, feedbackApi, llmApi } from "./api";
+import { llmApi } from "./api";
 
 const AUTH_TYPE: string = "auth-gaia";
 const AUTH_NAME: string = "TDS-Gaia Authentication";
