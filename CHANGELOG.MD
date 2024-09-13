@@ -8,6 +8,12 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.0.14
+
+### Melhorias
+
+- Adicionado limite configurável de tamanho para análise de auto-completar. Veja [`tds-gaia.maxSizeAutoComplete`](https://github.com/totvs/tds-gaia/wiki/settings#chaves-de-configura%C3%A7%C3%A3o-do-tds-gaia).
+
 ## TDS-Gaia 0.0.13
 
 ### Melhorias
