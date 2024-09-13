@@ -314,6 +314,11 @@
             "default": 3,
             "description": "Number of auto-reconnection attempts in case of unavailability (0 to disable)"
           },
+          "tds-gaia.maxSizeAutoComplete": {
+            "type": "number",
+            "default": 15,
+            "description": "Maximum sampling size in KBytes to auto complete."
+          },
           "tds-gaia.clearBeforeExplain": {
             "type": "boolean",
             "default": false,

@@ -60,6 +60,7 @@ export type TGaiaConfig = {
   maxLine: number;
   maxSuggestions: number;
   tryAutoReconnection: number;
+  maxSizeAutoComplete: number;
 
   // trace: {
   //   server: string | undefined
