@@ -83,6 +83,13 @@
         }
       ]
     },
+    "submenus": [
+      {
+        "id": "tds-gaia.submenu-editor",
+        "label": "TDS-Gaia",
+        "icon": "icons/tds-gaia.svg"
+      }
+    ],
     "menus": {
       "view/title": [
         {
@@ -134,6 +141,24 @@
         {
           "command": "tds-gaia.infer",
           "when": "webviewId == 'tds-gaia-view' && tds-gaia.logged"
+        }
+      ],
+      "editor/context": [
+        {
+          "submenu": "tds-gaia.submenu-editor",
+          "group": "tds-gaia",
+          "when": "editorTextFocus && (resourceLangId == 'advpl' || resourceLangId == 'advpl-asp')"
+        }
+      ],
+      "tds-gaia.submenu-editor": [
+        {
+          "command": "tds-gaia.explain"
+        },
+        {
+          "command": "tds-gaia.explain-word"
+        },
+        {
+          "command": "tds-gaia.infer"
         }
       ],
       "commandPalette": [
@@ -360,7 +385,7 @@
         "key": "Ctrl+D Ctrl+T",
         "mac": "Cmd+D Cmd+T",
         "command": "tds-gaia.infer",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && (resourceLangId == 'advpl' || resourceLangId == 'advpl-asp')"
       },
       {
         "key": "Ctrl+D Ctrl+C",
@@ -371,13 +396,13 @@
         "key": "Ctrl+D Ctrl+E",
         "mac": "Cmd+D Cmd+E",
         "command": "tds-gaia.explain",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && (resourceLangId == 'advpl' || resourceLangId == 'advpl-asp')"
       },
       {
         "key": "Ctrl+D Ctrl+W",
         "mac": "Cmd+D Cmd+W",
         "command": "tds-gaia.explain-word",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && (resourceLangId == 'advpl' || resourceLangId == 'advpl-asp')"
       },
       {
         "key": "Ctrl+D Ctrl+G",
