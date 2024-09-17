@@ -8,6 +8,12 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.0.NEXT
+
+### Melhorias
+
+- Adicionado menu `TDS-Gaia` ao menu de contexto de editor de fontes Adv/PL e suas variantes.
+
 ## TDS-Gaia 0.0.14
 
 ### Melhorias
