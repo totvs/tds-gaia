@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/webviewprotocol.ts","./src/models/chatmodel.ts","./src/models/generatecodemodel.ts","./src/models/messagemodel.ts","./src/panels/panelinterface.ts"],"version":"5.6.2"}
