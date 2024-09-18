@@ -14,6 +14,10 @@ Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#g
 
 - Adicionado menu `TDS-Gaia` ao menu de contexto de editor de fontes Adv/PL e suas variantes.
 
+### Correções
+
+- Correção no acionamento (_click_) da ligação a fontes do bate-papo.
+
 ## TDS-Gaia 0.0.14
 
 ### Melhorias
