@@ -47,7 +47,7 @@
   "If you are familiar with **VS-Code**, see {0}, if you do not or want more details, see {1}.": "Si está familiarizado con **VS-Code **, consulte {0}, si no lo hace o desea más detalles, consulte {1}.",
   "If you want to know more about a specific command, `help command`.": "Si desea saber más sobre un comando específico, escriba `{0} comando`.",
   "In some messages of mine, there may be a block of **feedback**.": "En algunos mensajes míos, puede haber un bloque de ** retroalimentación **.",
-  "invalid link in MouseOver: {0}": "Enlace no válido en MouseOver: {0}",
+  "Invalid link in {0}: {1}": "Enlace no válido en MouseOver: {0}",
   "It seems like this is the first time we've met.": "Parece que esta es la primera vez que nos conocemos.",
   "It was not possible to open **{0}**.": "No fue posible abrir **{0}**.",
   "It was not possible to recover the definitions of the source symbols.": "No fue posible recuperar las definiciones de los símbolos de origen.",
