@@ -18,7 +18,6 @@ import * as vscode from 'vscode';
 import { TQueueMessages } from '../api/chatApi';
 import { getGaiaUser } from '../config';
 import { logger } from '../logger';
-import { highlightCode } from '../decoration';
 import { dataCache } from '../dataCache';
 import { chatApi, feedbackApi } from '../api';
 import { getExtraPanelConfigurations, getWebviewContent } from '../utilities/webview-utils';
@@ -176,6 +175,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             }
 
             break;
+          case CommonCommandFromWebViewEnum.LinkClick:
           case CommonCommandFromWebViewEnum.LinkMouseOver:
             let ok: boolean = false;
 
@@ -191,17 +191,21 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                   const startColumn: number = parseInt(positionMatches[4] || "0");
                   const endLine: number = parseInt(positionMatches[6] || "0");
                   const endColumn: number = parseInt(positionMatches[7] || "0");
-                  const decorationType: vscode.TextEditorDecorationType = highlightCode(source, startLine, startColumn, endLine, endColumn);
 
-                  setTimeout(() => {
-                    this.oldMouseOverPosition = ""
-                    vscode.window.activeTextEditor?.setDecorations(decorationType, []);
-                  }, 5000);
+                  if (command === CommonCommandFromWebViewEnum.LinkMouseOver) {
+                    const decorationType: vscode.TextEditorDecorationType = highlightCode(source, startLine, startColumn, endLine, endColumn);
 
+                    setTimeout(() => {
+                      this.oldMouseOverPosition = ""
+                      vscode.window.activeTextEditor?.setDecorations(decorationType, []);
+                    }, 5000);
+                  } else {
+                    jumpTo(source, startLine, startColumn);
+                  }
                 }
 
                 if (!ok) {
-                  const msg: string = vscode.l10n.t("invalid link in MouseOver: {0}", data.command);
+                  const msg: string = vscode.l10n.t("Invalid link in {0}: {1}", command, data.command);
 
                   chatApi.gaia([
                     "Sorry.I didn't understand this command.",
@@ -271,5 +275,92 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         errors: errors
       }
     });
+  }
+}
+
+let processCodeDecorationType: vscode.TextEditorDecorationType = vscode.window.createTextEditorDecorationType({
+  // Propriedades de estilo baseadas no tema
+  backgroundColor: new vscode.ThemeColor("editor.selectionBackground"),
+  overviewRulerColor: 'blue',
+  overviewRulerLane: vscode.OverviewRulerLane.Left,
+});
+
+/**
+* Highlights the given range of code in the active text editor, if it matches the provided file name.
+* Creates a decoration with the given message that highlights the specified range.
+* 
+* @param source - The file name to match against the active editor's document.
+* @param startLine - The start line of the range to highlight.
+* @param startChar - The start character of the range to highlight. 
+* @param endLine - The end line of the range to highlight.
+* @param endChar - The end character of the range to highlight.
+* @returns The decoration type used to highlight the code.
+*/
+function highlightCode(source: string, startLine: number, startChar: number, endLine: number, endChar: number): vscode.TextEditorDecorationType {
+  const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+
+  if (editor && (editor.document.fileName === source)) {
+    let startPosition: vscode.Position | undefined = undefined;
+    let endPosition: vscode.Position | undefined = undefined;
+
+    if (startChar === 0) {
+      startLine = startLine - 1;
+      endLine = startLine;
+      endChar = editor.document.lineAt(endLine).text.length;
+    } else {
+      startLine = startLine - 1;
+      startChar = startChar - 1;
+      endLine = endLine - 1;
+      endChar = endChar - 1;
+    }
+
+    startPosition = editor.document.validatePosition(new vscode.Position(startLine, startChar));
+    endPosition = editor.document.validatePosition(new vscode.Position(endLine, endChar));
+
+    if (startPosition && endPosition) {
+      const range: vscode.Range = new vscode.Range(startPosition, endPosition);
+      const decorations: vscode.DecorationOptions[] = [{ range: range, hoverMessage: "Process block!" }];
+
+      editor.setDecorations(processCodeDecorationType, decorations);
+    }
+  }
+
+  return processCodeDecorationType;
+}
+
+async function jumpTo(source: string, startLine: number, startChar: number) {
+  let editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+  let document;
+
+  if (editor && (editor.document.fileName === source)) {
+    document = editor.document;
+  } else {
+    const filePath = vscode.Uri.file(source);
+    const documents = vscode.workspace.textDocuments.filter((value: vscode.TextDocument) => {
+      return value.fileName == source;
+    });
+
+    if (documents.length > 0) {
+      document = documents[0]
+    } else {
+      document = await vscode.workspace.openTextDocument(filePath);
+      editor = await vscode.window.showTextDocument(document);
+    }
+  }
+
+  if (editor) {
+
+    if (startChar === 0) {
+      startLine = startLine - 1;
+    } else {
+      startLine = startLine - 1;
+      startChar = startChar - 1;
+    }
+
+    let position: vscode.Position | undefined = editor.document.validatePosition(new vscode.Position(startLine, startChar));    
+    const range = new vscode.Range(position, position);
+    editor.selection = new vscode.Selection(position, position);
+
+    editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
   }
 }

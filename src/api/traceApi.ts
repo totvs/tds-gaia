@@ -136,12 +136,17 @@ export class TraceApi extends AbstractApi {
             }
         }
 
-        if (data.length > 0) {
+        if ((this.authorization !== "") && (data.length > 0)) {
             this.jsonRequest("POST", "", {}, { "batch": data })
                 .then(response => {
                     if (response instanceof Error) {
                         logger.error("sendQueue: ERROR.");
                         logger.error(response);
+
+                        if (response.message.startsWith("401")) {
+                            this.authorization = "";
+                            logger.error("No further messages will be sent.");
+                        }
                     } else {
                         logger.debug("sendQueue: SUCCESS. Messages sent: {0}", (response as any).successes.length);
                         logger.debug(JSON.stringify(data));

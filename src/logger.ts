@@ -141,6 +141,22 @@ const myFormat = winston.format.printf((info: winston.Logform.TransformableInfo)
         text += `\n${formatCause(info.cause)}`;
     }
 
+    //higienização
+    if ((info.level == "http") || (info.level == "error")) {
+        const sanitize = (re: RegExp) => {
+            const matches: RegExpExecArray | null = re.exec(text);
+
+            if (matches) {
+                return text.replace(re, `${matches[1]}${matches[2].length ? matches[2].substring(0, 4) + "..." : ""}"`);
+            }
+
+            return text;
+        };
+
+        text = sanitize(/("X\-Auth": ")(.*)"/i);
+        text = sanitize(/("authorization": "Basic )(.*)"/i);
+    }
+
     return text;
 });
 
