@@ -51,7 +51,7 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
      * @param scopes 
      * @returns 
      */
-    public async getSessions(scopes?: string[]): Promise<readonly vscode.AuthenticationSession[]> {
+    public async getSessions(scopes?: string[] | undefined): Promise<vscode.AuthenticationSession[]> {
         const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
 
         if (allSessions) {
