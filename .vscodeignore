@@ -14,4 +14,6 @@ docs/
 project-words.txt
 reports/
 src/**
-vsc-extension-quickstart.md
+.eslint*
+LOCALIZATION*.*
+TODO.md
