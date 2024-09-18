@@ -16,7 +16,7 @@ limitations under the License.
 
 import { MessageOperationEnum, TMessageModel } from "./chatModels";
 import { VSCodeLink, VSCodeTextArea } from "@vscode/webview-ui-toolkit/react";
-import { sendLinkMouseOver } from "./sendCommand";
+import { sendLinkClick, sendLinkMouseOver } from "./sendCommand";
 
 const PARAGRAPH_RE = /\n\n/i
 const PHRASE_RE = /\n/i
@@ -91,16 +91,15 @@ function mdToHtml(text: string): any[] {
                     );
                 } else if (matchesLink = link.match(LINK_SOURCE_RE)) {
                     children.push(
-                        <span key={spanSeq++}
+                        <VSCodeLink key={spanSeq++} href="#"
                             onMouseOver={(e) => {
                                 sendLinkMouseOver(matchesLink!.input);
-                            }}>
-                            <VSCodeLink key={spanSeq++} href={matchesLink[2]}
-                                onClick={() => {
-                                    (document.getElementsByName("newMessage")[0] as any).control.value = caption;
-                                }}>{matchesLink[1]}
-                            </VSCodeLink>
-                        </span>);
+                            }}
+                            onClick={() => {
+                                sendLinkClick(matchesLink!.input);
+                            }}>{matchesLink[1]}
+                        </VSCodeLink>
+                    );
                 } else {
                     children.push(<span key={spanSeq++}>{part}</span>);
                 }

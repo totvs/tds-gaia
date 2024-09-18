@@ -34,6 +34,24 @@ export function sendLinkMouseOver(command: string) {
 }
 
 /**
+ * Sends a link click event to the webview panel.
+ * 
+ * @param command - The command string associated with the link click event.
+ */
+export function sendLinkClick(command: string) {
+	console.log(">>>>>>>>>>>", command);
+
+	tdsVscode.postMessage({
+		command: "LINK_CLICK",
+		data: {
+			model: undefined,
+			messageId: "",
+			command: command
+		}
+	});
+}
+
+/**
 * Sends a feedback message to the webview panel.
 * 
 * @param messageId - The unique identifier of the message.
