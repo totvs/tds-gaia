@@ -23,6 +23,7 @@ export enum CommonCommandFromWebViewEnum {
 	SaveAndClose = "SAVE_AND_CLOSE",
 	SelectResource = "SELECT_RESOURCE",
 	LinkMouseOver = "LINK_MOUSE_OVER",
+	LinkClick = "LINK_CLICK",
 	CopyToClipboard = "COPY_TO_CLIPBOARD"
 }
 
