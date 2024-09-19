@@ -60,13 +60,15 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     messages: []
   };
   private oldMouseOverPosition: string = "";
+  private lastProcess: Date = new Date();
+  private countNews: number = 0;
 
   /**
- * Constructor for ChatViewProvider class.
- * 
- * @param _extensionUri - The URI of the VS Code extension. Used to resolve resources 
- *                        like images from the webview.
- */
+   * Constructor for ChatViewProvider class.
+   * 
+   * @param _extensionUri - The URI of the VS Code extension. Used to resolve resources 
+   *                        like images from the webview.
+   */
   constructor(
     private readonly _extensionUri: vscode.Uri,
   ) { }
@@ -82,6 +84,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken,
   ) {
+    this._view = webviewView;
 
     chatApi.onMessage((queueMessage: TQueueMessages) => {
       logger.debug(`ChatViewProvider.onMessage=> ${queueMessage.size()}`);
@@ -89,12 +92,20 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       while (queueMessage.size() > 0) {
         const message: TMessageModel = queueMessage.dequeue() as TMessageModel;
 
+        if (message.message == "refresh") {
+          message.operation = MessageOperationEnum.NoShow;
+        }
         if (message.message == "clear") {
           this.chatModel.messages = [];
           dataCache.clear();
+          continue;
         }
 
-        if (message.operation === MessageOperationEnum.Add) {
+        if (message.timeStamp.getMilliseconds() >= this.lastProcess.getMilliseconds()) {
+          this.countNews++;
+        }
+
+        if ((message.operation === MessageOperationEnum.Add) || (message.operation === MessageOperationEnum.NoShow)) {
           this.chatModel.messages.push(message);
         } else {
           const index: number = this.chatModel.messages.findIndex(m => m.messageId === message.messageId);
@@ -111,29 +122,49 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         }
       }
 
-      this.sendUpdateModel(this.chatModel, undefined);
+      if (this._view?.visible) {
+        this.lastProcess = new Date(Date.now());
+        this.sendUpdateModel(this.chatModel, undefined);
+
+        if (this.countNews > 0) {
+          const badge: vscode.ViewBadge = {
+            tooltip: "News",
+            value: this.countNews
+          };
+
+          this._view!.badge = badge;
+        } else {
+          this._view!.badge = undefined;
+        }
+        this.countNews = 0;
+      }
     })
 
-    this._view = webviewView;
-
     webviewView.onDidChangeVisibility(() => {
+      console.log("onDidChangeVisibility ---", this._view?.visible)
       if (this._view?.visible) {
-        chatApi.gaia("refresh", {});
-        //this._view.webview.reveal(); //vscode.ViewColumn.One
+        setTimeout(() => {
+          chatApi.gaia("refresh", {}); //força atualização
+        }, 500)
       }
     })
 
     webviewView.webview.options = {
       ...getExtraPanelConfigurations(this._extensionUri),
-      enableCommandUris: true
+      enableCommandUris: true,
     };
 
     const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('TOTVS.tds-gaia');
     const extensionUri: vscode.Uri = ext!.extensionUri;
 
     webviewView.webview.html = getWebviewContent(webviewView.webview, extensionUri, "chatView",
-      { title: "Gaia: Chat", translations: this.getTranslations() });
+      { title: vscode.l10n.t("Chat"), translations: this.getTranslations() });
     webviewView.webview.onDidReceiveMessage(this._getWebviewMessageListener(webviewView.webview));
+
+    setTimeout(() => {
+      chatApi.gaia("refresh", {}); //força atualização
+    }, 500)
+
   }
 
   /**
@@ -357,7 +388,7 @@ async function jumpTo(source: string, startLine: number, startChar: number) {
       startChar = startChar - 1;
     }
 
-    let position: vscode.Position | undefined = editor.document.validatePosition(new vscode.Position(startLine, startChar));    
+    let position: vscode.Position | undefined = editor.document.validatePosition(new vscode.Position(startLine, startChar));
     const range = new vscode.Range(position, position);
     editor.selection = new vscode.Selection(position, position);
 

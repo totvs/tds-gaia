@@ -20,7 +20,7 @@ import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { VSCodeDataGrid } from "@vscode/webview-ui-toolkit/react";
 import NewMessage from "./newMessage";
 import MessageRow from "./messageRow";
-import { TMessageModel } from "./chatModels";
+import { MessageOperationEnum, TMessageModel } from "./chatModels";
 import { CommonCommandEnum, ReceiveMessage, TdsAbstractModel, sendSave, setDataModel, IFormAction, TdsForm } from "@totvs/tds-webtoolkit";
 import { setErrorModel } from "@totvs/tds-webtoolkit/dist/components/form/form";
 import { tdsVscode } from '@totvs/tds-webtoolkit';
@@ -84,6 +84,7 @@ export function ChatView() {
     mode: "all"
   })
 
+  //não remover, pois afeta a atualização das mensagens.
   const { fields, remove, insert } = useFieldArray(
     {
       control: methods.control as any,
@@ -133,27 +134,19 @@ export function ChatView() {
       scrollIntoViewIfNeeded(targetRow);
     }
   };
+
   const model: TFields = methods.getValues();
 
   React.useEffect(() => {
     const model: TFields = methods.getValues();
 
-    console.log("ChatView.useEffect", model.messages);
-
     if (model.messages.length > 0) {
       const lastMessage: TMessageModel = model.messages[model.messages.length - 1];
-      const lastMessageIndex: number = findLastIndex(model.messages,
-        (message: TMessageModel) => message.author !== "Gaia");
-      console.log("lastMessageIndex: ", lastMessageIndex, lastMessage.messageId);
+      // const lastMessageIndex: number = findLastIndex(model.messages,
+      //   (message: TMessageModel) => message.author !== "Gaia");
+      // console.log("lastMessageIndex: ", lastMessageIndex, lastMessage.messageId);
 
       scrollToLineIfNeeded(lastMessage.messageId);
-      //document.getElementById(lastMessage.messageId)?.scrollIntoView({ behavior: "smooth", block: "center" });
-      // scrollIntoView({
-      //   behavior: 'auto',
-      //   block: 'start',
-      //   inline: 'nearest',
-      // })
-
       flashMessage(lastMessage, model.messages);
     }
   }, [model.messages]);
@@ -177,7 +170,6 @@ export function ChatView() {
           console.dir(model);
           setDataModel<TFields>(methods.setValue, model);
           setErrorModel(methods.setError, errors);
-          //scroll();
 
           break;
 
@@ -209,10 +201,6 @@ export function ChatView() {
     caption: tdsVscode.l10n.t("Help"),
     type: "link",
     href: "command:tds-gaia.help",
-    // onClick: (sender: any) => {
-    //   model.newMessage = "Help";
-    //   (document.getElementsByName("newMessage")[0] as any).control.value = "Help";
-    // }
   });
 
   return (
@@ -222,7 +210,9 @@ export function ChatView() {
 
           <VSCodeDataGrid id="messagesGrid">
             {
-              model.messages.map((row: TMessageModel, index: number) => (
+              //fields.map((row: any, index: number) => (
+              model.messages.filter((row: TMessageModel) => row.operation !== MessageOperationEnum.NoShow)
+                .map((row: TMessageModel, index: number) => (
                 <MessageRow key={`msgRow_${index}`} index={index} message={row} messages={model.messages} />
               ))
             }

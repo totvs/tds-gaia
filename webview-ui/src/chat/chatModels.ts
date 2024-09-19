@@ -1,7 +1,8 @@
 export enum MessageOperationEnum {
     Add,
     Update,
-    Remove
+    Remove,
+    NoShow
 }
 
 export type TMessageModel = {

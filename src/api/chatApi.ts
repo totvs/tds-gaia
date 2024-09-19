@@ -240,7 +240,7 @@ export class ChatApi {
     }
 
     private queueMessages: TQueueMessages = new Queue<TMessageModel>();
-    private messageGroup: boolean = false;
+    //private messageGroup: boolean = false;
     private messageId: number = 0;
 
     /**
@@ -255,23 +255,23 @@ export class ChatApi {
         return this._onMessage.event;
     }
 
-    beginMessageGroup(): void {
-        this.messageGroup = true;
-    }
+    // _beginMessageGroup(): void {
+    //     this.messageGroup = true;
+    // }
 
-    endMessageGroup(): void {
-        if (this.messageGroup) {
-            this.messageGroup = false;
-            this._onMessage.fire(this.queueMessages);
-        }
-    }
+    // _endMessageGroup(): void {
+    //     if (this.messageGroup) {
+    //         this.messageGroup = false;
+    //         this._onMessage.fire(this.queueMessages);
+    //     }
+    // }
 
     protected sendMessage(message: TMessageModel): void {
         this.queueMessages.enqueue(message);
 
-        if (!this.messageGroup) {
+        //if (!this.messageGroup) {
             this._onMessage.fire(this.queueMessages);
-        }
+        //}
     }
 
     /**
@@ -444,7 +444,7 @@ export class ChatApi {
             //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
             const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
 
-            this.beginMessageGroup();
+            //this.beginMessageGroup();
 
             this.sendMessage({
                 operation: MessageOperationEnum.Add,
@@ -461,7 +461,7 @@ export class ChatApi {
 
             this.processMessage(message);
 
-            this.endMessageGroup();
+            //this.endMessageGroup();
         } else {
             this.processMessage(message);
         }

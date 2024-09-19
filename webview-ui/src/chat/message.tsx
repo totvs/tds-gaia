@@ -69,7 +69,6 @@ function mdToHtml(text: string): any[] {
         const part: string = parts[index];
 
         if (part) {
-            console.log(part);
             //A ordem de teste deve ser: CodeCode, Link e demais tags (cuidado ao alterar)
             if (part.match(mdTags.code)) {
                 index++;

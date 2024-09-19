@@ -27,7 +27,8 @@ import { TAbstractModelPanel } from "../panels/panelInterface";
 export enum MessageOperationEnum {
   Add,
   Update,
-  Remove
+  Remove,
+  NoShow
 }
 
 /**
