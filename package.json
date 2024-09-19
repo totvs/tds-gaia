@@ -61,13 +61,14 @@
   "l10n": "./l10n",
   "contributes": {
     "viewsContainers": {
-      "activitybar": [],
-      "panel": [
+      "activitybar": [
         {
           "id": "tds-gaia-container",
-          "title": "Gaia",
+          "title": "TDS-Gaia",
           "icon": "icons/tds-gaia.svg"
         }
+      ],
+      "panel": [
       ]
     },
     "views": {
@@ -75,11 +76,8 @@
         {
           "type": "webview",
           "id": "tds-gaia-view",
-          "name": "Gaia: Chat",
-          "visibility": "visible",
-          "icon": "icons/tds-gaia.svg",
-          "contextualTitle": "Gaia: Chat",
-          "initialSize": 0.25
+          "name": "Chat",
+          "initialSize": 0.3
         }
       ]
     },

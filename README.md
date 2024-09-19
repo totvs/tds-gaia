@@ -98,11 +98,11 @@ Você pode instalar também usando a opção `--install-extension` através da l
 
 > `code --install-extension tds-gaia-0.0.1.vsix`
 
-Ao finalizar a instalação, lhe será apresentado um bate-bato (_chat_). É através dele que você e  **Gaia, seu parceiro na programação AdvPL/TLPP**, iram interagir.
+Ao finalizar a instalação, o ícone do **TDS-Gaia** lhe será apresentado na barra de atividades. Acionando-o, lhe é apresentado o bate-papo através do qual você e  **Gaia, seu parceiro na programação AdvPL/TLPP**, iram interagir.
 
 ![Gaia: Chat](images/chat.png)
 
-> DICA: Para melhor visualização, recomenda-se mover a aba `Gaia` para o painel secundário (`Ctrl+Alt-B`).
+> DICA: Para melhor visualização, recomenda-se mover o bate-papo para o painel secundário (`Ctrl+Alt-B` e arraste o ícone).
 
 ### Revertendo uma atualização
 
@@ -195,13 +195,14 @@ O **TDS-Gaia**, depende de acesso a URL´s de serviços externos que, eventualme
 
 Apresenta, na visão `TDS-Gaia` da aba `Output`, mensagem semelhante:
 
-`console
+```console
 Cause: Error: unable to get local issuer certificate
 Stack: TypeError: fetch failed
  at fetch (w:\ws_tds_vscode\tds-gaia\node_modules\undici\index.js:103:13)
  at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
  at async CarolApi.checkHealth (w:\ws_tds_vscode\tds-gaia\out\api\carolApi.js:30:20)
-`
+```
+
 #### Correção
 
 Entre em contato com o suporte de segurança de sua empresa/organização para que ele libere o acesso a URL `https://advpl.ds.dta.totvs.ai` ou outro _endpoint_ indicado.
