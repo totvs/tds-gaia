@@ -15,7 +15,7 @@
     "build": "webpack --mode=production"
   },
   "dependencies": {
-    "@totvs/tds-webtoolkit": "0.0.13",
+    "@totvs/tds-webtoolkit": "0.0.16",
     "@vscode/codicons": "^0.0.36",
     "@vscode/webview-ui-toolkit": "^1.4.0",
     "react": "^18.3.1",
