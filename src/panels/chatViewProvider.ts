@@ -101,7 +101,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
           continue;
         }
 
-        if (message.timeStamp.getMilliseconds() >= this.lastProcess.getMilliseconds()) {
+        if (message.timeStamp.getTime() >= this.lastProcess.getTime()) {
           this.countNews++;
         }
 
@@ -125,24 +125,28 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       if (this._view?.visible) {
         this.lastProcess = new Date(Date.now());
         this.sendUpdateModel(this.chatModel, undefined);
-
-        if (this.countNews > 0) {
-          const badge: vscode.ViewBadge = {
-            tooltip: "News",
-            value: this.countNews
-          };
-
-          this._view!.badge = badge;
-        } else {
-          this._view!.badge = undefined;
-        }
         this.countNews = 0;
       }
+
+      //paliativo pois não remove "badge" ao setar para undefined (conforme documentação)
+      let badge: vscode.ViewBadge = {
+        tooltip: "",
+        value: 0
+      };
+      if ((this.countNews > 0) && (!this._view?.visible)) {
+        badge = {
+          tooltip: vscode.l10n.t("New messages"),
+          value: this.countNews
+        };
+      }
+      this._view!.badge = badge;
+
     })
 
     webviewView.onDidChangeVisibility(() => {
       console.log("onDidChangeVisibility ---", this._view?.visible)
       if (this._view?.visible) {
+        this._view!.badge = undefined;
         setTimeout(() => {
           chatApi.gaia("refresh", {}); //força atualização
         }, 500)
