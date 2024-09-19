@@ -8,7 +8,7 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
-## TDS-Gaia 0.0.NEXT
+## TDS-Gaia 0.0.15
 
 ### Melhorias
 
