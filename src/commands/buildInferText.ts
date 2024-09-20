@@ -37,26 +37,31 @@ export async function buildInferText(documentUri: vscode.Uri, range: vscode.Rang
         range: range,
         types: []
     }
-    const getSymbolsReturn: TGetSymbolsReturn = await getSymbols(inferData.documentUri, inferData.range);    
+    const getSymbolsReturn: TGetSymbolsReturn = await getSymbols(inferData.documentUri, inferData.range);
     const documentSymbols: vscode.DocumentSymbol[] | undefined = getSymbolsReturn.symbols;
 
     let someTipped: boolean = false;
     dataCache.set(messageId, inferData);
 
     if (getSymbolsReturn.status == 2) { //possível erro
-        text.push(vscode.l10n.t("WARNING: {0}", getSymbolsReturn.message || "Error trying to get a list of symbols." ));
+        text.push(vscode.l10n.t("WARNING: {0}", getSymbolsReturn.message || "Error trying to get a list of symbols."));
     }
 
     text.push(vscode.l10n.t("The following variables were inferred:"));
     text.push("");
 
     for (const varType of types) {
-        //if (varType.type !== "function") {
         const documentSymbol: vscode.DocumentSymbol | undefined = documentSymbols?.find((symbol) => {
             return (symbol.name === varType.var) &&
                 (symbol.kind === vscode.SymbolKind.Variable);
         });
 
+        if (varType.type == "any") { //paliativo. IA responde de forma indevida.
+            varType.type = "variant"
+        } else if (varType.type == "block") { //paliativo. IA responde de forma indevida.
+            varType.type = "codeblock"
+        }
+        
         varType.active = varType.active === undefined ? true : varType.active; //normalização do dado
         let alreadyTipped: boolean = !(varType.active) || (documentSymbol?.detail.includes(`as ${varType.type}`) || false);
 

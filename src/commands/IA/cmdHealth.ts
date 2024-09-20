@@ -51,7 +51,7 @@ export function registerHealth(context: vscode.ExtensionContext): void {
             llmApi.checkHealth(detail).then(async (error: any) => {
                 updateContextKey("readyForUse", error === undefined);
                 setGaiaReady(error === undefined);
-
+                //error = undefined;
                 if (error !== undefined) {
                     let message: string[] = [];
                     if (totalAttempts > 1) {
@@ -72,7 +72,7 @@ export function registerHealth(context: vscode.ExtensionContext): void {
                         const parts: string = error.message.split("\n");
                         const time: RegExpMatchArray | null = parts[1].match(/(\d+) seconds/i);
                         if (attempt == 1) {
-                            message.push(`\'${parts[1]}\'`);
+                            message.push(`\`${parts[1]}\``);
                         }
                         chatApi.gaia(message, {});
 

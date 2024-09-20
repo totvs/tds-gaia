@@ -16,13 +16,13 @@ limitations under the License.
 
 import * as vscode from 'vscode';
 import { TQueueMessages } from '../api/chatApi';
-import { getGaiaUser } from '../config';
 import { logger } from '../logger';
 import { dataCache } from '../dataCache';
 import { chatApi, feedbackApi } from '../api';
 import { getExtraPanelConfigurations, getWebviewContent } from '../utilities/webview-utils';
 import { CommonCommandFromWebViewEnum, CommonCommandToWebViewEnum, ReceiveMessage, TChatModel, TFieldErrors, TMessageModel } from 'tds-shared/lib';
 import { MessageOperationEnum } from 'tds-shared/lib/models/messageModel';
+import { getGaiaConfiguration } from "../config";
 
 export enum ChatCommandEnum {
   Feedback = "FEEDBACK",
@@ -55,7 +55,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   private chatModel: TChatModel = {
     command: "",
     lastPublication: new Date(),
-    loggedUser: getGaiaUser()?.displayName || "<Not logged>",
+    loggedUser: getGaiaConfiguration().currentUser?.displayName || "<Not logged>",
     newMessage: "",
     messages: []
   };
@@ -257,8 +257,26 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             this.chatModel.messages
               .filter((msg: TMessageModel) => msg.messageId == data.messageId)
               .forEach((msg: TMessageModel) => {
-                msg.disabled = true;
-                feedbackApi.scoreMessage(msg.messageId, Number.parseInt(data.value));
+                if (data.text == "comment") {
+                  const inputComment: vscode.InputBox = vscode.window.createInputBox();
+                  inputComment.title = vscode.l10n.t("Comment feedback");
+                  inputComment.value = "";
+                  inputComment.prompt = vscode.l10n.t("Make a brief comment on the TDS-Gaia message");
+                  inputComment.ignoreFocusOut = true;
+                  
+                  inputComment.onDidAccept(() => {
+                    const value: string = inputComment.value;
+                    inputComment.enabled = false;
+                    inputComment.busy = true;
+
+                    feedbackApi.commentTrace(msg.messageId, value);
+                  });
+
+                  inputComment.show();
+                } else {
+                  msg.disabled = true;
+                  feedbackApi.scoreMessage(msg.messageId, Number.parseInt(data.value));
+                }
               });
 
             this.sendUpdateModel(this.chatModel, undefined);

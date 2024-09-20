@@ -68,8 +68,7 @@
           "icon": "icons/tds-gaia.svg"
         }
       ],
-      "panel": [
-      ]
+      "panel": []
     },
     "views": {
       "tds-gaia-container": [
@@ -440,6 +439,7 @@
     "@vscode/l10n": "^0.0.18",
     "@vscode/l10n-dev": "^0.0.35",
     "fs-extra": "^11.2.0",
+    "langfuse-langchain": "^3.25.0",
     "tds-shared": "file:./shared",
     "undici": "^6.19.2",
     "vscode-languageclient": "^9.0.1",

@@ -78,7 +78,6 @@ export interface IaApiInterface {
  */
 export class AbstractApi {
 
-    private _requestId: any;
     private _endPoint: string = "";
     private _apiVersion: string = "";
     private _urlRequest: string = "";

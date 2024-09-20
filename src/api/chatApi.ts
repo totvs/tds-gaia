@@ -16,12 +16,12 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import * as path from "path";
-import { getGaiaUser, isGaiaLogged, isGaiaReady } from "../config";
 import { Queue } from "../queue";
 import { exit } from "process";
 import { isGaiaFirstUse, isGaiaUpdated, updateGaiaLastLogin } from "../extension";
 import { TMessageModel } from "tds-shared/lib";
 import { MessageOperationEnum } from "tds-shared/lib/models/messageModel";
+import { getGaiaConfiguration, TGaiaConfig } from "../config";
 
 /**
  * Defines the queue message type for chat messages.
@@ -270,7 +270,7 @@ export class ChatApi {
         this.queueMessages.enqueue(message);
 
         //if (!this.messageGroup) {
-            this._onMessage.fire(this.queueMessages);
+        this._onMessage.fire(this.queueMessages);
         //}
     }
 
@@ -393,15 +393,17 @@ export class ChatApi {
     * @returns Void
     */
     async checkUser(answeringId: string) {
-        if (isGaiaReady()) {
-            if (!isGaiaLogged()) {
+        const config: TGaiaConfig = getGaiaConfiguration();
+
+        if (config.ready) {
+            if (!config.isGaiaLogged) {
                 this.gaia([
                     vscode.l10n.t("To start, I need to know you."),
                     vscode.l10n.t("Please, identify yourself with the command {0}.", this.commandText("login"))
                 ], { answeringId: answeringId });
             } else {
                 this.gaia([
-                    vscode.l10n.t("Hello, **{0}**.", getGaiaUser()?.displayName || "<unknown>"),
+                    vscode.l10n.t("Hello, **{0}**.", config.currentUser?.displayName || "<unknown>"),
                     vscode.l10n.t("I'm ready to help you in any way possible!"),
                 ], { answeringId: answeringId });
 
@@ -411,7 +413,7 @@ export class ChatApi {
                         vscode.l10n.t("Want to know how to interact with me? {0}", this.commandText("hint_1"))
                     ], { answeringId: answeringId });
                 } else if (await isGaiaUpdated()) {
-                    const version = vscode.extensions.getExtension("TOTVS.tds-gaia")?.packageJSON.version || "";
+                    const version = config.gaiaVersion;
                     this.gaia([
                         vscode.l10n.t("There was an evolution in my processes. I recommend reading the topic **TDS-Gaia {0}** in {1}.", version, this.commandText("open-change-log"))
                     ], { answeringId: answeringId });
@@ -425,9 +427,11 @@ export class ChatApi {
     }
 
     logout() {
-        if (isGaiaLogged()) {
+        const config: TGaiaConfig = getGaiaConfiguration();
+
+        if (config.isGaiaLogged) {
             this.gaia([
-                vscode.l10n.t("**{0}**, thank you for working with me!", getGaiaUser()?.displayName || "<unknown>"),
+                vscode.l10n.t("**{0}**, thank you for working with me!", config.currentUser?.displayName || "<unknown>"),
                 vscode.l10n.t("See you soon!"),
             ], {});
         }
@@ -441,6 +445,8 @@ export class ChatApi {
     */
     user(message: string, echo: boolean): void {
         if (echo) {
+            const config: TGaiaConfig = getGaiaConfiguration();
+
             //Necessário nesse formato para evitar conflitos nos objetos React criados dinamicamente
             const id: string = `FF0000${(this.messageId++).toString(16)}`.substring(-6);
 
@@ -452,7 +458,7 @@ export class ChatApi {
                 answering: "",
                 inProcess: false,
                 timeStamp: new Date(),
-                author: getGaiaUser()?.displayName || "<unknown>",
+                author: config.currentUser?.displayName || "<unknown>",
                 message: message == undefined ? "???" : message,
                 className: "tds-message-user",
                 feedback: false,
@@ -476,6 +482,8 @@ export class ChatApi {
     * @returns A comma-separated string of formatted command text that can be used to execute the commands.
     */
     commandList(): string {
+        const config: TGaiaConfig = getGaiaConfiguration();
+
         let commands: string[] = [];
 
         commands.push(`${this.commandText("help")}`);
@@ -483,9 +491,9 @@ export class ChatApi {
         commands.push(`${this.commandText("open-quick-guide")}`);
         commands.push(`${this.commandText("clear")}`);
 
-        if (!isGaiaReady()) {
+        if (!config.ready) {
             commands.push(`${this.commandText("details")}`);
-        } else if (isGaiaLogged()) {
+        } else if (config.isGaiaLogged) {
             commands.push(`${this.commandText("logout")}`);
             commands.push(`${this.commandText("explain")}`);
             commands.push(`${this.commandText("explain-world")}`);

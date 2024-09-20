@@ -18,7 +18,8 @@ import * as vscode from 'vscode';
 import * as fse from 'fs-extra';
 import winston = require('winston');
 import Transport = require('winston-transport');
-import { getGaiaLogLevel } from './config';
+import { getGaiaConfiguration } from './config';
+import { sanitizeText } from './util';
 
 const outputChannel: vscode.LogOutputChannel = vscode.window.createOutputChannel('TDS-Gaia', { log: true });
 export const PREFIX_GAIA = "[TDS-Gaia]";
@@ -143,18 +144,7 @@ const myFormat = winston.format.printf((info: winston.Logform.TransformableInfo)
 
     //higienização
     if ((info.level == "http") || (info.level == "error")) {
-        const sanitize = (re: RegExp) => {
-            const matches: RegExpExecArray | null = re.exec(text);
-
-            if (matches) {
-                return text.replace(re, `${matches[1]}${matches[2].length ? matches[2].substring(0, 4) + "..." : ""}"`);
-            }
-
-            return text;
-        };
-
-        text = sanitize(/("X\-Auth": ")(.*)"/i);
-        text = sanitize(/("authorization": "Basic )(.*)"/i);
+        text = sanitizeText(text);
     }
 
     return text;
@@ -167,7 +157,7 @@ const myFormat = winston.format.printf((info: winston.Logform.TransformableInfo)
  * The logger will log to the console and to a dated log file.
  */
 export const logger: winston.Logger = winston.createLogger({
-    level: getGaiaLogLevel(),
+    level: getGaiaConfiguration().logLevel,
     format: winston.format.combine(
         winston.format.errors({ stack: true }),
         winston.format.splat(),
@@ -206,18 +196,18 @@ export const logger: winston.Logger = winston.createLogger({
 // If we're not in production then log to the `console` with the format:
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
 //
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        level: 'info',
-        format: winston.format.combine(
-            winston.format.colorize(),
-            winston.format.splat(),
-            winston.format.timestamp(),
-            winston.format.label({ label: LABEL_GAIA }),
-            //winston.format.simple()
-            winston.format.prettyPrint(),
-        )
-    }));
-}
+// if (process.env.NODE_ENV !== 'production') {
+//     logger.add(new winston.transports.Console({
+//         level: 'info',
+//         format: winston.format.combine(
+//             winston.format.colorize(),
+//             winston.format.splat(),
+//             winston.format.timestamp(),
+//             winston.format.label({ label: LABEL_GAIA }),
+//             //winston.format.simple()
+//             winston.format.prettyPrint(),
+//         )
+//     }));
+// }
 
 outputChannel.appendLine(`TDS-Gaia logger initialized at ${new Date().toDateString()} and file writes in ${logDir}`);

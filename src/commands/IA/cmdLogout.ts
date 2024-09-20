@@ -16,8 +16,8 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { PREFIX_GAIA } from "../../logger";
-import { isGaiaLogged } from "../../config";
 import { chatApi, feedbackApi, llmApi } from "../../api";
+import { getGaiaConfiguration } from "../../config";
 
 export function registerLogout(context: vscode.ExtensionContext): void {
 
@@ -26,7 +26,7 @@ export function registerLogout(context: vscode.ExtensionContext): void {
     * This command unsubscribes the user from the Gaia API, logs them out of the chat and language models, and displays an information message to the user.
     */
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.logout', async (...args) => {
-        if (isGaiaLogged()) {
+        if (getGaiaConfiguration().isGaiaLogged) {
             chatApi.gaia(
                 vscode.l10n.t("To logout of the **TDS-Gaia**, please click in `Accounts` and in your identification, click in `Sign Out`"),
                 { answeringId: "" });
@@ -34,7 +34,7 @@ export function registerLogout(context: vscode.ExtensionContext): void {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('tds-gaia.afterLogout', async (...args) => {
-        if (isGaiaLogged()) {
+        if (getGaiaConfiguration().isGaiaLogged) {
             feedbackApi.eventLogout();
             chatApi.logout();
             llmApi.logout();

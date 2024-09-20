@@ -16,33 +16,20 @@ limitations under the License.
 
 import * as vscode from "vscode";
 import { randomUUID } from "crypto";
-import { PREFIX_GAIA } from "../logger";
-
-export enum TypeFeedbackEnum {
-    TraceCreate = "trace-create",
-    ScoreCreate = "score-create",
-    EventCreate = "event-create",
-    SpanCreate = "span-create",
-    SpanUpdate = "span-update",
-    GenerationCreate = "generation-create",
-    GenerationUpdate = "generation-update",
-    SdkLog = "sdk-log",
-    ObservationCreate = "observation-create",
-    ObservationUpdate = "observation-update",
-}
 
 interface ITraceElement {
-    toJSON(): {};
+    toJson(): {};
 }
 
 export class TraceElement implements ITraceElement {
-    readonly id: string = `trace_id_${randomUUID()}`;
+    readonly id: string = randomUUID();
 
     name: string = "";
     userId: string = "";
     input: string = "";
     output: string = "";
     metadata: Record<string, any> | undefined = undefined;
+    tags: string[] = []
 
     /**
     * Gets the current session ID.
@@ -52,61 +39,63 @@ export class TraceElement implements ITraceElement {
         return vscode.env.sessionId;
     };
 
-    toJSON(): {} {
-
+    toJson(): {} {
+        // id ?: string | null;
+        // timestamp ?: string | null;
+        // name ?: string | null;
+        // userId ?: string | null;
+        // input ?: unknown;
+        // output ?: unknown;
+        // sessionId ?: string | null;
+        // release ?: string | null;
+        // version ?: string | null;
+        // metadata ?: unknown;
+        // tags ?: string[] | null;
+        // public ?: boolean | null;
         return {
-            "type": "trace-create",
-            "id": `trace_id_${randomUUID()}`, //ID de envio
-            "timestamp": new Date().toISOString(),
-            "body": {
-                "id": this.id,
-                "sessionId": this.sessionId,
-                "name": this.name,
-                "userId": this.userId,
-                "input": this.input == "" ? undefined : this.input,
-                "output": this.output == "" ? undefined : this.output,
-                "metadata": this.metadata === undefined ? undefined : this.metadata
-            }
+            "id": this.id,
+            "sessionId": this.sessionId,
+            "name": this.name,
+            "userId": this.userId,
+            "input": this.input == "" ? undefined : this.input,
+            "output": this.output == "" ? undefined : this.output,
+            "metadata": this.metadata === undefined ? undefined : this.metadata,
+            "tags": this.tags
         }
     }
 }
 
 export class EventElement implements ITraceElement {
     readonly trace: TraceElement;
-    readonly id: string = `event_id_${randomUUID()}`;
-    readonly timeStamp: Date = new Date();
+    readonly id: string = randomUUID();
 
     name: string = "";
-    input: string = "";
-    output: string = "";
+    input: {} = {};
+    output: {} = {};
     level: "DEBUG" | "DEFAULT" | "WARNING" | "ERROR" | "" = "";
+    statusMessage: string = "";
 
     constructor(trace: TraceElement) {
         this.trace = trace;
     }
 
-    toJSON(): {} {
-
+    toJson(): {} {
         return {
-            "type": "event-create",
-            "id": `event_id_${randomUUID()}`, //ID de envio
-            "timestamp": this.timeStamp.toISOString(),
-            "body": {
-                "id": this.id,
-                "traceId": this.trace.id,
-                "name": this.name,
-                "input": this.input == "" ? undefined : this.input,
-                "output": this.output == "" ? undefined : this.output,
-                "level": this.level == "" ? undefined : this.level,
-            }
-        };
+            //"id": this.id,
+            "traceId": this.trace.id,
+            "name": this.name,
+            "input": this.input,
+            "output": this.output,
+            "level": this.level == "" ? undefined : this.level,
+            "statusMessage": this.statusMessage == "" ? undefined : this.statusMessage,
+        }
     }
 }
 
 export class ScoreElement implements ITraceElement {
     readonly trace: TraceElement;
-    readonly id: string = `score_id_${randomUUID()}`;
-    readonly timeStamp: Date = new Date();
+    readonly id: string = randomUUID();
+
     value: number = -1;
     comment: string = "";
     name: string = "";
@@ -115,19 +104,13 @@ export class ScoreElement implements ITraceElement {
         this.trace = trace;
     }
 
-    toJSON(): {} {
-
+    toJson(): {} {
         return {
-            "type": "score-create",
-            "id": `score_id_${randomUUID()}`, //ID de envio
-            "timestamp": this.timeStamp.toISOString(),
-            "body": {
-                "id": this.id,
-                "traceId": this.trace.id,
-                "name": this.name,
-                "value": this.value,
-                "comment": this.comment == "" ? undefined : this.comment,
-            }
-        };
+            //"id": this.id,
+            "traceId": this.trace.id,
+            "name": this.name,
+            "value": this.value,
+            "comment": this.comment == "" ? undefined : this.comment,
+        }
     }
 }

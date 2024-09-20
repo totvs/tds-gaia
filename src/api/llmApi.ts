@@ -16,7 +16,7 @@ limitations under the License.
 
 import * as vscode from "vscode";
 
-import { TGaiaConfig, getGaiaConfiguration, getGaiaUser, isGaiaLogged, setGaiaUser } from "../config";
+import { TGaiaConfig, getGaiaConfiguration, setGaiaUser } from "../config";
 import { capitalize } from "../util";
 import { CompletionResponse, AbstractApi, IaApiInterface, InferTypeResponse } from "./interfaceApi";
 import { logger } from "../logger";
@@ -103,15 +103,13 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
     * @returns A promise that resolves to `true` when the logout operation is complete.
     */
     logout(): Promise<boolean> {
-        //logger.profile("logout");
         logger.info(vscode.l10n.t("Logging out..."));
         this.authorization = "";
 
-        if (isGaiaLogged()) {
+        if (getGaiaConfiguration().isGaiaLogged) {
             setGaiaUser(undefined);
         }
 
-        //logger.profile("logout");
         return Promise.resolve(true);
     }
 
@@ -289,14 +287,11 @@ export class LLMApi extends AbstractApi implements IaApiInterface {
 
         if (!json || json.length === 0) {
             void vscode.window.showInformationMessage(vscode.l10n.t("No code found in the stack"));
-            //logger.profile("innerType");
         } else if (json.types) {
             types = json.types;
         }
 
         logger.debug(vscode.l10n.t("Code infer end with {0} suggestions", types.length));
-
-        //logger.profile("innerType");
 
         return json;
     }

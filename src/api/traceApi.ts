@@ -15,33 +15,19 @@ limitations under the License.
 */
 
 import * as vscode from "vscode";
-import { getGaiaConfiguration, LoggedUser, TGaiaConfig } from "../config";
+import { getGaiaConfiguration } from "../config";
 import { AbstractApi } from "./interfaceApi";
 import { PREFIX_GAIA, logger } from "../logger";
 import { Queue } from "../queue";
 import { EventElement, ScoreElement, TraceElement } from "./traceTypes";
-
-enum TypeFeedbackEnum {
-    TraceCreate = "trace-create",
-    ScoreCreate = "score-create",
-    EventCreate = "event-create",
-    SpanCreate = "span-create",
-    SpanUpdate = "span-update",
-    GenerationCreate = "generation-create",
-    GenerationUpdate = "generation-update",
-    SdkLog = "sdk-log",
-    ObservationCreate = "observation-create",
-    ObservationUpdate = "observation-update",
-}
-const config: TGaiaConfig = getGaiaConfiguration();
-const END_POINT: string = config.endPointEvent;
+import { Langfuse } from "langfuse-langchain";
 
 type TQueueData = TraceElement | EventElement | ScoreElement;
 
 export class TraceApi extends AbstractApi {
     private authorization: string = "";
-    private user: LoggedUser | undefined = undefined;
     private queue: Queue<TQueueData> = new Queue<TQueueData>();
+    private langfuse!: Langfuse;
 
     /**
      * Constructor for FeedbackApi class.
@@ -49,7 +35,8 @@ export class TraceApi extends AbstractApi {
      * 
      */
     constructor() {
-        super(END_POINT, "v1");
+        super(`${getGaiaConfiguration().endPointEvent}`, "v1");
+
     }
 
     /**
@@ -69,6 +56,21 @@ export class TraceApi extends AbstractApi {
     */
     start(publicKey: string, secretKey: string): boolean {
         this.authorization = Buffer.from(`pk-lf-${publicKey}:sk-lf-${secretKey}`).toString("base64");
+        this.langfuse = new Langfuse({
+            secretKey: `sk-lf-${secretKey}`,
+            publicKey: `pk-lf-${publicKey}`,
+            baseUrl: `${this.apiRequest}`, //"https://cloud.langfuse.com",
+            flushAt: 1,
+            release: `${getGaiaConfiguration().apiVersion}`,
+        });
+        // this.langfuse.debug(true);
+
+        // const trace = this.langfuse.trace({
+        //     //id: this.sessionId,
+        //     name: "gaia-trace-new",
+        //     //release: `${getGaiaConfiguration().apiVersion}`,
+        // });
+        //console.log(trace);
 
         logger.info(vscode.l10n.t("Trace Service is running. EndPoint: {0}", this.endPoint));
 
@@ -81,7 +83,6 @@ export class TraceApi extends AbstractApi {
     */
     stop(): boolean {
         this.authorization = "";
-        this.user = undefined;
 
         return true;
     }
@@ -105,6 +106,8 @@ export class TraceApi extends AbstractApi {
         let trace: TraceElement = new TraceElement();
 
         trace.name = PREFIX_GAIA;
+        trace.tags.push(`gaia-${getGaiaConfiguration().gaiaVersion}`)
+        trace.tags.push(`tds-${getGaiaConfiguration().tdsVersion}`)
 
         return trace;
     }
@@ -126,40 +129,37 @@ export class TraceApi extends AbstractApi {
     }
 
     sendQueue(): void {
-        const data: {}[] = [];
+        let countMsg: number = 0;
 
         while (this.queue.size() > 0) {
             const element = this.queue.dequeue();
 
             if (element !== undefined) {
-                data.push(element.toJSON())
+                if (element instanceof TraceElement) {
+                    this.langfuse.trace(element.toJson());
+                } else if (element instanceof EventElement) {
+                    this.langfuse.event(element.toJson());
+                } else if (element instanceof ScoreElement) {
+                    this.langfuse.score(element.toJson() as any);
+                }
+
+                countMsg++;
             }
         }
 
-        if ((this.authorization !== "") && (data.length > 0)) {
-            this.jsonRequest("POST", "", {}, { "batch": data })
-                .then(response => {
-                    if (response instanceof Error) {
-                        logger.error("sendQueue: ERROR.");
-                        logger.error(response);
-
-                        if (response.message.startsWith("401")) {
-                            this.authorization = "";
-                            logger.error("No further messages will be sent.");
-                        }
-                    } else {
-                        logger.debug("sendQueue: SUCCESS. Messages sent: {0}", (response as any).successes.length);
-                        logger.debug(JSON.stringify(data));
-                    }
-                })
-                .catch(error => {
-                    logger.error("sendQueue: ERROR. Messages count: {0}", data.length);
-                    logger.error(JSON.stringify(data));
-                    logger.error(error);
-                });
-        } else {
-            logger.debug("sendQueue: Empty queue.");
-        }
+        // if ((this.authorization !== "")) {
+        //     this.langfuse.flushAsync()
+        //         .then((data) => {
+        //             logger.debug("sendQueue: SUCCESS. Messages sent: {0}", countMsg);
+        //             logger.debug(data);
+        //         })
+        //         .catch(error => {
+        //             logger.error("sendQueue: ERROR. Messages count: {0}", countMsg);
+        //             logger.error(error);
+        //         });
+        // } else {
+        //     logger.debug("sendQueue: Empty queue.");
+        // }
     }
 
 }

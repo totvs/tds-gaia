@@ -18,7 +18,7 @@ import * as vscode from "vscode";
 import { PREFIX_GAIA, logger } from "../../logger";
 import { GaiaAuthenticationProvider, getGaiaSession } from "../../authenticationProvider";
 import { chatApi, feedbackApi, llmApi } from "../../api";
-import { getGaiaUser } from "../../config";
+import { getGaiaConfiguration } from "../../config";
 
 export function registerLogin(context: vscode.ExtensionContext): void {
 
@@ -63,10 +63,10 @@ export function registerLogin(context: vscode.ExtensionContext): void {
 
             if (await llmApi.login(session.account.id, session.accessToken)) {
                 logger.info(vscode.l10n.t("{0} Logged in successfully as {1}",
-                    "", getGaiaUser()?.displayName || vscode.l10n.t("<unknown>")));
+                    "", getGaiaConfiguration().currentUser?.displayName || vscode.l10n.t("<unknown>")));
 
                 vscode.window.showInformationMessage(vscode.l10n.t("{0} Logged in successfully as {1}",
-                    PREFIX_GAIA, getGaiaUser()?.displayName || vscode.l10n.t("<unknown>")));
+                    PREFIX_GAIA, getGaiaConfiguration().currentUser?.displayName || vscode.l10n.t("<unknown>")));
 
                 const [_, publicKey, secretKey] = session.scopes[0].split(":");
                 feedbackApi.start(publicKey, secretKey);

@@ -15,15 +15,14 @@ limitations under the License.
 */
 
 import * as vscode from 'vscode';
-import { getGaiaLogLevel, getGaiaUser, isGaiaLogged, isGaiaShowBanner } from './config';
 import { ChatViewProvider } from './panels/chatViewProvider';
 import { PREFIX_GAIA, logger } from './logger';
 import { registerIaCommands } from './commands/IA/index';
 import { registerChatCommands } from './commands/chat';
 import { registerAuthentication } from './authenticationProvider';
-import { updateContextKey } from './util';
 import { registerInlineCompletionItemProvider } from './completionItemProvider';
 import { feedbackApi, llmApi } from './api';
+import { getGaiaConfiguration } from './config';
 
 let extensionContext: vscode.ExtensionContext;
 
@@ -79,7 +78,7 @@ export function deactivate() {
 function handleConfigChange(context: vscode.ExtensionContext) {
 	const listener: vscode.Disposable = vscode.workspace.onDidChangeConfiguration(async event => {
 		if (event.affectsConfiguration('tds-gaia')) {
-			logger.level = getGaiaLogLevel();
+			logger.level = getGaiaConfiguration().logLevel;
 		}
 	});
 
@@ -91,7 +90,7 @@ function handleConfigChange(context: vscode.ExtensionContext) {
  * The banner contains the extension name, version, info, and link to the repo.
  */
 function showBanner(force: boolean = false): void {
-	const showBanner: boolean = isGaiaShowBanner();
+	const showBanner: boolean = getGaiaConfiguration().showBanner;
 
 	if (showBanner || force) {
 		let ext = vscode.extensions.getExtension("TOTVS.tds-gaia");
@@ -120,7 +119,7 @@ function showBanner(force: boolean = false): void {
  * @returns True if this is the first time TGaia is being used, false otherwise.
  */
 export async function isGaiaFirstUse(): Promise<boolean> {
-	if ((getGaiaUser()?.email || "").startsWith("//")) {
+	if ((getGaiaConfiguration().currentUser?.email || "").startsWith("//")) {
 		await extensionContext.secrets.delete("tds-gaia.information");
 	}
 

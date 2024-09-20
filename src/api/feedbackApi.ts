@@ -15,11 +15,12 @@ limitations under the License.
 */
 
 import * as vscode from "vscode";
-import { LoggedUser, getGaiaUser } from "../config";
+import { getGaiaConfiguration, LoggedUser } from "../config";
 import { Completion, InferType } from "./interfaceApi";
 import { logger } from "../logger";
 import { TraceApi } from "./traceApi";
 import { EventElement, ScoreElement, TraceElement } from "./traceTypes";
+import { sanitizeJson } from "../util";
 
 enum EventsFeedbackEnum {
     Login = "login",
@@ -64,7 +65,7 @@ export class FeedbackApi {
         this.traceApi.start(publicKey, secretKey);
 
         logger.info(vscode.l10n.t("Feedback Service is running"));
-        this.user = getGaiaUser();
+        this.user = getGaiaConfiguration().currentUser;
 
         return true;
     }
@@ -78,39 +79,30 @@ export class FeedbackApi {
 
     private createTrace(): TraceElement {
         let result!: TraceElement;
-        //logger.profile("createTrace");
 
         if (this.user) {
             result = this.traceApi.createTrace();
             result.userId = this.user.email;
-
-            // this.traceMap[result.id] = result;
         } else {
             logger.error("createTrace: user not found");
         }
 
-        //logger.profile("createTrace");
         return result;
     }
 
     private createEvent(trace: TraceElement, event: EventsFeedbackEnum): EventElement {
-        //logger.profile("createEvent");
         const result = this.traceApi.createEvent(trace);
 
         result.name = event;
 
-        //this.traceMap[result.id] = result;
         this.elementMap[event] = result;
 
-        //logger.profile("createEvent");
         return result;
     }
 
     private createScore(trace: TraceElement): ScoreElement {
-        //logger.profile("scoreEvent");
         const result = this.traceApi.createScore(trace);
 
-        //logger.profile("createScore");
         return result;
     }
 
@@ -119,22 +111,17 @@ export class FeedbackApi {
     * @returns A Promise that resolves to a boolean indicating whether the login event was successfully logged.
     */
     eventLogin(): void {
-        //logger.profile("eventLogin");
         if (this.user == undefined) {
-            this.user = getGaiaUser();
+            this.user = getGaiaConfiguration().currentUser;
         }
 
         if (this.user) {
             const trace: TraceElement = this.createTrace();
-            const gaiaExt: vscode.Extension<any> | undefined = vscode.extensions.getExtension("TOTVS.tds-gaia");
-            const tdsExt: vscode.Extension<any> | undefined = vscode.extensions.getExtension("TOTVS.tds-vscode");
 
             trace.metadata = {
                 "email": this.user.email,
                 "name": this.user.fullname,
                 "company": this.user.orgs?.join(",") || "",
-                "gaiaVersion": gaiaExt?.packageJSON.version || "unavailable",
-                "tdsVersion": tdsExt?.packageJSON.version || "unavailable",
                 "vscode": {
                     "version": vscode.version,
                     "language": vscode.env.language,
@@ -157,23 +144,20 @@ export class FeedbackApi {
             logger.error("eventLogin: user not found");
         }
 
-        //logger.profile("eventLogin");
         return;
     }
 
-    //curl -X POST https://langfuse-api.example.com/traces/trace_id/update -d 'updated_data=your_updated_data'
     eventLogout(): boolean {
-        //logger.profile("eventLogout");
         const eventLogin: EventElement = this.elementMap[EventsFeedbackEnum.Login] as EventElement;
         let result: boolean = false;
-
+        
         if (eventLogin) {
             const eventLogout: EventElement = this.createEvent(eventLogin.trace, EventsFeedbackEnum.Logout);
 
             eventLogout.input = JSON.stringify({
-                "start": eventLogin.timeStamp.toISOString(),
-                "end": eventLogout.timeStamp.toISOString(),
-                "duration": `${(eventLogout.timeStamp.getMilliseconds() - eventLogin.timeStamp.getMilliseconds()) / 1000} seg`
+                //"start": eventLogin.timeStamp.toISOString(),
+                //"end": eventLogout.timeStamp.toISOString(),
+                //"duration": `${(eventLogout.timeStamp.getMilliseconds() - eventLogin.timeStamp.getMilliseconds()) / 1000} seg`
             });
 
             this.traceApi.enqueue(eventLogout);
@@ -186,13 +170,10 @@ export class FeedbackApi {
 
         this.user = undefined;
 
-        //logger.profile("eventLogout");
         return result;
     }
 
     eventCompletion(argument: { selected: number, completions: Completion[]; textBefore: string; textAfter: string; }) {
-        //logger.profile("eventCompletion");
-
         if (this.user) {
             const trace: TraceElement = this.createTrace();
             trace.input = JSON.stringify({
@@ -222,7 +203,6 @@ export class FeedbackApi {
         } else {
             logger.error("eventCompletion: user not found");
         }
-
     }
 
     /**
@@ -233,7 +213,6 @@ export class FeedbackApi {
     * @returns 
     */
     traceInferType(messageId: string, codeToAnalyze: string, types: InferType[]): string {
-        //logger.profile("traceInferType");
         let result: string = "";
 
         if (this.user) {
@@ -258,12 +237,10 @@ export class FeedbackApi {
             logger.error("traceInferType: user not found");
         }
 
-        //logger.profile("traceInferType");
         return result;
     }
 
     scoreInferType(messageId: string, types: InferType[], scoreValue: number, comment: string = "", unregister: boolean = false) {
-        //logger.profile("scoreInferType");
         let result: string = "";
 
         if (this.user) {
@@ -297,12 +274,10 @@ export class FeedbackApi {
             }
         }
 
-        //logger.profile("scoreInferType");
         return result;
     }
 
     scoreMessage(messageId: string, scoreValue: number) {
-        //logger.profile("scoreMessage");
 
         if (this.user) {
             const traceId: string = this.feedbackMap[messageId];
@@ -321,7 +296,28 @@ export class FeedbackApi {
             }
         }
 
-        //logger.profile("scoreMessage");
+        return;
+    }
+
+    commentTrace(messageId: string, comment: string) {
+
+        if (this.user) {
+            const traceId: string = this.feedbackMap[messageId];
+            const trace: TraceElement = this.elementMap[traceId] as TraceElement;
+
+            if (trace) {
+                const score: ScoreElement = this.createScore(trace);
+                score.name = "chat-msg-comment";
+                //score.value = scoreValue;
+                score.comment = comment;
+
+                this.traceApi.enqueue(score);
+                this.traceApi.sendQueue();
+            } else {
+                logger.error("scoreMessage: Message trace element not found");
+            }
+        }
+
         return;
     }
 
@@ -333,7 +329,6 @@ export class FeedbackApi {
     * @param explain - The explanation for the code snippet.
     */
     traceExplain(messageId: string, codeToExplain: string, explain: string): void {
-        //logger.profile("traceExplain");
         let result: string = "";
 
         if (this.user) {
@@ -359,13 +354,10 @@ export class FeedbackApi {
             logger.error("traceExplain: user not found");
         }
 
-        //logger.profile("traceExplain");
         return;
     }
 
     traceGenerateCode(messageId: string, generateText: string, generateCode: string[]) {
-        //logger.profile("traceGenerateCode");
-
         if (this.user) {
             const trace: TraceElement = this.createTrace();
             trace.input = JSON.stringify({
@@ -388,12 +380,10 @@ export class FeedbackApi {
             logger.error("traceGenerateCode: user not found");
         }
 
-        //logger.profile("traceGenerateCode");
         return;
     }
 
     traceRequestError(status: number, statusText: string, url: string, method: string, headers: {}, body: string | object): void {
-        //logger.profile("traceExplain");
         let result: string = "";
 
         if (this.user) {
@@ -407,7 +397,7 @@ export class FeedbackApi {
                 statusText: statusText,
             });
             trace.metadata = {
-                headers: headers,
+                headers: sanitizeJson(headers),
                 body: body,
             }
             this.traceApi.enqueue(trace);

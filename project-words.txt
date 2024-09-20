@@ -6,6 +6,7 @@ codicons
 fullname
 HOMEPATH
 huggingface
+langfuse
 Logform
 protheus
 tlpp

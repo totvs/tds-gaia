@@ -126,3 +126,48 @@ export async function updateContextKey(key: string, value: boolean | string | nu
     vscode.commands.executeCommand('setContext', `tds-gaia.${key}`, value);
 }
 
+/**
+ * Sanitizes the given text by replacing sensitive information with a partial representation.
+ * 
+ * This function takes a string of text and replaces any occurrences of sensitive information,
+ * such as authentication headers, with a partial representation to prevent the exposure of
+ * sensitive data.
+ * 
+ * @param data The text to be sanitized.
+ * @returns The sanitized text.
+ */
+export function sanitizeText(data: string): string {
+    let result: string = data;
+    const sanitize = (text: string, re: RegExp): string => {
+        const matches: RegExpExecArray | null = re.exec(text);
+
+        if (matches) {
+            return text.replace(re, `${matches[1]}${matches[2].length ? matches[2].substring(0, 4) + "..." : ""}"`);
+        }
+
+        return text;
+    };
+
+    result = sanitize(result, /("X\-Auth": ")(.*)"/i);
+    result = sanitize(result, /("authorization": "Basic )(.*)"/i);
+
+    return result;
+}
+
+type DataJson = {
+    [key: string]: any;
+};
+
+export function sanitizeJson(data: DataJson): DataJson {
+    const result: DataJson = {};
+
+    Object.keys(data).forEach((key: string) => {
+        if (typeof data[key] === "string") {
+            result[key] = sanitizeText(data[key]) as string;
+        } else {
+            result[key] = data[key];
+        }
+    });
+
+    return result;
+}

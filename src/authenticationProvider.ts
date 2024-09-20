@@ -17,7 +17,7 @@ limitations under the License.
 import * as vscode from "vscode";
 import { Disposable } from "vscode";
 import { PromiseAdapter, promiseFromEvent, updateContextKey } from "./util";
-import { LoggedUser, getGaiaUser } from "./config";
+import { getGaiaConfiguration, LoggedUser } from "./config";
 import { randomUUID } from "crypto";
 import { llmApi } from "./api";
 
@@ -73,7 +73,7 @@ export class GaiaAuthenticationProvider implements vscode.AuthenticationProvider
                 throw new Error(vscode.l10n.t("{0} invalid credentials", AUTH_NAME));
             }
 
-            const userInfo: LoggedUser | undefined = getGaiaUser();
+            const userInfo: LoggedUser | undefined = getGaiaConfiguration().currentUser;
 
             const session: vscode.AuthenticationSession = {
                 id: randomUUID(),

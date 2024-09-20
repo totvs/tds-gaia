@@ -16,7 +16,14 @@ limitations under the License.
 
 import * as vscode from 'vscode';
 
-let customConfig: TGaiaCustomConfig = {};
+let customConfig: TGaiaCustomConfig = {
+  currentUser: undefined,
+  ready: false,
+  isGaiaLogged: false,
+  gaiaVersion: "",
+  tdsVersion: ""
+
+};
 
 /**
  * Interface for a logged in user. 
@@ -38,62 +45,140 @@ export type LoggedUser = {
 export type UserOrganization = LoggedUser & Omit<LoggedUser, "orgs">;
 
 /**
- * Interface for TGaia configuration options.
- 
- * Must be a mirror of what is defined in package.json
- * Other settings, preferably non-persistent, must be made in TGaiaCustomConfig
-*/
-export type TGaiaConfig = {
+ * Represents the standard configuration properties for the TDS-Gaia package.
+ */
+type TPackageConfig = {
+  /**
+   * Indicates whether the TDS-Gaia package is enabled.
+   */
   enable: boolean;
+  /**
+   * Indicates whether the editor should be cleared before explaining a code snippet.
+   */
   clearBeforeExplain: boolean;
+  /**
+   * Indicates whether the editor should be cleared before inferring a code snippet.
+   */
   clearBeforeInfer: boolean;
+  /**
+   * Indicates whether the TDS-Gaia banner should be shown.
+   */
   showBanner: boolean;
+  /**
+   * The log level for the TDS-Gaia package, which can be one of "off", "error", "warn", "info", "http", "verbose", or "debug".
+   */
   logLevel: "off" | "error" | "warn" | "info" | "http" | "verbose" | "debug";
+  /**
+   * The endpoint URL for the TDS-Gaia service.
+   */
   endPoint: string;
+  /**
+   * The endpoint URL for the TDS-Gaia event service.
+   */
   endPointEvent: string;
+  /**
+   * The API version for the TDS-Gaia service.
+   */
   apiVersion: string;
+  /**
+   * A set of document filters for the TDS-Gaia package.
+   */
   documentFilter: {
     [key: string]: string;
-  }
+  };
+  /**
+   * Indicates whether auto-suggest functionality is enabled for the TDS-Gaia package.
+   */
   enableAutoSuggest: boolean;
+  /**
+   * The delay (in milliseconds) between requests to the TDS-Gaia service.
+   */
   requestDelay: number;
+  /**
+   * The maximum number of lines to be displayed in the TDS-Gaia editor.
+   */
   maxLine: number;
+  /**
+   * The maximum number of suggestions to be displayed in the TDS-Gaia editor.
+   */
   maxSuggestions: number;
+  /**
+   * The number of times to attempt auto-reconnection to the TDS-Gaia service.
+   */
   tryAutoReconnection: number;
+  /**
+   * The maximum size (in characters) of the auto-complete suggestions in the TDS-Gaia editor.
+   */
   maxSizeAutoComplete: number;
-
-  // trace: {
-  //   server: string | undefined
-  // }
-}
-
-export type TGaiaCustomConfig = {
-  currentUser?: LoggedUser
-  ready?: boolean;
 }
 
 /**
- * Gets the TGaia configuration from the VS Code workspace.
+ * Represents additional custom configuration properties for the TDS-Gaia.
+ */
+type TGaiaCustomConfig = {
+  currentUser: LoggedUser | undefined;
+  ready: boolean;
+  isGaiaLogged: boolean;
+  gaiaVersion: string;
+  tdsVersion: string;
+}
+
+/**
+ * Represents the combined configuration for the TDS-Gaia package, including both the standard package configuration 
+ * and any custom configuration.
+ */
+export type TGaiaConfig = TPackageConfig & TGaiaCustomConfig;
+
+/**
+ * Gets the TDS-Gaia configuration from the VS Code workspace or a custom configuration.
  *
- * @returns The TGaia configuration object.
+ * @returns The TDS-Gaia configuration object.
  */
 export function getGaiaConfiguration(): TGaiaConfig {
-  const config: any = vscode.workspace.getConfiguration("tds-gaia");
-
-  return config;
+  return {
+    enable: vscode.workspace.getConfiguration('tds-gaia').get('enable') ?? true,
+    clearBeforeExplain: vscode.workspace.getConfiguration('tds-gaia').get('clearBeforeExplain') ?? false,
+    clearBeforeInfer: vscode.workspace.getConfiguration('tds-gaia').get('clearBeforeInfer') ?? false,
+    showBanner: vscode.workspace.getConfiguration('tds-gaia').get('showBanner') ?? true,
+    logLevel: vscode.workspace.getConfiguration('tds-gaia').get('logLevel') ?? "info",
+    endPoint: vscode.workspace.getConfiguration('tds-gaia').get('endPoint') ?? "<not informed>",
+    endPointEvent: vscode.workspace.getConfiguration('tds-gaia').get('endPointEvent') ?? "<not informed>",
+    apiVersion: vscode.workspace.getConfiguration('tds-gaia').get('apiVersion') ?? "<not informed>",
+    documentFilter: vscode.workspace.getConfiguration('tds-gaia').get('documentFilter') ?? {},
+    enableAutoSuggest: vscode.workspace.getConfiguration('tds-gaia').get('enableAutoSuggest') ?? true,
+    requestDelay: vscode.workspace.getConfiguration('tds-gaia').get('requestDelay') ?? 400,
+    maxLine: vscode.workspace.getConfiguration('tds-gaia').get('maxLine') ?? 5,
+    maxSuggestions: vscode.workspace.getConfiguration('tds-gaia').get('maxSuggestions') ?? 1,
+    tryAutoReconnection: vscode.workspace.getConfiguration('tds-gaia').get('tryAutoReconnection') ?? 3,
+    maxSizeAutoComplete: vscode.workspace.getConfiguration('tds-gaia').get('maxSizeAutoComplete') ?? 15,
+    currentUser: getGaiaUser(),
+    isGaiaLogged: isGaiaLogged(),
+    ready: isGaiaReady(),
+    gaiaVersion: getGaiaVersion(),
+    tdsVersion: getTdsVersion(),
+  }
 }
 
-//Enter key without prefix 'tds-gaia'
-function setGaiaConfiguration(key: keyof TGaiaConfig, newValue: string | boolean | number | []): void {
-  const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("tds-gaia");
-
-  config.update(key, newValue);//, vscode.ConfigurationTarget.Global);
-
-  return;
-}
-
-function setGaiaCustomConfiguration(key: keyof TGaiaCustomConfig, newValue: any): void {
-  customConfig[key] = newValue;
+/**
+ * Sets a value in the TGaia custom configuration.
+ *
+ * @param key - The key to set in the custom configuration.
+ * @param newValue - The new value to set for the specified key.
+ */
+function setGaiaCustomConfiguration(key: keyof TGaiaCustomConfig, newValue: TGaiaCustomConfig[keyof TGaiaCustomConfig]): void {
+  //customConfig[key] = newValue;
+  if (key == "currentUser") {
+    customConfig[key] = newValue as TGaiaCustomConfig["currentUser"];
+  } else if (key == "ready") {
+    customConfig[key] = newValue as TGaiaCustomConfig["ready"]
+  } else if (key == "isGaiaLogged") {
+    customConfig[key] = newValue as TGaiaCustomConfig["isGaiaLogged"]
+  } else if (key == "gaiaVersion") {
+    customConfig[key] = newValue as TGaiaCustomConfig["gaiaVersion"]
+  } else if (key == "tdsVersion") { customConfig[key] = newValue as TGaiaCustomConfig["tdsVersion"] }
+  else {
+    throw new Error(`Invalid key: ${key} or invalid new value type: ${typeof newValue}`);
+  }
 }
 
 /**
@@ -110,7 +195,7 @@ export function setGaiaUser(user: LoggedUser | undefined) {
  * 
  * @returns The current logged in user, or undefined if no user is logged in.
  */
-export function getGaiaUser(): LoggedUser | undefined {
+function getGaiaUser(): LoggedUser | undefined {
 
   return customConfig["currentUser"]; //|| EMPTY_USER;
 }
@@ -120,39 +205,42 @@ export function getGaiaUser(): LoggedUser | undefined {
  * 
  * @returns True if a user is logged in, false otherwise.
  */
-export function isGaiaLogged(): boolean {
+function isGaiaLogged(): boolean {
 
   return getGaiaUser() !== undefined;
 }
 
-/**
- * Checks if the banner is enabled in the TGaia configuration.
- * 
- * @returns True if the banner is enabled, false otherwise.
- */
-export function isGaiaShowBanner(): boolean {
-
-  return getGaiaConfiguration().showBanner;
-}
-
-/**
- * Gets the log level from the TGaia configuration.
- * 
- * @returns The configured log level.
- */
-export function getGaiaLogLevel(): string {
-
-  return getGaiaConfiguration().logLevel;
-}
 
 /**
  * Checks if TGaia is ready by looking at the "ready" value in the custom configuration.
  * 
  * @returns True if TGaia is ready, false otherwise.
  */
-export function isGaiaReady(): boolean {
+function isGaiaReady(): boolean {
 
   return customConfig["ready"] || false;
+}
+
+/**
+ * Gets the version of the TDS-Gaia extension.
+ * 
+ * @returns The version of the TDS-Gaia extension, or "NA" if the extension is not found.
+ */
+function getGaiaVersion(): string {
+  const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension("TOTVS.tds-gaia");
+
+  return ext!.packageJSON.version ?? "";
+}
+
+/**
+ * Gets the version of the TDS-VSCode extension.
+ * 
+ * @returns The version of the TDS-VSCode extension, or "<Unavailable>" if the extension is not found.
+ */
+function getTdsVersion(): string {
+  const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension("TOTVS.tds-vscode");
+
+  return ext!.packageJSON.version ?? "";
 }
 
 /**
