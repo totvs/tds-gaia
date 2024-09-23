@@ -2,17 +2,38 @@
 
 > **NÃO USE EM AMBIENTES DE PRODUÇÃO**, sem revisar cuidadosamente os códigos e explicações geradas.
 >
-> Por ser um projeto **BETA**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral. Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
+> Por ser um projeto **BETA**, não há garantias de que ele funcione corretamente ou esteja disponível para uso em tempo integral.
+> Também pode apresentar alguma demora, por isso tenha um pouco de paciência.
 >
 > No momento, o serviço está **disponível** das **08h00** as **18h00**, em dias úteis.
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.0.16
+
+### Novos recursos
+
+- Adicionado na Opinião do usuário (_feedback_), opção de adicionar comentários.
+
+### Melhoria
+
+- Quando bate-papo não estiver visível, este apresentará a informação do número de novas mensagens desde a última visualização.
+
+- No tratamento de erro de acesso ao serviço de `Trace`.
+
+- Na identificação de logs (_trace_) e outras informações de identificação (_tags_).
+
+### Correções
+
+- Atualização das mensagens do bate-papo, quando este torna-se visível.
+
 ## TDS-Gaia 0.0.15
 
-### Melhorias
+### Novos recursos
 
 - Adicionado menu `TDS-Gaia` ao menu de contexto de editor de fontes Adv/PL e suas variantes.
+
+### Melhorias
 
 - Inicialização do **TDS-Gaia** na barra de atividades, melhorando visibilidade e maior liberdade de arranjo.
 
