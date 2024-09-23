@@ -134,7 +134,7 @@ const commandsMap: Record<string, TCommand> = {
         commandId: "tds-gaia.external-open",
         caption: "Change Log",
         commandArgs: {
-            target: "CHANGELOG.md",
+            target: "CHANGELOG.MD",
             title: vscode.l10n.t("Change Log")
         }
     },
