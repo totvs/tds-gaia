@@ -11,7 +11,7 @@
   "[Code generation]generateCode.md": "[Geração de Código]generateCode.md",
   "A description was not informed.": "Descrição não informada.",
   "All variables are already typed.": "Todas as variáveis já estão tipadas.",
-  "Analyzing the code for explain {0}": "Explicando o código {0}",
+  "Analyzing the code for explain. {0}": "Explicando o código {0}",
   "Analyzing the code for infer type variables. {0} ": "Analisando o código para deduzir tipos de variáveis. {0} ",
   "Available service!": "Serviço disponível!",
   "Change Log": "Log de Alterações",

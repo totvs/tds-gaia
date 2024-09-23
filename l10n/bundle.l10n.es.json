@@ -15,7 +15,7 @@
   "**{0}**, thank you for working with me!": "**{0}**, g'racias por trabajar conmigo!",
   "<unknown>": "<desconocida>",
   "All variables are already typed.": "Todas las variables ya están escritas.",
-  "Analyzing the code for explain {0}": "Analizar el código para explicar{0}",
+  "Analyzing the code for explain. {0}": "Analizar el código para explicar{0}",
   "Analyzing the code for infer type variables. {0} ": "Analizar el código para las variables de tipo inferir. {0} ",
   "Available service!": "¡Servicio disponible!",
   "Clear": "Clara",
