@@ -48,7 +48,7 @@ export function registerExplain(context: vscode.ExtensionContext): void {
 
             if (codeToExplain.length > 0) {
                 const messageId: string = chatApi.gaia(
-                    vscode.l10n.t("Analyzing the code for explain {0}", whatExplain), {});
+                    vscode.l10n.t("Analyzing the code for explain. {0}", whatExplain), {});
 
                 return llmApi.explainCode(codeToExplain).then((explain: string) => {
                     const responseId: string = chatApi.nextMessageId();

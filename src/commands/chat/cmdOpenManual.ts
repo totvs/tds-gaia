@@ -21,13 +21,13 @@ import { chatApi } from "../../api";
 export function registerOpenManual(context: vscode.ExtensionContext): void {
 
     const openManual = vscode.commands.registerCommand('tds-gaia.external-open', async (...args) => {
-        const baseUrl: string = "https://github.com/totvs/tds-gaia/blob/main";
+        const baseUrl: string = "https://github.com/totvs/tds-gaia/blob/dev";
         let url: string = `${baseUrl}/${args[0].target}`;
         const title: string = args[0].title;
 
-        if (vscode.env.language != "pt-br") {
-            url = url.replace(/\.md/gi, `-${vscode.env.language}.md`);
-        }
+        // if (vscode.env.language != "pt-br") {
+        //     url = url.replace(/\.md/gi, `-${vscode.env.language}.md`);
+        // }
 
         return vscode.env.openExternal(vscode.Uri.parse(url)).then(() => {
             chatApi.gaia(vscode.l10n.t("**{0}** opened.", title), {});

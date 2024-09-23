@@ -261,17 +261,22 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                   const inputComment: vscode.InputBox = vscode.window.createInputBox();
                   inputComment.title = vscode.l10n.t("Comment feedback");
                   inputComment.value = "";
-                  inputComment.prompt = vscode.l10n.t("Make a brief comment on the TDS-Gaia message");
+                  inputComment.prompt = vscode.l10n.t("Make a brief comment about message");
                   inputComment.ignoreFocusOut = true;
-                  
+
                   inputComment.onDidAccept(() => {
                     const value: string = inputComment.value;
                     inputComment.enabled = false;
                     inputComment.busy = true;
 
                     feedbackApi.commentTrace(msg.messageId, value);
+                    inputComment.hide();
                   });
 
+                  inputComment.onDidHide(() => {
+                    inputComment.dispose();
+                  });
+                  
                   inputComment.show();
                 } else {
                   msg.disabled = true;

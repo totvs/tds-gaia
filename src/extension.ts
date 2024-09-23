@@ -69,6 +69,8 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 
 	return new Promise(async (value: any) => {
+		await vscode.commands.executeCommand("tds-gaia.afterLogout");
+
 		feedbackApi.stop();
 		await llmApi.stop();
 	});

@@ -63,8 +63,10 @@ export class TraceApi extends AbstractApi {
             flushAt: 1,
             release: `${getGaiaConfiguration().apiVersion}`,
         });
-        // this.langfuse.debug(true);
-
+        this.langfuse.debug(true);
+        this.langfuse.on("error", (error: any) => {
+            logger.error(error);
+        });
         // const trace = this.langfuse.trace({
         //     //id: this.sessionId,
         //     name: "gaia-trace-new",
@@ -82,6 +84,7 @@ export class TraceApi extends AbstractApi {
     * @returns `true` if the session was successfully stopped, `false` otherwise.
     */
     stop(): boolean {
+        this.langfuse.shutdown();
         this.authorization = "";
 
         return true;
@@ -102,10 +105,10 @@ export class TraceApi extends AbstractApi {
         return super.jsonRequest(method, url, headers, data);
     }
 
-    createTrace(): TraceElement {
+    createTrace(name: string): TraceElement {
         let trace: TraceElement = new TraceElement();
 
-        trace.name = PREFIX_GAIA;
+        trace.name = name;
         trace.tags.push(`gaia-${getGaiaConfiguration().gaiaVersion}`)
         trace.tags.push(`tds-${getGaiaConfiguration().tdsVersion}`)
 

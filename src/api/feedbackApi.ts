@@ -77,11 +77,11 @@ export class FeedbackApi {
         return true;
     }
 
-    private createTrace(): TraceElement {
+    private createTrace(name: string): TraceElement {
         let result!: TraceElement;
 
         if (this.user) {
-            result = this.traceApi.createTrace();
+            result = this.traceApi.createTrace(name);
             result.userId = this.user.email;
         } else {
             logger.error("createTrace: user not found");
@@ -116,7 +116,7 @@ export class FeedbackApi {
         }
 
         if (this.user) {
-            const trace: TraceElement = this.createTrace();
+            const trace: TraceElement = this.createTrace("login");
 
             trace.metadata = {
                 "email": this.user.email,
@@ -150,7 +150,7 @@ export class FeedbackApi {
     eventLogout(): boolean {
         const eventLogin: EventElement = this.elementMap[EventsFeedbackEnum.Login] as EventElement;
         let result: boolean = false;
-        
+
         if (eventLogin) {
             const eventLogout: EventElement = this.createEvent(eventLogin.trace, EventsFeedbackEnum.Logout);
 
@@ -175,7 +175,7 @@ export class FeedbackApi {
 
     eventCompletion(argument: { selected: number, completions: Completion[]; textBefore: string; textAfter: string; }) {
         if (this.user) {
-            const trace: TraceElement = this.createTrace();
+            const trace: TraceElement = this.createTrace("completion");
             trace.input = JSON.stringify({
                 textBefore: argument.textBefore,
                 textAfter: argument.textAfter,
@@ -216,7 +216,7 @@ export class FeedbackApi {
         let result: string = "";
 
         if (this.user) {
-            const trace: TraceElement = this.createTrace();
+            const trace: TraceElement = this.createTrace("inferType");
             trace.input = JSON.stringify({
                 code: codeToAnalyze,
             });
@@ -306,12 +306,19 @@ export class FeedbackApi {
             const trace: TraceElement = this.elementMap[traceId] as TraceElement;
 
             if (trace) {
-                const score: ScoreElement = this.createScore(trace);
-                score.name = "chat-msg-comment";
-                //score.value = scoreValue;
-                score.comment = comment;
+                if (!trace.metadata) {
+                    trace.metadata = {}
+                }
+                let comments: string[] = trace.metadata.comment ? trace.metadata.comment!.split("\n") : [];
+                comments.push(`${new Date().toTimeString()}: ${comment}`);
+                trace.metadata = {
+                    ...trace.metadata,
+                    "comment": comments.join("\n")
+                }
 
-                this.traceApi.enqueue(score);
+                trace.tags = [...trace.tags, "comment"];
+
+                this.traceApi.enqueue(trace);
                 this.traceApi.sendQueue();
             } else {
                 logger.error("scoreMessage: Message trace element not found");
@@ -332,18 +339,13 @@ export class FeedbackApi {
         let result: string = "";
 
         if (this.user) {
-            const trace: TraceElement = this.createTrace();
+            const trace: TraceElement = this.createTrace("explain");
             trace.input = JSON.stringify({
                 code: codeToExplain,
             });
             trace.output = JSON.stringify({
                 explain: explain,
             });
-            // trace.metadata = {
-            //     "typesCount": types.length,
-            //     "scorePerItem": ScoreEnum.Positive / types.length
-            // }
-
 
             this.traceApi.enqueue(trace);
             this.traceApi.sendQueue();
@@ -359,7 +361,7 @@ export class FeedbackApi {
 
     traceGenerateCode(messageId: string, generateText: string, generateCode: string[]) {
         if (this.user) {
-            const trace: TraceElement = this.createTrace();
+            const trace: TraceElement = this.createTrace("generateCode");
             trace.input = JSON.stringify({
                 code: generateText,
             });
@@ -387,7 +389,7 @@ export class FeedbackApi {
         let result: string = "";
 
         if (this.user) {
-            const trace: TraceElement = this.createTrace();
+            const trace: TraceElement = this.createTrace("requestError");
             trace.input = JSON.stringify({
                 url: url,
                 method: method,
