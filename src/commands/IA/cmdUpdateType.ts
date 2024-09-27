@@ -116,17 +116,7 @@ async function updateType(inferData: InferData, targetSymbol: string): Promise<s
                                             symbol.range.start.character,
                                             symbol.range.end.line,
                                             symbol.range.end.character + matches[2].length);
-                                        editBuilder.replace(changeRange, `${infer.var} as ${infer.type}`);
-
-                                        let lastBlock: vscode.Position = documentSymbols[0].range.end;
-                                        documentSymbols.forEach((value: vscode.DocumentSymbol) => {
-                                            if (value.range.end.isAfter(lastBlock)) {
-                                                lastBlock = value.range.end;
-                                            }
-                                        })
-
-                                        lastBlock.translate(2);
-                                        editBuilder.insert(lastBlock, `\n\t${infer.var} ${matches[2]}`);
+                                        editBuilder.replace(changeRange, `${infer.var} ${matches[2]} as ${infer.type}`);
                                     }
                                 }
 
