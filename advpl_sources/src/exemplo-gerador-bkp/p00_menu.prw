@@ -1,6 +1,7 @@
 #include "protheus.ch"
 
-// basico: Gerar uma função para exibir diálogo de menu de cadastro usando AxCadastro e MVC e que retorna a opção selecionada.
+// Gerar uma função para exibir diálogo de menu de cadastro usando AxCadastro e MVC e que retorna a opção selecionada.
+
 // complementar: Usar uma função estática já implementada no código para gerar o diálogo de opções contendo
 // botões para cada opção do array passado por parâmetro, uma validação que verifica se o tipo do parametro informado é um array,
 // e em caso positivo, apenas continua o processo, e caso nagativo apresenta um alerta com o texto: "Parametro aaOpcoes não é uma lista (array)"

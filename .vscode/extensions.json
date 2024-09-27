@@ -1,5 +1,9 @@
 {
 	"recommendations": [
-		"dbaeumer.vscode-eslint"
+		"dbaeumer.vscode-eslint",
+		"editorconfig.editorconfig",
+		"github.vscode-pull-request-github",
+		"ms-vscode.vscode-github-issue-notebooks",
+		"ms-vscode.extension-test-runner",
 	]
 }

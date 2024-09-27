@@ -5,11 +5,11 @@
 // um alerta caso a senha esteja correta com o texto "senha correta" e título "ok" 
 // e um alerta casoa senha esteja errada com o texto "senha incorreta" e título "erro"
 user function dlglogin()
-	local oDlg
-	local oButton1
+	local oDlg as object
+	local oButton1 as object
 	local oGet1
 	local oGet2
-	local oSay1
+	local oSay1 as object
 	local oSay2
 	local cName := space(10) //tem que reservar "espaço"
 	local cPassword := space(10)
@@ -28,6 +28,7 @@ user function dlglogin()
 	activate msdialog oDlg centered
 
 	//adicione o seu código
+
 	if trim(cPassword) == "1234"
 		msgalert(cName + ", senha correta", "ok")
 	else

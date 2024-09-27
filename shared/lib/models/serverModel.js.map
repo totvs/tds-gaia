@@ -1,0 +1,1 @@
+{"version":3,"file":"serverModel.js","sourceRoot":"","sources":["../../src/models/serverModel.ts"],"names":[],"mappings":";;;AAqBa,QAAA,kBAAkB,GAAiB;IAC/C,UAAU,EAAE,uBAAuB;IACnC,UAAU,EAAE,EAAE;IACd,IAAI,EAAE,CAAC;IACP,OAAO,EAAE,EAAE;IACX,YAAY,EAAE,EAAE;IAChB,mBAAmB,EAAE,IAAI;IACzB,MAAM,EAAE,KAAK;IACb,YAAY,EAAE,EAAE;IAChB,wBAAwB,EAAE,EAAE;CAC5B,CAAA"}

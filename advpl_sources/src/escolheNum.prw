@@ -6,6 +6,7 @@ user function escolheNum(replay, replayPath, numbers)
 	private cOpcao
 	private ondeEstou := "escolheNum"
 	public aPublic := {}
+	
 
 	if replay == "true" .or. replay == "TRUE"
 		replay = .t.
@@ -14,8 +15,10 @@ user function escolheNum(replay, replayPath, numbers)
 		TDSReplay(.T. , {"*"}, {}, {"*"} , replayPath, 0 , .t. , "")
 	endif
 //
+
 	for n := 1 to 5
 		aAdd(aOpcoes, strZero(n,1,0))
+
 
 	next
 //
@@ -28,6 +31,7 @@ user function escolheNum(replay, replayPath, numbers)
 		else
 			tela(aOpcoes)
 		endif
+
 
 		n++
 		//cResp := trim(cOpcao)
@@ -79,23 +83,22 @@ static function tela(aaOpcoes)
 		return cOpcao
 	endif
 
+//listar produtos 
 	oDlg := MSDIALOG():Create()
 	oDlg:cName := "oDlg"
 	oDlg:cCaption := "Escolha um número"
 	oDlg:nLeft := 0
+	oDlg:nTop := 0
+	oDlg:nWidth := 300
+	oDlg:nHeight := 150
+	oDlg:lShowHint :=.F.
+	oDlg:lCentered :=.T.
+	oDlg:lEscClose :=.F.
+	oDlg:lMaximized :=.F.
+	oDlg:lMinimized :=.F.
+	oDlg:lVisibleControl :=.T.
+	oDlg:lDesign =.F.
 
-	aEval(aaOpcoes, { |x,i| ;
-		oBtn := TButton():Create(oDlg),;
-		oBtn:cName := "oBtn" + strZero(i,1,0),;
-		oBtn:cCaption := x,;
-		oBtn:nLeft := 10,;
-		oBtn:nTop := 10 + i * 20,;
-		oBtn:nWidth := 180,;
-		oBtn:nHeight := 20,;
-		oBtn:onClick := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
-		oBtn:bLClicked := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
-		oBtn:bRClicked := {|| cOpcao := oBtn:cCaption, oDlg:End() },;
-		})
 
 //ACTIVATE DIALOG oDlg CENTERED
 	oDlg:Activate( oDlg:bLClicked, oDlg:bMoved, oDlg:bPainted,.T.,,,, oDlg:bRClicked, )

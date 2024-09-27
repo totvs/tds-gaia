@@ -2,14 +2,14 @@
 
 // gerar diálogo solicitando usuário e senha
 user function dlglogin()
-	local oDlg
-	local oButton1
-	local oGet1
-	local oGet2
-	local oSay1
-	local oSay2
-	local cName := space(10) //tem que reservar "espaço"
-	local cPassword := space(10)
+	local oDlg as object
+	local oButton1 := null as object as object
+	local oGet1 as object
+	local oGet2 as object
+	local oSay1 as object
+	local oSay2 as object
+	local cName := space(10) as character as character/tem que reservar "espaço"
+	local cPassword := space(10) as character
 
 	define msdialog oDlg title "Login" from 000, 000 to 300, 500 pixel //oDlg := MSDialog()....
 

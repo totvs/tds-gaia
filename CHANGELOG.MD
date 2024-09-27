@@ -8,6 +8,86 @@
 
 Favor ler [GUIA RÁPIDO](https://github.com/totvs/tds-gaia/blob/main/README.md#guia-rápido).
 
+## TDS-Gaia 0.0.17
+
+### Correções
+
+- Correção na edição de variáveis com valor atribuído na definição, no processo de inferência.
+
+## TDS-Gaia 0.0.16
+
+### Novos recursos
+
+- Adicionado na Opinião do usuário (_feedback_), opção de adicionar comentários.
+
+### Melhoria
+
+- Quando bate-papo não estiver visível, este apresentará a informação do número de novas mensagens desde a última visualização.
+
+- No tratamento de erro de acesso ao serviço de `Trace`.
+
+- Na identificação de logs (_trace_) e outras informações de identificação (_tags_).
+
+### Correções
+
+- Atualização das mensagens do bate-papo, quando este torna-se visível.
+
+## TDS-Gaia 0.0.15
+
+### Novos recursos
+
+- Adicionado menu `TDS-Gaia` ao menu de contexto de editor de fontes Adv/PL e suas variantes.
+
+### Melhorias
+
+- Inicialização do **TDS-Gaia** na barra de atividades, melhorando visibilidade e maior liberdade de arranjo.
+
+### Correções
+
+- Correção no acionamento (_click_) da ligação a fontes do bate-papo.
+
+- Tratamento de erro de acesso ao serviço de `Trace`.
+
+## TDS-Gaia 0.0.14
+
+### Melhorias
+
+- Adicionado limite configurável de tamanho para análise de auto-completar. Veja [`tds-gaia.maxSizeAutoComplete`](https://github.com/totvs/tds-gaia/wiki/settings#chaves-de-configura%C3%A7%C3%A3o-do-tds-gaia).
+
+## TDS-Gaia 0.0.13
+
+### Melhorias
+
+- Melhoria no envio de ocorrências para serviço de `Trace`.
+- Adicionado limite de tamanho para análise de auto-completar.
+
+### Correções
+
+- Tipificação:
+  - Correção na operação de aplicação em todas as variáveis.
+  - Ajuste na edição de definições com atribuição.
+
+## TDS-Gaia 0.0.12
+
+### Novidades
+
+- Geração de código a partir de blocos comentados no código.
+
+### Melhorias
+
+- Melhoria na formatação das respostas apresentadas no bate-papo.
+
+### Correções
+
+- Tipificação: identificação da implementação de métodos.
+
+## TDS-Gaia 0.0.11
+
+### Correções
+
+- Ao solicitar geração de código, não apresenta o código gerado.
+  Corrigido.
+
 ## TDS-Gaia 0.0.10
 
 ### Melhorias

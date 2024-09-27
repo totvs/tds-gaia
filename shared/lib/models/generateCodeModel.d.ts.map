@@ -1,0 +1,1 @@
+{"version":3,"file":"generateCodeModel.d.ts","sourceRoot":"","sources":["../../src/models/generateCodeModel.ts"],"names":[],"mappings":"AAgBA,OAAO,EAAE,mBAAmB,EAAE,MAAM,0BAA0B,CAAC;AAE/D,MAAM,MAAM,kBAAkB,GAAG,mBAAmB,GAAG;IACnD,WAAW,EAAE,MAAM,CAAC;IACpB,YAAY,EAAE,MAAM,CAAC;CACxB,CAAA"}
