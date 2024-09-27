@@ -2,7 +2,7 @@
   "name": "tds-gaia",
   "displayName": "TDS-Gaia, your partner in AdvPL/TLPP programming",
   "description": "Using artificial intelligence resources, TDS-Gaia will assist you in AdvPL programming",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "publisher": "TOTVS",
   "preview": true,
   "author": {
@@ -423,7 +423,7 @@
     "--L10N--": "",
     "l10n:export": "npx @vscode/l10n-dev export -o ./l10n ./src",
     "---RELEASE---": "",
-    "release": "npx standard-version --skip.changelog --release-as 0.0.16",
+    "release": "npx standard-version --skip.changelog --release-as 0.0.17",
     "tag": "git push --follow-tags origin dev",
     "vscode:package": "vsce package",
     "vscode:prepublish": "npm run compile",
