@@ -114,7 +114,6 @@ export function registerInfer(context: vscode.ExtensionContext): void {
                             const text: string[] = buildInferTextReturn.text;
 
                             chatApi.gaia(text.join("\n"), { answeringId: messageId, canFeedback: true });
-                            //chatApi.gaia(vscode.l10n.t("I think that the types are right."), { answeringId: messageId });
                             feedbackApi.traceInferType(responseId, codeToAnalyze, response.types)
                         } else {
                             chatApi.gaia(vscode.l10n.t("Sorry, I couldn't make the typification because of an internal problem."), { answeringId: messageId });
