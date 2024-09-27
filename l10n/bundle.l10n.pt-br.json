@@ -41,7 +41,7 @@
   "Generate Code": "Gerar código",
   "Generating code...": "Gerando código...",
   "Generating the code as requested.": "Gerando o código conforme solicitado.",
-  "Getting health check. EndPoint: {0}": "Obtendo verificação de saúde...",
+  "Getting health check. EndPoint: {0}": "Verificando disponibilidade do serviço...",
   "Hello, **{0}**.": "Olá, **{0}**.",
   "Help": "Ajuda",
   "Hint": "Dica",
