@@ -81,6 +81,10 @@ type TPackageConfig = {
    */
   apiVersion: string;
   /**
+   * The event version for the TDS-Gaia service.
+   */
+  eventVersion: string;
+  /**
    * A set of document filters for the TDS-Gaia package.
    */
   documentFilter: {
@@ -142,8 +146,9 @@ export function getGaiaConfiguration(): TGaiaConfig {
     showBanner: vscode.workspace.getConfiguration('tds-gaia').get('showBanner') ?? true,
     logLevel: vscode.workspace.getConfiguration('tds-gaia').get('logLevel') ?? "info",
     endPoint: vscode.workspace.getConfiguration('tds-gaia').get('endPoint') ?? "<not informed>",
-    endPointEvent: vscode.workspace.getConfiguration('tds-gaia').get('endPointEvent') ?? "<not informed>",
     apiVersion: vscode.workspace.getConfiguration('tds-gaia').get('apiVersion') ?? "<not informed>",
+    endPointEvent: vscode.workspace.getConfiguration('tds-gaia').get('endPointEvent') ?? "<not informed>",
+    eventVersion: vscode.workspace.getConfiguration('tds-gaia').get('eventVersion') ?? "<not informed>",
     documentFilter: vscode.workspace.getConfiguration('tds-gaia').get('documentFilter') ?? {},
     enableAutoSuggest: vscode.workspace.getConfiguration('tds-gaia').get('enableAutoSuggest') ?? true,
     requestDelay: vscode.workspace.getConfiguration('tds-gaia').get('requestDelay') ?? 400,

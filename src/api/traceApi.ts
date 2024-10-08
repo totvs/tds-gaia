@@ -35,8 +35,7 @@ export class TraceApi extends AbstractApi {
      * 
      */
     constructor() {
-        super(`${getGaiaConfiguration().endPointEvent}`, "v1");
-
+        super(`${getGaiaConfiguration().endPointEvent}`, getGaiaConfiguration().eventVersion);
     }
 
     /**

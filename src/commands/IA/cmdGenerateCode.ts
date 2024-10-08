@@ -69,13 +69,7 @@ export function registerGenerateCode(context: vscode.ExtensionContext): void {
 
         if (generateCode.length == 0) {
           chatApi.gaia(vscode.l10n.t("Sorry. I could not generate the code with the information past. See log for details."), { canFeedback: true, answeringId: messageId });
-          generateCode = [
-            "//line 1\n",
-            "//line 2\n",
-            "//line 3\n",
-            "//line 4\n",
-            "//line 5\n",
-          ];
+          generateCode = [];
         }// else 
         {
           if (whatDescription) {
@@ -92,7 +86,7 @@ export function registerGenerateCode(context: vscode.ExtensionContext): void {
                     code: Buffer.from(generateCode.join("\n")).toString("base64"),
                   }))
             ], { canFeedback: true, answeringId: messageId });
-          } else {
+          } else if (generateCode.length > 0) {
             chatApi.gaia(vscode.l10n.t("Code generated with {0} lines.", generateCode.length), { canFeedback: true, answeringId: messageId });
           }
         }

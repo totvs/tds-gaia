@@ -272,20 +272,26 @@
             "default": "https://advpl.ds.dta.totvs.ai",
             "description": "endPoint"
           },
+          "tds-gaia.apiVersion": {
+            "order": 2,
+            "type": "string",
+            "default": "v2",
+            "description": "API Version"
+          },
           "tds-gaia.endPointEvent": {
-            "order": 1,
+            "order": 3,
             "type": "string",
             "default": "https://events.dta.totvs.ai",
             "description": "endPointEvent"
           },
-          "tds-gaia.apiVersion": {
+          "tds-gaia.eventVersion": {
             "order": 2,
             "type": "string",
             "default": "v1",
             "description": "API Version"
           },
           "tds-gaia.documentFilter": {
-            "order": 3,
+            "order": 4,
             "type": [
               "object",
               "array"
@@ -303,25 +309,25 @@
             "description": "Filter documents to enable suggestions for"
           },
           "tds-gaia.enableAutoSuggest": {
-            "order": 4,
+            "order": 5,
             "type": "boolean",
             "default": true,
             "description": "enableAutoSuggest"
           },
           "tds-gaia.requestDelay": {
-            "order": 5,
+            "order": 6,
             "type": "number",
             "default": 400,
             "description": "Delay in typing to activate the IA completion"
           },
           "tds-gaia.maxLine": {
-            "order": 6,
+            "order": 7,
             "type": "number",
             "default": 5,
             "description": "Maximum lines per suggestion"
           },
           "tds-gaia.maxSuggestions": {
-            "order": 7,
+            "order": 8,
             "type": "number",
             "default": 1,
             "description": "Maximum suggestions per requisition"
